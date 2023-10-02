@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const dotenv = require("dotenv");
 
 module.exports = () => {
-  const env = dotenv.config({ path: "./.env.prod" }).parsed;
+  const env = dotenv.config({ path: "./.env.dev" }).parsed;
 
   const envKeys = Object.keys(env).reduce((prev, next) => {
     prev[`process.env.${next}`] = JSON.stringify(env[next]);
@@ -15,11 +15,11 @@ module.exports = () => {
   return {
     entry: {
       vendor: {
-        import: path.resolve(__dirname, "src", "vendor.js"),
+        import: path.resolve(__dirname, "./src/vendor.ts"),
       },
       index: {
         dependOn: "vendor",
-        import: path.resolve(__dirname, "src", "index.js"),
+        import: path.resolve(__dirname, "./src/index.tsx"),
       },
     },
     output: {
@@ -31,14 +31,10 @@ module.exports = () => {
     module: {
       rules: [
         {
-          test: /\.(js|jsx)$/,
-          include: [path.resolve(__dirname, "src")],
-          exclude: /(node_modules|bower_components)/,
+          test: /\.(js|ts)x?$/,
+          exclude: /node_modules/,
           use: {
             loader: "babel-loader",
-            options: {
-              presets: ["@babel/preset-env"],
-            },
           },
         },
         {
@@ -48,7 +44,7 @@ module.exports = () => {
         },
         {
           test: /\.(sa|sc|c)ss$/,
-          use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
+          use: ["style-loader", "css-loader"],
         },
         {
           test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
@@ -57,7 +53,7 @@ module.exports = () => {
       ],
     },
     resolve: {
-      extensions: [".tsx", ".ts", ".js"],
+      extensions: [".tsx", ".ts", ".js", ".jsx"],
     },
     plugins: [
       new HtmlWebpackPlugin({
