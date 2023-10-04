@@ -1,7 +1,62 @@
-import { Container, Nav, Navbar } from "react-bootstrap";
+import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useAppSelector } from "../../hooks/useAppSelector";
+import { hideNotification, setButtonDisabled, setButtonLoading, showNotification } from "../../store/slices/notificationSlice";
+import auth from "../../http/auth";
+import { setUser } from "../../store/slices/userSlice";
 
 export default function Header() {
+  const dispatch = useAppDispatch();
+
+  const { user } = useAppSelector((c) => c.userItems);
+
+  const handleClickLogout = () => {
+    const cancelButtonKey = "cancel";
+    const okButtonKey = "ok";
+    dispatch(
+      showNotification({
+        show: true,
+        title: "Çıkış Yapılıyor",
+        closable: true,
+        description: "Çıkış yapmak istediğinize emin misiniz?",
+        buttons: [
+          {
+            key: cancelButtonKey,
+            text: "Vazgeç",
+            handleClick: () => dispatch(hideNotification()),
+            variant: "secondary",
+            disabled: false,
+            loading: false,
+          },
+          {
+            key: okButtonKey,
+            text: "Çıkış Yap",
+            handleClick: async () => {
+              dispatch(setButtonDisabled(cancelButtonKey));
+              dispatch(setButtonLoading(okButtonKey));
+              await auth
+                .revokeToken()
+                .then((response) => {})
+                .catch((errorResponse) => {})
+                .finally(() => {
+                  dispatch(setUser());
+                  dispatch(hideNotification());
+                });
+            },
+            variant: "danger",
+            disabled: false,
+            loading: false,
+            icon: faRightFromBracket,
+            iconLocation: "before",
+          },
+        ],
+      })
+    );
+  };
+
   return (
     <Navbar className="bg-body-tertiary" sticky="top">
       <Container>
@@ -10,17 +65,30 @@ export default function Header() {
             <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie
           </Navbar.Brand>
         </Link>
-        <Navbar.Toggle aria-controls="navbarScroll" />
-        <Navbar.Collapse id="navbarScroll">
-          <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: "100px" }} navbarScroll>
-            <Link to={"/"}>
-              <Nav.Link as={"span"} active={location.pathname === "/"}>
-                Ana Sayfa
-              </Nav.Link>
-            </Link>
-          </Nav>
-        </Navbar.Collapse>
-        <Navbar.Text>Yönetim Paneli</Navbar.Text>
+        {user ? (
+          <>
+            <Navbar.Toggle aria-controls="navbarScroll" />
+            <Navbar.Collapse id="navbarScroll">
+              <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: "100px" }} navbarScroll>
+                <Link to={"/yan-urunler"}>
+                  <Nav.Link as={"span"} active={location.pathname === "/yan-urunler"}>
+                    Yan Ürünler
+                  </Nav.Link>
+                </Link>
+              </Nav>
+            </Navbar.Collapse>
+          </>
+        ) : null}
+        {user ? (
+          <>
+            <Navbar.Text>Yönetim Paneli</Navbar.Text>
+            <Button variant="danger" size="sm" className="ms-3" onClick={handleClickLogout}>
+              <FontAwesomeIcon icon={faRightFromBracket} />
+            </Button>
+          </>
+        ) : (
+          <Navbar.Text>Yönetim Paneli</Navbar.Text>
+        )}
       </Container>
     </Navbar>
   );

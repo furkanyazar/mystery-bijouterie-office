@@ -1,8 +1,8 @@
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Formik, Form as FormikForm } from "formik";
+import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, Form, Row } from "react-bootstrap";
+import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router";
 import * as Yup from "yup";
@@ -44,14 +44,22 @@ export default function index() {
     password: Yup.string().required(ValidationRequired).min(4, ValidationMinLength),
   });
 
+  const pageTitle = "Giriş Yap";
+
   return (
     <>
       <Helmet>
-        <title>Giriş Yap</title>
+        <title>{pageTitle}</title>
       </Helmet>
       <Container className="my-5">
         <Row>
-          <Col className="mx-auto col-sm-12 col-md-6">
+          <Col>
+            <h3 className="text-inline">{pageTitle}</h3>
+          </Col>
+        </Row>
+        <hr className="mb-5" />
+        <Row>
+          <Col className="col-sm-12 col-md-6 mx-auto">
             <Formik
               enableReinitialize
               onSubmit={handleSubmit}
@@ -61,10 +69,10 @@ export default function index() {
               validateOnBlur={false}
             >
               {({ errors }) => (
-                <FormikForm>
-                  <Form.Group className="mb-3" controlId="loginFormEmail">
-                    <Form.Label>E-Posta</Form.Label>
-                    <Form.Control
+                <Form>
+                  <FormGroup className="mb-3" controlId="loginFormEmail">
+                    <FormLabel>E-Posta</FormLabel>
+                    <FormControl
                       className={errors.email && "is-invalid"}
                       type="text"
                       placeholder="E-posta adresinizi giriniz"
@@ -73,10 +81,10 @@ export default function index() {
                       onChange={(e: any) => handleChangeInput(e, loginModel, setLoginModel)}
                     />
                     <div className="invalid-feedback">{errors.email}</div>
-                  </Form.Group>
-                  <Form.Group className="mb-3" controlId="loginFormPassword">
-                    <Form.Label>Şifre</Form.Label>
-                    <Form.Control
+                  </FormGroup>
+                  <FormGroup className="mb-3" controlId="loginFormPassword">
+                    <FormLabel>Şifre</FormLabel>
+                    <FormControl
                       className={errors.password && "is-invalid"}
                       type="password"
                       placeholder="Şifrenizi giriniz"
@@ -85,11 +93,11 @@ export default function index() {
                       onChange={(e: any) => handleChangeInput(e, loginModel, setLoginModel)}
                     />
                     <div className="invalid-feedback">{errors.password}</div>
-                  </Form.Group>
+                  </FormGroup>
                   <Button variant="success" type="submit" disabled={loading}>
                     {loading ? <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" /> : "Giriş Yap"}
                   </Button>
-                </FormikForm>
+                </Form>
               )}
             </Formik>
           </Col>
@@ -99,7 +107,4 @@ export default function index() {
   );
 }
 
-const defaultLoginModel: LoginCommand = {
-  email: "",
-  password: "",
-};
+const defaultLoginModel: LoginCommand = { email: "", password: "" };
