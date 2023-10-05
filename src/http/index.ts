@@ -3,13 +3,10 @@ import { toast } from "react-toastify";
 import { getCookie, setCookie } from "../functions";
 import RefreshedTokenResponse from "./auth/models/responses/refreshedTokenResponse";
 
-const cancelToken = axios.CancelToken.source();
-
 const baseAxiosInstance = axios.create({
   baseURL: process.env.API_URL,
   headers: { "Content-Type": "application/json" },
   withCredentials: true,
-  cancelToken: cancelToken.token,
 });
 
 // add token to all requests
@@ -49,8 +46,8 @@ baseAxiosInstance.interceptors.response.use(
       request._retry = true;
       isRefreshing = true;
 
-      return new Promise((resolve, reject) => {
-        baseAxiosInstance({
+      return new Promise(async (resolve, reject) => {
+        await baseAxiosInstance({
           method: "GET",
           url: "Auth/",
         })
@@ -78,7 +75,7 @@ baseAxiosInstance.interceptors.response.use(
   }
 );
 
-export { baseAxiosInstance, cancelToken };
+export default baseAxiosInstance;
 
 interface ErrorResponse {
   title: string;

@@ -1,30 +1,34 @@
-import { AxiosResponse } from "axios";
-import { baseAxiosInstance } from "..";
+import axios, { AxiosResponse } from "axios";
+import baseAxiosInstance from "..";
 import { removeCookie, setCookie } from "../../functions";
 import LoginCommand from "./models/commands/loginCommand";
 import LoggedResponse from "./models/responses/loggedResponse";
 import RevokedTokenResponse from "./models/responses/revokedTokenResponse";
 
 const instance = baseAxiosInstance;
+const authCancelToken = axios.CancelToken.source();
 
-export default {
-  login: (loginDto: LoginCommand): Promise<AxiosResponse<LoggedResponse>> =>
-    instance({
-      method: "POST",
-      url: "Auth/",
-      data: loginDto,
-    }).then((response: AxiosResponse<LoggedResponse>) => {
-      const resData = response.data;
-      setCookie("token", resData.token, resData.expiration);
-      return response;
-    }),
-  revokeToken: (refreshToken?: string): Promise<AxiosResponse<RevokedTokenResponse>> =>
-    instance({
-      method: "PUT",
-      url: "Auth/",
-      data: refreshToken,
-    }).then((response: AxiosResponse<RevokedTokenResponse>) => {
-      removeCookie("token");
-      return response;
-    }),
-};
+const login = async (loginDto: LoginCommand): Promise<AxiosResponse<LoggedResponse>> =>
+  await instance({
+    method: "POST",
+    url: "Auth",
+    data: loginDto,
+    cancelToken: authCancelToken.token,
+  }).then((response: AxiosResponse<LoggedResponse>) => {
+    const resData = response.data;
+    setCookie("token", resData.token, resData.expiration);
+    return response;
+  });
+
+const revokeToken = async (refreshToken?: string): Promise<AxiosResponse<RevokedTokenResponse>> =>
+  await instance({
+    method: "PUT",
+    url: "Auth",
+    data: refreshToken,
+    cancelToken: authCancelToken.token,
+  }).then((response: AxiosResponse<RevokedTokenResponse>) => {
+    removeCookie("token");
+    return response;
+  });
+
+export default { login, revokeToken, authCancelToken };

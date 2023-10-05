@@ -1,18 +1,20 @@
-import { AxiosResponse } from "axios";
-import { baseAxiosInstance } from "..";
+import axios, { AxiosResponse } from "axios";
+import baseAxiosInstance from "..";
 import { setUser } from "../../store/slices/userSlice";
 import { store } from "../../store/store";
 import GetByIdUserResponse from "./models/responses/getByIdUserResponse";
 
 const instance = baseAxiosInstance;
+const usersCancelToken = axios.CancelToken.source();
 
-export default {
-  getFromAuth: (): Promise<AxiosResponse<GetByIdUserResponse>> =>
-    instance({
-      method: "GET",
-      url: "Users/",
-    }).then((response: AxiosResponse<GetByIdUserResponse>) => {
-      store.dispatch(setUser(response.data));
-      return response;
-    }),
-};
+const getUserFromAuth = async (): Promise<AxiosResponse<GetByIdUserResponse>> =>
+  await instance({
+    method: "GET",
+    url: "Users",
+    cancelToken: usersCancelToken.token,
+  }).then((response: AxiosResponse<GetByIdUserResponse>) => {
+    store.dispatch(setUser(response.data));
+    return response;
+  });
+
+export default { getUserFromAuth, usersCancelToken };
