@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
 import { removeCookie, setCookie } from "../../functions";
 import LoginCommand from "./models/commands/loginCommand";
@@ -6,14 +6,12 @@ import LoggedResponse from "./models/responses/loggedResponse";
 import RevokedTokenResponse from "./models/responses/revokedTokenResponse";
 
 const instance = baseAxiosInstance;
-const authCancelToken = axios.CancelToken.source();
 
 const login = async (loginDto: LoginCommand): Promise<AxiosResponse<LoggedResponse>> =>
   await instance({
     method: "POST",
     url: "Auth",
     data: loginDto,
-    cancelToken: authCancelToken.token,
   }).then((response: AxiosResponse<LoggedResponse>) => {
     const resData = response.data;
     setCookie("token", resData.token, resData.expiration);
@@ -25,10 +23,9 @@ const revokeToken = async (refreshToken?: string): Promise<AxiosResponse<Revoked
     method: "PUT",
     url: "Auth",
     data: refreshToken,
-    cancelToken: authCancelToken.token,
   }).then((response: AxiosResponse<RevokedTokenResponse>) => {
     removeCookie("token");
     return response;
   });
 
-export default { login, revokeToken, authCancelToken };
+export default { login, revokeToken };

@@ -1,14 +1,13 @@
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router";
 import * as Yup from "yup";
 import { ValidationEmail, ValidationMinLength, ValidationRequired } from "../../constants/validationMessages";
 import { handleChangeInput } from "../../functions";
-import { cancelToken } from "../../http";
 import auth from "../../http/auth";
 import LoginCommand from "../../http/auth/models/commands/loginCommand";
 import users from "../../http/users";
@@ -19,10 +18,6 @@ export default function index() {
   const [loginModel, setLoginModel] = useState<LoginCommand>({ ...defaultLoginModel });
   const [loading, setLoading] = useState<boolean>(false);
 
-  useEffect(() => {
-    return () => cancelToken.cancel();
-  }, []);
-
   const handleSubmit = async () => {
     setLoading(true);
     await auth
@@ -30,7 +25,7 @@ export default function index() {
       .then(async (response) => {
         setLoading(true);
         await users
-          .getFromAuth()
+          .getUserFromAuth()
           .then((response) => navigate("/"))
           .catch((errorResponse) => {})
           .finally(() => setLoading(false));

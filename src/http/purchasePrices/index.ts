@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
 import DynamicQuery from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
@@ -14,7 +14,6 @@ import GetListPurchasePriceListItemDto from "./models/responses/getListPurchaseP
 import UpdatedPurchasePriceResponse from "./models/responses/updatedPurchasePriceResponse";
 
 const instance = baseAxiosInstance;
-const purchasePricesCancelToken = axios.CancelToken.source();
 
 const createPurchasePrice = async (
   createPurchasePriceCommand: CreatePurchasePriceCommand
@@ -23,7 +22,6 @@ const createPurchasePrice = async (
     method: "POST",
     url: "PurchasePrices",
     data: createPurchasePriceCommand,
-    cancelToken: purchasePricesCancelToken.token,
   });
 
 const deletePurchasePrice = async (
@@ -33,7 +31,6 @@ const deletePurchasePrice = async (
     method: "DELETE",
     url: "PurchasePrices",
     data: deletePurchasePriceCommand,
-    cancelToken: purchasePricesCancelToken.token,
   });
 
 const updatePurchasePrice = async (
@@ -43,14 +40,12 @@ const updatePurchasePrice = async (
     method: "PUT",
     url: "PurchasePrices",
     data: updatePurchasePriceCommand,
-    cancelToken: purchasePricesCancelToken.token,
   });
 
 const getByIdPurchasePrice = async (id: number): Promise<AxiosResponse<GetByIdPurchasePriceResponse>> =>
   await instance({
     method: "GET",
     url: "PurchasePrices/" + id,
-    cancelToken: purchasePricesCancelToken.token,
   });
 
 const getListPurchasePrice = async (pageRequest?: PageRequest): Promise<AxiosResponse<GetListResponse<GetListPurchasePriceListItemDto>>> =>
@@ -58,7 +53,6 @@ const getListPurchasePrice = async (pageRequest?: PageRequest): Promise<AxiosRes
     method: "GET",
     url: "PurchasePrices",
     params: pageRequest,
-    cancelToken: purchasePricesCancelToken.token,
   });
 
 const getListByDynamicPurchasePrice = async (
@@ -70,7 +64,6 @@ const getListByDynamicPurchasePrice = async (
     url: "PurchasePrices/GetListByDynamic",
     data: dynamicQuery,
     params: pageRequest,
-    cancelToken: purchasePricesCancelToken.token,
   });
 
 export default {
@@ -80,5 +73,4 @@ export default {
   getByIdPurchasePrice,
   getListPurchasePrice,
   getListByDynamicPurchasePrice,
-  purchasePricesCancelToken,
 };

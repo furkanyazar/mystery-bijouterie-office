@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
 import DynamicQuery from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
@@ -14,14 +14,12 @@ import GetListOrderListItemDto from "./models/responses/getListOrderListItemDto"
 import UpdatedOrderResponse from "./models/responses/updatedOrderResponse";
 
 const instance = baseAxiosInstance;
-const ordersCancelToken = axios.CancelToken.source();
 
 const createOrder = async (createOrderCommand: CreateOrderCommand): Promise<AxiosResponse<CreatedOrderResponse>> =>
   await instance({
     method: "POST",
     url: "Orders",
     data: createOrderCommand,
-    cancelToken: ordersCancelToken.token,
   });
 
 const deleteOrder = async (deleteOrderCommand: DeleteOrderCommand): Promise<AxiosResponse<DeletedOrderResponse>> =>
@@ -29,7 +27,6 @@ const deleteOrder = async (deleteOrderCommand: DeleteOrderCommand): Promise<Axio
     method: "DELETE",
     url: "Orders",
     data: deleteOrderCommand,
-    cancelToken: ordersCancelToken.token,
   });
 
 const updateOrder = async (updateOrderCommand: UpdateOrderCommand): Promise<AxiosResponse<UpdatedOrderResponse>> =>
@@ -37,14 +34,12 @@ const updateOrder = async (updateOrderCommand: UpdateOrderCommand): Promise<Axio
     method: "PUT",
     url: "Orders",
     data: updateOrderCommand,
-    cancelToken: ordersCancelToken.token,
   });
 
 const getByIdOrder = async (id: number): Promise<AxiosResponse<GetByIdOrderResponse>> =>
   await instance({
     method: "GET",
     url: "Orders/" + id,
-    cancelToken: ordersCancelToken.token,
   });
 
 const getListOrder = async (pageRequest?: PageRequest): Promise<AxiosResponse<GetListResponse<GetListOrderListItemDto>>> =>
@@ -52,7 +47,6 @@ const getListOrder = async (pageRequest?: PageRequest): Promise<AxiosResponse<Ge
     method: "GET",
     url: "Orders",
     params: pageRequest,
-    cancelToken: ordersCancelToken.token,
   });
 
 const getListByDynamicOrder = async (
@@ -64,7 +58,6 @@ const getListByDynamicOrder = async (
     url: "Orders/GetListByDynamic",
     data: dynamicQuery,
     params: pageRequest,
-    cancelToken: ordersCancelToken.token,
   });
 
-export default { createOrder, deleteOrder, updateOrder, getByIdOrder, getListOrder, getListByDynamicOrder, ordersCancelToken };
+export default { createOrder, deleteOrder, updateOrder, getByIdOrder, getListOrder, getListByDynamicOrder };

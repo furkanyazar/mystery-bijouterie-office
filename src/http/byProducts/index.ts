@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
 import DynamicQuery from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
@@ -14,14 +14,12 @@ import GetListByProductListItemDto from "./models/responses/getListByProductList
 import UpdatedByProductResponse from "./models/responses/updatedByProductResponse";
 
 const instance = baseAxiosInstance;
-const byProductsCancelToken = axios.CancelToken.source();
 
 const createByProduct = async (createByProductCommand: CreateByProductCommand): Promise<AxiosResponse<CreatedByProductResponse>> =>
   await instance({
     method: "POST",
     url: "ByProducts",
     data: createByProductCommand,
-    cancelToken: byProductsCancelToken.token,
   });
 
 const deleteByProduct = async (deleteByProductCommand: DeleteByProductCommand): Promise<AxiosResponse<DeletedByProductResponse>> =>
@@ -29,7 +27,6 @@ const deleteByProduct = async (deleteByProductCommand: DeleteByProductCommand): 
     method: "DELETE",
     url: "ByProducts",
     data: deleteByProductCommand,
-    cancelToken: byProductsCancelToken.token,
   });
 
 const updateByProduct = async (updateByProductCommand: UpdateByProductCommand): Promise<AxiosResponse<UpdatedByProductResponse>> =>
@@ -37,14 +34,12 @@ const updateByProduct = async (updateByProductCommand: UpdateByProductCommand): 
     method: "PUT",
     url: "ByProducts",
     data: updateByProductCommand,
-    cancelToken: byProductsCancelToken.token,
   });
 
 const getByIdByProduct = async (id: number): Promise<AxiosResponse<GetByIdByProductResponse>> =>
   await instance({
     method: "GET",
     url: "ByProducts/" + id,
-    cancelToken: byProductsCancelToken.token,
   });
 
 const getListByProduct = async (pageRequest?: PageRequest): Promise<AxiosResponse<GetListResponse<GetListByProductListItemDto>>> =>
@@ -52,7 +47,6 @@ const getListByProduct = async (pageRequest?: PageRequest): Promise<AxiosRespons
     method: "GET",
     url: "ByProducts",
     params: pageRequest,
-    cancelToken: byProductsCancelToken.token,
   });
 
 const getListByDynamicByProduct = async (
@@ -64,7 +58,6 @@ const getListByDynamicByProduct = async (
     url: "ByProducts/GetListByDynamic",
     data: dynamicQuery,
     params: pageRequest,
-    cancelToken: byProductsCancelToken.token,
   });
 
 export default {
@@ -74,5 +67,4 @@ export default {
   getByIdByProduct,
   getListByProduct,
   getListByDynamicByProduct,
-  byProductsCancelToken,
 };
