@@ -1,6 +1,6 @@
 # Semantic Branch Names
 
-**Format:** `<type>/<task>/<name>/<date>`
+**Format:** `<type>/<task>`
 
 ## 🏷️ Types
 
@@ -18,10 +18,8 @@
 ## 💡 Example
 
 ```
-feature/exampleTaskName/furkan/2023-09-22
+feature/exampleTaskName
 ```
-
----
 
 <details>
     <summary>References</summary>

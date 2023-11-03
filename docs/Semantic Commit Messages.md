@@ -21,8 +21,6 @@
 feat(core): add otp authenticator
 ```
 
----
-
 <details>
     <summary>References</summary>
     <ul>
