@@ -1,6 +1,0 @@
-{
-  "material-icon-theme.activeIconPack": "react_redux",
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
-}
