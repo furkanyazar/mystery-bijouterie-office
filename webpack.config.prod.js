@@ -5,7 +5,7 @@ const CopyPlugin = require("copy-webpack-plugin");
 const dotenv = require("dotenv");
 
 module.exports = () => {
-  const env = dotenv.config({ path: "./.env.dev" }).parsed;
+  const env = dotenv.config({ path: "./.env.prod" }).parsed;
 
   const envKeys = Object.keys(env).reduce((prev, next) => {
     prev[`process.env.${next}`] = JSON.stringify(env[next]);
