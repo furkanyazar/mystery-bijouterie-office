@@ -7,7 +7,6 @@ import { useAppDispatch } from "./hooks/useAppDispatch";
 import { useAppSelector } from "./hooks/useAppSelector";
 import Footer from "./layouts/Footer";
 import Header from "./layouts/Header";
-import Categories from "./pages/Categories";
 import Error from "./pages/Error";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -31,7 +30,6 @@ const App = () => {
         <Route path="/giris-yap" element={!user ? <Login /> : <Navigate to={"/"} />} />
         <Route path="/" element={user ? <Home /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/urunler" element={user ? <Products /> : <Navigate to={"/giris-yap"} />} />
-        <Route path="/kategoriler" element={user ? <Categories /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/hata/:code" element={<Error />} />
         <Route path="*" element={<Navigate to={"/hata/404"} />} />
       </Routes>

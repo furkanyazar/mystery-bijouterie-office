@@ -29,19 +29,11 @@ export default function index() {
     searchValues.orderBy.split(",").forEach((field) => dynamicQuery.sort.push({ field, dir }));
 
     const nameFilter: Filter = { field: "name", operator: "contains", value: searchValues.name };
-    const categoryFilter: Filter = { field: "category.name", operator: "contains", value: searchValues.categoryName };
     const barcodeNumberFilter: Filter = { field: "barcodeNumber", operator: "contains", value: searchValues.barcodeNumber };
     const minUnitPriceFilter: Filter = { field: "unitPrice", operator: "gte", value: searchValues.minUnitPrice };
     const maxUnitPriceFilter: Filter = { field: "unitPrice", operator: "lte", value: searchValues.maxUnitPrice };
 
     if (nameFilter.value) dynamicQuery.filter = nameFilter;
-
-    if (categoryFilter.value) {
-      if (dynamicQuery.filter) {
-        dynamicQuery.filter.logic = "and";
-        dynamicQuery.filter.filters = [categoryFilter];
-      } else dynamicQuery.filter = categoryFilter;
-    }
 
     if (barcodeNumberFilter.value) {
       if (dynamicQuery.filter) {
@@ -121,14 +113,6 @@ export default function index() {
               </Col>
               <Col className="col-2">
                 <FormControl
-                  name="categoryName"
-                  placeholder="Kategori"
-                  value={searchValues.categoryName}
-                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
-                />
-              </Col>
-              <Col className="col-2">
-                <FormControl
                   name="barcodeNumber"
                   placeholder="Barkod"
                   value={searchValues.barcodeNumber}
@@ -182,13 +166,6 @@ export default function index() {
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
-                    title="Kategori"
-                    value="category.name"
-                  />
-                  <CustomTHeadItem
-                    responsive={true}
-                    searchValues={searchValues}
-                    setSearchValues={setSearchValues}
                     title="Barkod"
                     value="barcodeNumber"
                   />
@@ -207,7 +184,6 @@ export default function index() {
                   <tr key={product.id}>
                     <td>{product.id}</td>
                     <td>{product.name}</td>
-                    <td>{product.categoryName}</td>
                     <td>{product.barcodeNumber ?? ""}</td>
                     <td>{product.unitPrice}</td>
                     <td className="text-end">
@@ -239,7 +215,6 @@ export default function index() {
 
 const defaultSearchValues = {
   name: "",
-  categoryName: "",
   barcodeNumber: "",
   minUnitPrice: "",
   maxUnitPrice: "",

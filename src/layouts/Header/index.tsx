@@ -71,11 +71,6 @@ export default function Header() {
             <Navbar.Toggle aria-controls="navbarScrollHeader" />
             <Navbar.Collapse id="navbarScrollHeader">
               <Nav className="me-auto my-2 my-lg-0" navbarScroll>
-                <Link to={"/kategoriler"}>
-                  <Nav.Link as={"span"} active={pathName.pathname === "/kategoriler"}>
-                    Kategoriler
-                  </Nav.Link>
-                </Link>
                 <Link to={"/urunler"}>
                   <Nav.Link as={"span"} active={pathName.pathname === "/urunler"}>
                     Ürünler
