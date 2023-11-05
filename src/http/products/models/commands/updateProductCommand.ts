@@ -1,5 +1,7 @@
 export default interface UpdateProductCommand {
   id: number;
+  categoryId: number;
   name: string;
-  shopierId?: string;
+  barcodeNumber?: string;
+  unitPrice: number;
 }

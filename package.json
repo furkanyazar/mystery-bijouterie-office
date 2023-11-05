@@ -1,7 +1,7 @@
 {
-  "name": "mystery-bijouterie",
+  "name": "mystery-bijouterie-office",
   "version": "1.0.0",
-  "description": "Mystery Bijouterie Management System",
+  "description": "Mystery Bijouterie Ofis Management System",
   "main": "index.js",
   "scripts": {
     "start": "webpack serve --open --mode development --config ./webpack.config.dev.js",

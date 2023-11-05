@@ -1,6 +1,8 @@
 export default interface DeletedProductResponse {
   id: number;
+  categoryId: number;
   name: string;
-  shopierId?: string;
-  imageUrl?: string;
+  barcodeNumber?: string;
+  unitPrice: number;
+  categoryName: string;
 }

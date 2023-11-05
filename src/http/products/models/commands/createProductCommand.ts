@@ -1,4 +1,6 @@
 export default interface CreateProductCommand {
+  categoryId: number;
   name: string;
-  shopierId?: string;
+  barcodeNumber?: string;
+  unitPrice: number;
 }

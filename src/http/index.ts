@@ -49,7 +49,7 @@ baseAxiosInstance.interceptors.response.use(
       return new Promise(async (resolve, reject) => {
         await baseAxiosInstance({
           method: "GET",
-          url: "Auth/",
+          url: "Auth/RefreshToken",
         })
           .then((res: AxiosResponse<RefreshedTokenResponse>) => {
             const resData = res.data;

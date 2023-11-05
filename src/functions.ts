@@ -18,11 +18,11 @@ export const removeCookie = (name: string): void => {
   document.cookie = name + "=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
 };
 
-export const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>, values: any, setValues: Function) =>
-  setValues({ ...values, [e.currentTarget.name]: e.currentTarget.value });
+export const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>, setValues: (newValues: any) => void) =>
+  setValues((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
 
-export const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>, values: any, setValues: Function) =>
-  setValues({ ...values, [e.currentTarget.name]: e.currentTarget.value });
+export const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>, setValues: (newValues: any) => void) =>
+  setValues((prev: any) => ({ ...prev, [e.currentTarget.name]: e.currentTarget.value }));
 
-export const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>, values: any, setValues: Function) =>
-  setValues({ ...values, [e.currentTarget.name]: e.currentTarget.checked });
+export const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>, setValues: (newValues: any) => void) =>
+  setValues((prev: any) => ({ ...prev, [e.currentTarget.name]: e.currentTarget.value }));

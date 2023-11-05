@@ -46,14 +46,14 @@ export default function index() {
       <Helmet>
         <title>{pageTitle}</title>
       </Helmet>
-      <Container className="my-5">
+      <Container className="my-3">
         <Row>
           <Col>
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
         </Row>
-        <hr className="mb-5" />
-        <Row>
+        <hr />
+        <Row className="my-5">
           <Col className="col-sm-12 col-md-6 mx-auto">
             <Formik
               enableReinitialize
@@ -73,7 +73,7 @@ export default function index() {
                       placeholder="E-posta adresinizi giriniz"
                       name="email"
                       value={loginModel.email}
-                      onChange={(e: any) => handleChangeInput(e, loginModel, setLoginModel)}
+                      onChange={(e: any) => handleChangeInput(e, setLoginModel)}
                     />
                     <div className="invalid-feedback">{errors.email}</div>
                   </FormGroup>
@@ -85,7 +85,7 @@ export default function index() {
                       placeholder="Şifrenizi giriniz"
                       name="password"
                       value={loginModel.password}
-                      onChange={(e: any) => handleChangeInput(e, loginModel, setLoginModel)}
+                      onChange={(e: any) => handleChangeInput(e, setLoginModel)}
                     />
                     <div className="invalid-feedback">{errors.password}</div>
                   </FormGroup>

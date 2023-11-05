@@ -9,7 +9,7 @@ const instance = baseAxiosInstance;
 const getUserFromAuth = async (): Promise<AxiosResponse<GetByIdUserResponse>> =>
   await instance({
     method: "GET",
-    url: "Users",
+    url: "Users/GetFromAuth",
   }).then((response: AxiosResponse<GetByIdUserResponse>) => {
     store.dispatch(setUser(response.data));
     return response;

@@ -12,14 +12,14 @@ export default function index() {
       <Helmet>
         <title>{pageTitle}</title>
       </Helmet>
-      <Container className="my-5">
+      <Container className="my-3">
         <Row>
           <Col>
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
         </Row>
-        <hr className="mb-5" />
-        <Row>
+        <hr />
+        <Row className="my-5">
           <Col>
             <strong className="d-block text-center">
               {code === "404" ? "Aradığınız sayfa bulunamadı!" : "Beklenmedik bir hata oluştu!"}

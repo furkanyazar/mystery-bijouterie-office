@@ -1,7 +1,7 @@
 import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Container, Nav, Navbar } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import { useAppSelector } from "../../hooks/useAppSelector";
 import { hideNotification, setButtonDisabled, setButtonLoading, showNotification } from "../../store/slices/notificationSlice";
@@ -10,6 +10,7 @@ import { setUser } from "../../store/slices/userSlice";
 
 export default function Header() {
   const dispatch = useAppDispatch();
+  const pathName = useLocation();
 
   const { user } = useAppSelector((c) => c.userItems);
 
@@ -58,33 +59,34 @@ export default function Header() {
   };
 
   return (
-    <Navbar className="bg-body-tertiary" sticky="top">
+    <Navbar className="bg-body-tertiary" expand="lg" sticky="top">
       <Container>
         <Link to={"/"}>
           <Navbar.Brand>
-            <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie
+            <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie Ofis
           </Navbar.Brand>
         </Link>
         {user ? (
           <>
-            <Navbar.Toggle aria-controls="navbarScroll" />
-            <Navbar.Collapse id="navbarScroll">
-              <Nav className="me-auto my-2 my-lg-0" style={{ maxHeight: "100px" }} navbarScroll>
-                <Link to={"/yan-urunler"}>
-                  <Nav.Link as={"span"} active={location.pathname === "/yan-urunler"}>
-                    Yan Ürünler
+            <Navbar.Toggle aria-controls="navbarScrollHeader" />
+            <Navbar.Collapse id="navbarScrollHeader">
+              <Nav className="me-auto my-2 my-lg-0" navbarScroll>
+                <Link to={"/kategoriler"}>
+                  <Nav.Link as={"span"} active={pathName.pathname === "/kategoriler"}>
+                    Kategoriler
+                  </Nav.Link>
+                </Link>
+                <Link to={"/urunler"}>
+                  <Nav.Link as={"span"} active={pathName.pathname === "/urunler"}>
+                    Ürünler
                   </Nav.Link>
                 </Link>
               </Nav>
+              <Navbar.Text>Yönetim Paneli</Navbar.Text>
+              <Button variant="danger" className="ms-3" onClick={handleClickLogout}>
+                <FontAwesomeIcon icon={faRightFromBracket} />
+              </Button>
             </Navbar.Collapse>
-          </>
-        ) : null}
-        {user ? (
-          <>
-            <Navbar.Text>Yönetim Paneli</Navbar.Text>
-            <Button variant="danger" size="sm" className="ms-3" onClick={handleClickLogout}>
-              <FontAwesomeIcon icon={faRightFromBracket} />
-            </Button>
           </>
         ) : (
           <Navbar.Text>Yönetim Paneli</Navbar.Text>
