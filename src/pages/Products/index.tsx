@@ -1,18 +1,19 @@
-import { faInfoCircle, faPen, faPlus, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faPen, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import CustomSpinner from "../../components/CustomSpinner";
+import CustomTHeadItem from "../../components/CustomTHeadItem";
 import CustomTableFooter from "../../components/CustomTableFooter";
+import { handleChangeInput } from "../../functions";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/responses/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
 import PageRequest from "../../models/pageRequest";
-import { handleChangeInput } from "../../functions";
-import { Form, Formik } from "formik";
-import CustomTHeadItem from "../../components/CustomTHeadItem";
+import AddProductModal from "./components/Modals/AddProductModal";
 
 export default function index() {
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
@@ -94,9 +95,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <Button variant="success">
-              <FontAwesomeIcon icon={faPlus} />
-            </Button>
+            <AddProductModal fetchProducts={handleSubmit} />
           </Col>
         </Row>
         <hr />

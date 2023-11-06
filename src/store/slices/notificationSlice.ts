@@ -20,8 +20,6 @@ export const notificationSlice = createSlice({
       const button = state.buttons.find((c) => c.key === action.payload);
       button.disabled = true;
       button.loading = true;
-      button.text = "";
-      button.icon = faSpinner;
       state.closable = false;
     },
     setButtonDisabled: (state, action: PayloadAction<string>) => {
