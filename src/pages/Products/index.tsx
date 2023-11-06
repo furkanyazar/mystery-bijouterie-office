@@ -87,6 +87,13 @@ export default function index() {
   useEffect(() => {
     if (clipboard)
       clipboard.on("success", () => toast.success("Panoya kopyalandı.")).on("error", () => toast.error("Kopyalama işlemi başarısız."));
+
+    return () => {
+      if (clipboard) {
+        clipboard.destroy();
+        setClipboard(null);
+      }
+    };
   }, [clipboard]);
 
   const fetchProducts = async (dynamicQuery: DynamicQuery) =>
