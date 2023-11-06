@@ -56,7 +56,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
         fetchProducts();
         toast.success("Ürün başarılı bir şekilde eklendi.");
       })
-      .catch((errorResponse: AxiosError<ErrorResponse>) => toast.error(errorResponse.response.data.detail))
+      .catch((errorResponse) => {})
       .finally(() => setLoading(false));
   };
 
@@ -70,7 +70,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
   const validationSchema = Yup.object({
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
     barcodeNumber: Yup.string()
-      .notRequired()
+      .required(ValidationRequired)
       .matches(/^MB-\d{10}$/, ValidationInvalid),
   });
 
@@ -114,7 +114,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
                         mask={"MB-9999999999"}
                         placeholder="MB-0000000001"
                         name="barcodeNumber"
-                        value={formValues.barcodeNumber ?? ""}
+                        value={formValues.barcodeNumber}
                         onChange={(e: any) => handleChangeInput(e, setFormValues)}
                       />
                       {errors.barcodeNumber && <div className="invalid-feedback">{errors.barcodeNumber}</div>}

@@ -1,6 +1,7 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faInfoCircle, faPen, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { AxiosError } from "axios";
 import ClipboardJS from "clipboard";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -14,11 +15,10 @@ import { formatCurrency, handleChangeInput } from "../../functions";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/responses/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
+import ErrorResponse from "../../models/errorResponse";
 import GetListResponse from "../../models/getListResponse";
 import PageRequest from "../../models/pageRequest";
 import AddProductModal from "./components/Modals/AddProductModal";
-import { AxiosError } from "axios";
-import ErrorResponse from "../../models/errorResponse";
 
 export default function index() {
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
@@ -100,7 +100,7 @@ export default function index() {
     await products
       .getListByDynamicProduct(dynamicQuery, pageRequest)
       .then((response) => setProductsResponse(response.data))
-      .catch((errorResponse: AxiosError<ErrorResponse>) => toast.error(errorResponse.response.data.detail))
+      .catch((errorResponse) => {})
       .finally(() => setProductsLoaded(true));
 
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
@@ -218,14 +218,10 @@ export default function index() {
                       {product.name}
                     </td>
                     <td>
-                      {product.barcodeNumber ? (
-                        <>
-                          <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.barcodeNumber}>
-                            <FontAwesomeIcon icon={faCopy} />
-                          </Button>
-                          {product.barcodeNumber}
-                        </>
-                      ) : null}
+                      <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.barcodeNumber}>
+                        <FontAwesomeIcon icon={faCopy} />
+                      </Button>
+                      {product.barcodeNumber}
                     </td>
                     <td>{formatCurrency(product.unitPrice)}</td>
                     <td className="text-end">

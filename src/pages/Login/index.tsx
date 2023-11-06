@@ -30,10 +30,10 @@ export default function index() {
         await users
           .getUserFromAuth()
           .then((response) => navigate("/"))
-          .catch((errorResponse: AxiosError<ErrorResponse>) => toast.error(errorResponse.response.data.detail))
+          .catch((errorResponse) => {})
           .finally(() => setLoading(false));
       })
-      .catch((errorResponse: AxiosError<ErrorResponse>) => toast.error(errorResponse.response.data.detail))
+      .catch((errorResponse) => {})
       .finally(() => setLoading(false));
   };
 

@@ -1,6 +1,6 @@
 export default interface DeletedProductResponse {
   id: number;
   name: string;
-  barcodeNumber?: string;
+  barcodeNumber: string;
   unitPrice: number;
 }
