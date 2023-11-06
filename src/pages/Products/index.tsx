@@ -111,7 +111,7 @@ export default function index() {
       <Helmet>
         <title>{pageTitle}</title>
       </Helmet>
-      <Container className="my-5">
+      <Container className="my-3">
         <Row>
           <Col className="col-6">
             <h3 className="text-inline">{pageTitle}</h3>
@@ -160,10 +160,10 @@ export default function index() {
               </Col>
               <Col className="col-auto ms-auto">
                 <Button type="submit" variant="primary" className="me-1">
-                  <FontAwesomeIcon icon={faSearch} />
+                  <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
                 </Button>
                 <Button variant="warning" className="text-white" onClick={setDefaultSearch}>
-                  <FontAwesomeIcon icon={faTrash} />
+                  <FontAwesomeIcon icon={faTrash} className="me-1" /> Temizle
                 </Button>
               </Col>
             </Row>

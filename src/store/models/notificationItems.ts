@@ -24,7 +24,6 @@ export interface IButton {
   disabled: boolean;
   loading: boolean;
   icon?: IconProp;
-  iconLocation?: "before" | "after";
 }
 
 export interface ISetNotification {

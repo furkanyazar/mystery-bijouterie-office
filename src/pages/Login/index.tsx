@@ -1,4 +1,4 @@
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faRightToBracket, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import { Form, Formik } from "formik";
@@ -93,7 +93,14 @@ export default function index() {
                     <div className="invalid-feedback">{errors.password}</div>
                   </FormGroup>
                   <Button variant="success" type="submit" disabled={loading}>
-                    {loading ? <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" /> : "Giriş Yap"}
+                    {loading ? (
+                      <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
+                    ) : (
+                      <>
+                        <FontAwesomeIcon icon={faRightToBracket} className="me-1" />
+                        Giriş Yap
+                      </>
+                    )}
                   </Button>
                 </Form>
               )}

@@ -1,4 +1,4 @@
-import { faPlus } from "@fortawesome/free-solid-svg-icons";
+import { faPlus, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import { Form, Formik } from "formik";
@@ -26,6 +26,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
       disabled: loading,
       loading: loading,
       handleClick: () => handleClose(),
+      icon: faXmark,
     },
     {
       key: submitButtonKey,
@@ -35,6 +36,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
       disabled: loading,
       loading: loading,
       form: formId,
+      icon: faSave,
     },
   ]);
 
@@ -75,7 +77,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
   return (
     <>
       <Button variant="success" onClick={handleShow}>
-        <FontAwesomeIcon icon={faPlus} />
+        <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
       <CustomModal closable={false} handleClose={handleClose} show={show} title="Ürün Ekle" buttons={modalButtons}>
         <Container>

@@ -1,4 +1,4 @@
-import { faRightFromBracket } from "@fortawesome/free-solid-svg-icons";
+import { faRightFromBracket, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, Container, Nav, Navbar } from "react-bootstrap";
 import { Link, useLocation } from "react-router-dom";
@@ -31,6 +31,7 @@ export default function Header() {
             variant: "secondary",
             disabled: false,
             loading: false,
+            icon: faXmark,
           },
           {
             key: okButtonKey,
@@ -51,7 +52,6 @@ export default function Header() {
             disabled: false,
             loading: false,
             icon: faRightFromBracket,
-            iconLocation: "before",
           },
         ],
       })
@@ -79,7 +79,8 @@ export default function Header() {
               </Nav>
               <Navbar.Text>Yönetim Paneli</Navbar.Text>
               <Button variant="danger" className="ms-3" onClick={handleClickLogout}>
-                <FontAwesomeIcon icon={faRightFromBracket} />
+                <FontAwesomeIcon icon={faRightFromBracket} className="me-1" />
+                Çıkış Yap
               </Button>
             </Navbar.Collapse>
           </>

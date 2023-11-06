@@ -55,3 +55,32 @@ a {
   margin-left: -10px;
   top: 3px;
 }
+
+/* Welcome Page  */
+#welcome-container {
+  font-size: 1rem;
+  min-height: 500px;
+  height: 100%;
+  justify-content: center;
+}
+#welcome-container .text-content {
+  text-align: right;
+  line-height: 1.5em;
+  margin-right: 6em;
+}
+#welcome-container .text-content .head {
+  font-size: 1.75em;
+  font-weight: 700;
+  color: #5a5a5a;
+}
+#welcome-container .text-content .text-alt {
+  font-size: 0.875em;
+  font-weight: 600;
+  color: #f9c014;
+}
+#welcome-container .image-content {
+  width: 21em;
+  img {
+    width: 100%;
+  }
+}

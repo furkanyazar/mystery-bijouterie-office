@@ -25,9 +25,8 @@ export default function index() {
               <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
             ) : (
               <>
-                {button.icon && button.iconLocation === "before" ? <FontAwesomeIcon icon={button.icon} className="me-1" /> : null}
+                {button.icon && <FontAwesomeIcon icon={button.icon} className="me-1" />}
                 {button.text}
-                {button.icon && button.iconLocation === "after" ? <FontAwesomeIcon icon={button.icon} className="ms-1" /> : null}
               </>
             )}
           </Button>

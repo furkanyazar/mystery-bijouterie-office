@@ -20,10 +20,18 @@ export default function index() {
         </Row>
         <hr />
         <Row className="my-5">
-          <Col>
-            <strong className="d-block text-center">
-              Hoş geldin {user?.firstName} {user?.lastName}
-            </strong>
+          <Col md={12}>
+            <div id="welcome-container" className="d-flex align-items-center">
+              <div className="text-content flex-column">
+                <div className="head">
+                  {user?.firstName} {user?.lastName}
+                </div>
+                <div className="text-alt">Hoşgeldin</div>
+              </div>
+              <div className="image-content">
+                <img src="/assets/svg/welcome.svg" alt="Blank welcome image"></img>
+              </div>
+            </div>
           </Col>
         </Row>
       </Container>
