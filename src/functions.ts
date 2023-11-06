@@ -26,3 +26,5 @@ export const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>, setV
 
 export const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>, setValues: (newValues: any) => void) =>
   setValues((prev: any) => ({ ...prev, [e.currentTarget.name]: e.currentTarget.value }));
+
+export const formatCurrency = (price: number) => Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(price);

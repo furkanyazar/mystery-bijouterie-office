@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { AxiosError } from "axios";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
+import { Button, Col, Container, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -52,6 +52,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
       .then((response) => {
         handleClose();
         fetchProducts();
+        toast.success("Ürün başarılı bir şekilde eklendi.");
       })
       .catch((errorResponse: AxiosError<ErrorResponse>) => toast.error(errorResponse.response.data.detail))
       .finally(() => setLoading(false));
@@ -78,17 +79,17 @@ export default function AddProductModal({ fetchProducts }: Props) {
       </Button>
       <CustomModal closable={false} handleClose={handleClose} show={show} title="Ürün Ekle" buttons={modalButtons}>
         <Container>
-          <Row>
-            <Formik
-              initialValues={formValues}
-              onSubmit={handleSubmit}
-              enableReinitialize
-              validationSchema={validationSchema}
-              validateOnChange={false}
-              validateOnBlur={false}
-            >
-              {({ errors }) => (
-                <Form id={formId}>
+          <Formik
+            initialValues={formValues}
+            onSubmit={handleSubmit}
+            enableReinitialize
+            validationSchema={validationSchema}
+            validateOnChange={false}
+            validateOnBlur={false}
+          >
+            {({ errors }) => (
+              <Form id={formId}>
+                <Row>
                   <Col md={12}>
                     <FormGroup className="mb-3" controlId="addProductModalNameInput">
                       <FormLabel>Ad</FormLabel>
@@ -102,7 +103,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
                       {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                     </FormGroup>
                   </Col>
-                  <Col md={12}>
+                  <Col md={6}>
                     <FormGroup className="mb-3" controlId="addProductModalBarcodeNumberInput">
                       <FormLabel>Barkod</FormLabel>
                       <ReactInputMask
@@ -117,22 +118,25 @@ export default function AddProductModal({ fetchProducts }: Props) {
                       {errors.barcodeNumber && <div className="invalid-feedback">{errors.barcodeNumber}</div>}
                     </FormGroup>
                   </Col>
-                  <Col md={12}>
+                  <Col md={6}>
                     <FormGroup className="mb-3" controlId="addProductModalUnitPriceInput">
-                      <FormLabel>Fiyat</FormLabel>
-                      <FormControl
-                        type="number"
-                        placeholder="Fiyat"
-                        name="unitPrice"
-                        value={formValues.unitPrice}
-                        onChange={(e: any) => handleChangeInput(e, setFormValues)}
-                      />
+                      <FormLabel>Alış Fiyatı</FormLabel>
+                      <InputGroup className="mb-3">
+                        <FormControl
+                          type="number"
+                          placeholder="Alış Fiyatı"
+                          name="unitPrice"
+                          value={formValues.unitPrice}
+                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                        />
+                        <InputGroup.Text>₺</InputGroup.Text>
+                      </InputGroup>
                     </FormGroup>
                   </Col>
-                </Form>
-              )}
-            </Formik>
-          </Row>
+                </Row>
+              </Form>
+            )}
+          </Formik>
         </Container>
       </CustomModal>
     </>

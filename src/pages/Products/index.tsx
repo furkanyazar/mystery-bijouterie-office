@@ -1,25 +1,31 @@
+import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faInfoCircle, faPen, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import ClipboardJS from "clipboard";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
+import { toast } from "react-toastify";
 import CustomSpinner from "../../components/CustomSpinner";
 import CustomTHeadItem from "../../components/CustomTHeadItem";
 import CustomTableFooter from "../../components/CustomTableFooter";
-import { handleChangeInput } from "../../functions";
+import { formatCurrency, handleChangeInput } from "../../functions";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/responses/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
 import PageRequest from "../../models/pageRequest";
 import AddProductModal from "./components/Modals/AddProductModal";
+import { AxiosError } from "axios";
+import ErrorResponse from "../../models/errorResponse";
 
 export default function index() {
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
   const [pageRequest, setPageRequest] = useState<PageRequest>({ ...defaultPageRequest });
   const [productsResponse, setProductsResponse] = useState<GetListResponse<GetListByDynamicProductListItemDto>>(null);
   const [productsLoaded, setProductsLoaded] = useState<boolean>(false);
+  const [clipboard, setClipboard] = useState(null);
 
   useEffect(() => {
     setProductsLoaded(false);
@@ -67,11 +73,27 @@ export default function index() {
     if (productsLoaded) setPageRequest({ ...pageRequest });
   }, [searchValues.orderBy, searchValues.descending]);
 
+  useEffect(() => {
+    if (productsLoaded) {
+      setClipboard(new ClipboardJS(".btn-clipboard"));
+    } else {
+      if (clipboard) {
+        clipboard.destroy();
+        setClipboard(null);
+      }
+    }
+  }, [productsLoaded]);
+
+  useEffect(() => {
+    if (clipboard)
+      clipboard.on("success", () => toast.success("Panoya kopyalandı.")).on("error", () => toast.error("Kopyalama işlemi başarısız."));
+  }, [clipboard]);
+
   const fetchProducts = async (dynamicQuery: DynamicQuery) =>
     await products
       .getListByDynamicProduct(dynamicQuery, pageRequest)
       .then((response) => setProductsResponse(response.data))
-      .catch((errorResponse) => {})
+      .catch((errorResponse: AxiosError<ErrorResponse>) => toast.error(errorResponse.response.data.detail))
       .finally(() => setProductsLoaded(true));
 
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
@@ -122,7 +144,7 @@ export default function index() {
                 <FormControl
                   type="number"
                   name="minUnitPrice"
-                  placeholder="Min. Fiyat"
+                  placeholder="Min. Alış Fiyatı"
                   value={searchValues.minUnitPrice}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
@@ -131,7 +153,7 @@ export default function index() {
                 <FormControl
                   type="number"
                   name="maxUnitPrice"
-                  placeholder="Maks. Fiyat"
+                  placeholder="Maks. Alış Fiyatı"
                   value={searchValues.maxUnitPrice}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
@@ -172,7 +194,7 @@ export default function index() {
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
-                    title="Fiyat"
+                    title="Alış Fiyatı"
                     value="unitPrice"
                   />
                   <th className="responsive-thead-item"></th>
@@ -182,9 +204,23 @@ export default function index() {
                 {productsResponse?.items.map((product) => (
                   <tr key={product.id}>
                     <td>{product.id}</td>
-                    <td>{product.name}</td>
-                    <td>{product.barcodeNumber ?? ""}</td>
-                    <td>{product.unitPrice}</td>
+                    <td>
+                      <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.name}>
+                        <FontAwesomeIcon icon={faCopy} />
+                      </Button>
+                      {product.name}
+                    </td>
+                    <td>
+                      {product.barcodeNumber ? (
+                        <>
+                          <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.barcodeNumber}>
+                            <FontAwesomeIcon icon={faCopy} />
+                          </Button>
+                          {product.barcodeNumber}
+                        </>
+                      ) : null}
+                    </td>
+                    <td>{formatCurrency(product.unitPrice)}</td>
                     <td className="text-end">
                       <Button className="btn-sm" variant="primary">
                         <FontAwesomeIcon icon={faInfoCircle} />
