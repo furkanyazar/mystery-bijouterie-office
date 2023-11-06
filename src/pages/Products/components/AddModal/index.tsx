@@ -1,27 +1,25 @@
 import { faPlus, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AxiosError } from "axios";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import CustomModal, { ButtonProps } from "../../../../../components/Modals/CustomModal";
-import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../../constants/validationMessages";
-import { handleChangeInput } from "../../../../../functions";
-import products from "../../../../../http/products";
-import CreateProductCommand from "../../../../../http/products/models/commands/createProductCommand";
-import ErrorResponse from "../../../../../models/errorResponse";
+import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
+import { handleChangeInput } from "../../../../functions";
+import products from "../../../../http/products";
+import CreateProductCommand from "../../../../http/products/models/commands/createProductCommand";
 
-export default function AddProductModal({ fetchProducts }: Props) {
+export default function index({ fetchProducts }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreateProductCommand>({ ...defaultFormValues });
   const [loading, setLoading] = useState<boolean>(false);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
       key: cancelButtonKey,
-      variant: "danger",
+      variant: "secondary",
       text: "Vazgeç",
       disabled: loading,
       loading: loading,
@@ -52,9 +50,9 @@ export default function AddProductModal({ fetchProducts }: Props) {
     await products
       .createProduct(formValues)
       .then((response) => {
+        toast.success("Ürün başarılı bir şekilde eklendi.");
         handleClose();
         fetchProducts();
-        toast.success("Ürün başarılı bir şekilde eklendi.");
       })
       .catch((errorResponse) => {})
       .finally(() => setLoading(false));
@@ -72,6 +70,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
     barcodeNumber: Yup.string()
       .required(ValidationRequired)
       .matches(/^MB-\d{10}$/, ValidationInvalid),
+    unitPrice: Yup.number().required(ValidationRequired),
   });
 
   return (
@@ -111,7 +110,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
                       <ReactInputMask
                         id="addProductModalBarcodeNumberInput"
                         className={errors.barcodeNumber ? "form-control is-invalid" : "form-control"}
-                        mask={"MB-9999999999"}
+                        mask={"MB-0000000999"}
                         placeholder="MB-0000000001"
                         name="barcodeNumber"
                         value={formValues.barcodeNumber}
@@ -123,15 +122,17 @@ export default function AddProductModal({ fetchProducts }: Props) {
                   <Col md={6}>
                     <FormGroup className="mb-3" controlId="addProductModalUnitPriceInput">
                       <FormLabel>Alış Fiyatı</FormLabel>
-                      <InputGroup className="mb-3">
+                      <InputGroup>
                         <FormControl
                           type="number"
+                          className={errors.unitPrice && "is-invalid"}
                           placeholder="Alış Fiyatı"
                           name="unitPrice"
                           value={formValues.unitPrice}
                           onChange={(e: any) => handleChangeInput(e, setFormValues)}
                         />
                         <InputGroup.Text>₺</InputGroup.Text>
+                        {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}
                       </InputGroup>
                     </FormGroup>
                   </Col>
@@ -145,7 +146,7 @@ export default function AddProductModal({ fetchProducts }: Props) {
   );
 }
 
-const defaultFormValues: CreateProductCommand = { name: "", barcodeNumber: null, unitPrice: 0 };
+const defaultFormValues: CreateProductCommand = { name: "", barcodeNumber: "", unitPrice: 0 };
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";
 const formId = "addProductForm";

@@ -26,9 +26,20 @@ export const notificationSlice = createSlice({
       const button = state.buttons.find((c) => c.key === action.payload);
       button.disabled = true;
     },
+    setButtonNotLoading: (state, action: PayloadAction<string>) => {
+      const button = state.buttons.find((c) => c.key === action.payload);
+      button.disabled = false;
+      button.loading = false;
+      state.closable = true;
+    },
+    setButtonNotDisabled: (state, action: PayloadAction<string>) => {
+      const button = state.buttons.find((c) => c.key === action.payload);
+      button.disabled = false;
+    },
   },
 });
 
-export const { hideNotification, showNotification, setButtonLoading, setButtonDisabled } = notificationSlice.actions;
+export const { hideNotification, showNotification, setButtonLoading, setButtonDisabled, setButtonNotLoading, setButtonNotDisabled } =
+  notificationSlice.actions;
 
 export default notificationSlice.reducer;

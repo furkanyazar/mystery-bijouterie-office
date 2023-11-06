@@ -21,6 +21,7 @@ export default function index({ buttons, children, closable, handleClose, show, 
               variant={button.variant}
               onClick={button.handleClick}
               disabled={button.disabled}
+              className={button.className}
             >
               {button.loading ? (
                 <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
@@ -57,4 +58,5 @@ export interface ButtonProps {
   icon?: IconProp;
   form?: string;
   type?: "button" | "reset" | "submit";
+  className?: string;
 }

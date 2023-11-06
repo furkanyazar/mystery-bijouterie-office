@@ -1,7 +1,6 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faInfoCircle, faPen, faSearch, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faInfoCircle, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AxiosError } from "axios";
 import ClipboardJS from "clipboard";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
@@ -12,15 +11,27 @@ import CustomSpinner from "../../components/CustomSpinner";
 import CustomTHeadItem from "../../components/CustomTHeadItem";
 import CustomTableFooter from "../../components/CustomTableFooter";
 import { formatCurrency, handleChangeInput } from "../../functions";
+import { useAppDispatch } from "../../hooks/useAppDispatch";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/responses/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
-import ErrorResponse from "../../models/errorResponse";
 import GetListResponse from "../../models/getListResponse";
 import PageRequest from "../../models/pageRequest";
-import AddProductModal from "./components/Modals/AddProductModal";
+import {
+  hideNotification,
+  setButtonDisabled,
+  setButtonLoading,
+  setButtonNotDisabled,
+  setButtonNotLoading,
+  showNotification,
+} from "../../store/slices/notificationSlice";
+import AddModal from "./components/AddModal";
+import UpdateModal from "./components/UpdateModal";
+import InfoModal from "./components/InfoModal";
 
 export default function index() {
+  const dispatch = useAppDispatch();
+
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
   const [pageRequest, setPageRequest] = useState<PageRequest>({ ...defaultPageRequest });
   const [productsResponse, setProductsResponse] = useState<GetListResponse<GetListByDynamicProductListItemDto>>(null);
@@ -111,6 +122,54 @@ export default function index() {
 
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
 
+  const handleClickRemove = (id: number, name: string) => {
+    const cancelButtonKey = "cancel";
+    const okButtonKey = "ok";
+    dispatch(
+      showNotification({
+        show: true,
+        title: "Ürün Sil",
+        closable: true,
+        description: `${name} adlı ürünü silmek istediğinize emin misiniz?`,
+        buttons: [
+          {
+            key: cancelButtonKey,
+            text: "Vazgeç",
+            handleClick: () => dispatch(hideNotification()),
+            variant: "secondary",
+            disabled: false,
+            loading: false,
+            icon: faXmark,
+          },
+          {
+            key: okButtonKey,
+            text: "Sil",
+            handleClick: async () => {
+              dispatch(setButtonDisabled(cancelButtonKey));
+              dispatch(setButtonLoading(okButtonKey));
+              await products
+                .deleteProduct({ id })
+                .then((response) => {
+                  toast.success("Ürün başarılı bir şekilde silindi.");
+                  dispatch(hideNotification());
+                  handleSubmit();
+                })
+                .catch((errorResponse) => {
+                  dispatch(setButtonNotDisabled(cancelButtonKey));
+                  dispatch(setButtonNotLoading(okButtonKey));
+                })
+                .finally(() => {});
+            },
+            variant: "danger",
+            disabled: false,
+            loading: false,
+            icon: faTrash,
+          },
+        ],
+      })
+    );
+  };
+
   const pageTitle = "Ürünler";
 
   return (
@@ -124,7 +183,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddProductModal fetchProducts={handleSubmit} />
+            <AddModal fetchProducts={handleSubmit} />
           </Col>
         </Row>
         <hr />
@@ -225,13 +284,9 @@ export default function index() {
                     </td>
                     <td>{formatCurrency(product.unitPrice)}</td>
                     <td className="text-end">
-                      <Button className="btn-sm" variant="primary">
-                        <FontAwesomeIcon icon={faInfoCircle} />
-                      </Button>
-                      <Button className="btn-sm text-white ms-1" variant="warning">
-                        <FontAwesomeIcon icon={faPen} />
-                      </Button>
-                      <Button className="btn-sm ms-1" variant="danger">
+                      <InfoModal product={product} />
+                      <UpdateModal fetchProducts={handleSubmit} product={product} />
+                      <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(product.id, product.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
                     </td>
