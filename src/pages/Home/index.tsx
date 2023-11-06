@@ -19,7 +19,7 @@ export default function index() {
           </Col>
         </Row>
         <hr />
-        <Row className="my-5">
+        <Row>
           <Col md={12}>
             <div id="welcome-container" className="d-flex align-items-center">
               <div className="text-content flex-column">
