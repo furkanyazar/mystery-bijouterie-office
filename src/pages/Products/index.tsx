@@ -130,7 +130,11 @@ export default function index() {
         show: true,
         title: "Ürün Sil",
         closable: true,
-        description: `${name} adlı ürünü silmek istediğinize emin misiniz?`,
+        description: (
+          <>
+            <b>{name}</b> adlı ürünü silmek istediğinize emin misiniz?
+          </>
+        ),
         buttons: [
           {
             key: cancelButtonKey,

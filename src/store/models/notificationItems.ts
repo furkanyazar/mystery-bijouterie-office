@@ -1,4 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import { ReactNode } from "react";
 
 export const notificationItems: INotificationItems = {
   show: false,
@@ -11,7 +12,7 @@ export const notificationItems: INotificationItems = {
 export interface INotificationItems {
   show: boolean;
   title: string;
-  description: string;
+  description: ReactNode;
   buttons: IButton[];
   closable: boolean;
 }
@@ -29,7 +30,7 @@ export interface IButton {
 export interface ISetNotification {
   show: boolean;
   title: string;
-  description: string;
+  description: ReactNode;
   closable: boolean;
   buttons: IButton[];
 }

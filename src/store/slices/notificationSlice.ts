@@ -1,4 +1,3 @@
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 import { ISetNotification, notificationItems } from "../models/notificationItems";
 
