@@ -63,7 +63,7 @@ export default function Header() {
       <Container>
         <Link to={"/"}>
           <Navbar.Brand>
-            <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie Ofis
+            <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie
           </Navbar.Brand>
         </Link>
         {user ? (
@@ -71,6 +71,11 @@ export default function Header() {
             <Navbar.Toggle aria-controls="navbarScrollHeader" />
             <Navbar.Collapse id="navbarScrollHeader">
               <Nav className="me-auto my-2 my-lg-0" navbarScroll>
+                <Link to={"/kategoriler"}>
+                  <Nav.Link as={"span"} active={pathName.pathname === "/kategoriler"}>
+                    Kategoriler
+                  </Nav.Link>
+                </Link>
                 <Link to={"/urunler"}>
                   <Nav.Link as={"span"} active={pathName.pathname === "/urunler"}>
                     Ürünler

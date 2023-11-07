@@ -1,5 +1,5 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faInfoCircle, faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faSearch, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ClipboardJS from "clipboard";
 import { Form, Formik } from "formik";
@@ -12,6 +12,8 @@ import CustomTHeadItem from "../../components/CustomTHeadItem";
 import CustomTableFooter from "../../components/CustomTableFooter";
 import { formatCurrency, handleChangeInput } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
+import categories from "../../http/categories";
+import GetListCategoryListItemDto from "../../http/categories/models/responses/getListCategoryListItemDto";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/responses/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
@@ -26,8 +28,8 @@ import {
   showNotification,
 } from "../../store/slices/notificationSlice";
 import AddModal from "./components/AddModal";
-import UpdateModal from "./components/UpdateModal";
 import InfoModal from "./components/InfoModal";
+import UpdateModal from "./components/UpdateModal";
 
 export default function index() {
   const dispatch = useAppDispatch();
@@ -36,7 +38,13 @@ export default function index() {
   const [pageRequest, setPageRequest] = useState<PageRequest>({ ...defaultPageRequest });
   const [productsResponse, setProductsResponse] = useState<GetListResponse<GetListByDynamicProductListItemDto>>(null);
   const [productsLoaded, setProductsLoaded] = useState<boolean>(false);
-  const [clipboard, setClipboard] = useState(null);
+  const [clipboard, setClipboard] = useState<ClipboardJS>(null);
+  const [categoriesResponse, setCategoriesResponse] = useState<GetListResponse<GetListCategoryListItemDto>>(null);
+  const [categoriesLoaded, setCategoriesLoaded] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     setProductsLoaded(false);
@@ -48,6 +56,7 @@ export default function index() {
 
     const nameFilter: Filter = { field: "name", operator: "contains", value: searchValues.name };
     const barcodeNumberFilter: Filter = { field: "barcodeNumber", operator: "contains", value: searchValues.barcodeNumber };
+    const modelNumberFilter: Filter = { field: "modelNumber", operator: "contains", value: searchValues.modelNumber };
     const minUnitPriceFilter: Filter = { field: "unitPrice", operator: "gte", value: searchValues.minUnitPrice };
     const maxUnitPriceFilter: Filter = { field: "unitPrice", operator: "lte", value: searchValues.maxUnitPrice };
 
@@ -59,6 +68,14 @@ export default function index() {
         if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(barcodeNumberFilter);
         else dynamicQuery.filter.filters = [barcodeNumberFilter];
       } else dynamicQuery.filter = barcodeNumberFilter;
+    }
+
+    if (modelNumberFilter.value) {
+      if (dynamicQuery.filter) {
+        dynamicQuery.filter.logic = "and";
+        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(modelNumberFilter);
+        else dynamicQuery.filter.filters = [modelNumberFilter];
+      } else dynamicQuery.filter = modelNumberFilter;
     }
 
     if (minUnitPriceFilter.value) {
@@ -114,13 +131,23 @@ export default function index() {
       .catch((errorResponse) => {})
       .finally(() => setProductsLoaded(true));
 
+  const fetchCategories = async () =>
+    await categories
+      .getListCategory({ pageIndex: 0, pageSize: 0 })
+      .then((response) => setCategoriesResponse(response.data))
+      .catch((errorResponse) => {})
+      .finally(() => setCategoriesLoaded(true));
+
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
   const setPageSize = (pageSize: number) => setPageRequest({ pageIndex: 0, pageSize });
 
-  const setDefaultSearch = () => setSearchValues({ ...defaultSearchValues });
-
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
+
+  const handleClear = () => {
+    setSearchValues({ ...defaultSearchValues });
+    handleSubmit();
+  };
 
   const handleClickRemove = (id: number, name: string) => {
     const cancelButtonKey = "cancel";
@@ -187,7 +214,12 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddModal fetchProducts={handleSubmit} />
+            <AddModal
+              fetchProducts={handleSubmit}
+              categoriesResponse={categoriesResponse}
+              categoriesLoaded={categoriesLoaded}
+              disabled={!productsLoaded}
+            />
           </Col>
         </Row>
         <hr />
@@ -212,6 +244,14 @@ export default function index() {
               </Col>
               <Col className="col-2">
                 <FormControl
+                  name="modelNumber"
+                  placeholder="Model"
+                  value={searchValues.modelNumber}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
+                />
+              </Col>
+              <Col className="col-2">
+                <FormControl
                   type="number"
                   name="minUnitPrice"
                   placeholder="Min. Alış Fiyatı"
@@ -229,10 +269,10 @@ export default function index() {
                 />
               </Col>
               <Col className="col-auto ms-auto">
-                <Button type="submit" variant="primary" className="me-1">
+                <Button type="submit" variant="primary" className="me-1" disabled={!productsLoaded}>
                   <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
                 </Button>
-                <Button variant="warning" className="text-white" onClick={setDefaultSearch}>
+                <Button variant="warning" className="text-white" onClick={handleClear} disabled={!productsLoaded}>
                   <FontAwesomeIcon icon={faTrash} className="me-1" /> Temizle
                 </Button>
               </Col>
@@ -264,6 +304,13 @@ export default function index() {
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
+                    title="Model"
+                    value="modelNumber"
+                  />
+                  <CustomTHeadItem
+                    responsive={true}
+                    searchValues={searchValues}
+                    setSearchValues={setSearchValues}
                     title="Alış Fiyatı"
                     value="unitPrice"
                   />
@@ -286,10 +333,21 @@ export default function index() {
                       </Button>
                       {product.barcodeNumber}
                     </td>
+                    <td>
+                      <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.modelNumber}>
+                        <FontAwesomeIcon icon={faCopy} />
+                      </Button>
+                      {product.modelNumber}
+                    </td>
                     <td>{formatCurrency(product.unitPrice)}</td>
                     <td className="text-end">
                       <InfoModal product={product} />
-                      <UpdateModal fetchProducts={handleSubmit} product={product} />
+                      <UpdateModal
+                        fetchProducts={handleSubmit}
+                        product={product}
+                        categoriesResponse={categoriesResponse}
+                        categoriesLoaded={categoriesLoaded}
+                      />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(product.id, product.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
@@ -313,6 +371,7 @@ export default function index() {
 const defaultSearchValues = {
   name: "",
   barcodeNumber: "",
+  modelNumber: "",
   minUnitPrice: "",
   maxUnitPrice: "",
   orderBy: "id",

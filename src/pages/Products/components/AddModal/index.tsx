@@ -2,17 +2,20 @@ import { faPlus, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
+import { Button, Col, Container, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row } from "react-bootstrap";
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import CustomSpinner from "../../../../components/CustomSpinner";
 import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
-import { handleChangeInput } from "../../../../functions";
+import { handleChangeInput, handleChangeSelect } from "../../../../functions";
+import GetListCategoryListItemDto from "../../../../http/categories/models/responses/getListCategoryListItemDto";
 import products from "../../../../http/products";
 import CreateProductCommand from "../../../../http/products/models/commands/createProductCommand";
+import GetListResponse from "../../../../models/getListResponse";
 
-export default function index({ fetchProducts }: Props) {
+export default function index({ fetchProducts, categoriesLoaded, categoriesResponse, disabled }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreateProductCommand>({ ...defaultFormValues });
   const [loading, setLoading] = useState<boolean>(false);
@@ -66,91 +69,140 @@ export default function index({ fetchProducts }: Props) {
   };
 
   const validationSchema = Yup.object({
+    categoryId: Yup.number().required(ValidationRequired).min(1, ValidationInvalid),
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
     barcodeNumber: Yup.string()
       .required(ValidationRequired)
       .matches(/^MB-\d{10}$/, ValidationInvalid),
+    modelNumber: Yup.string()
+      .required(ValidationRequired)
+      .matches(/^MB-\d{5}$/, ValidationInvalid),
     unitPrice: Yup.number().required(ValidationRequired),
   });
 
   return (
     <>
-      <Button variant="success" onClick={handleShow}>
+      <Button variant="success" onClick={handleShow} disabled={disabled}>
         <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
       <CustomModal closable={false} handleClose={handleClose} show={show} title="Ürün Ekle" buttons={modalButtons}>
         <Container>
-          <Formik
-            initialValues={formValues}
-            onSubmit={handleSubmit}
-            enableReinitialize
-            validationSchema={validationSchema}
-            validateOnChange={false}
-            validateOnBlur={false}
-          >
-            {({ errors }) => (
-              <Form id={formId}>
-                <Row>
-                  <Col md={12}>
-                    <FormGroup className="mb-3" controlId="addProductModalNameInput">
-                      <FormLabel>Ad</FormLabel>
-                      <FormControl
-                        className={errors.name && "is-invalid"}
-                        placeholder="Ad"
-                        name="name"
-                        value={formValues.name}
-                        onChange={(e: any) => handleChangeInput(e, setFormValues)}
-                      />
-                      {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addProductModalBarcodeNumberInput">
-                      <FormLabel>Barkod</FormLabel>
-                      <ReactInputMask
-                        id="addProductModalBarcodeNumberInput"
-                        className={errors.barcodeNumber ? "form-control is-invalid" : "form-control"}
-                        mask={"MB-0000000999"}
-                        placeholder="MB-0000000001"
-                        name="barcodeNumber"
-                        value={formValues.barcodeNumber}
-                        onChange={(e: any) => handleChangeInput(e, setFormValues)}
-                      />
-                      {errors.barcodeNumber && <div className="invalid-feedback">{errors.barcodeNumber}</div>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addProductModalUnitPriceInput">
-                      <FormLabel>Alış Fiyatı</FormLabel>
-                      <InputGroup>
+          {categoriesLoaded ? (
+            <Formik
+              initialValues={formValues}
+              onSubmit={handleSubmit}
+              enableReinitialize
+              validationSchema={validationSchema}
+              validateOnChange={false}
+              validateOnBlur={false}
+            >
+              {({ errors }) => (
+                <Form id={formId}>
+                  <Row>
+                    <Col md={12}>
+                      <FormGroup className="mb-3" controlId="addProductModalNameInput">
+                        <FormLabel>Ad</FormLabel>
                         <FormControl
-                          type="number"
-                          className={errors.unitPrice && "is-invalid"}
-                          placeholder="Alış Fiyatı"
-                          name="unitPrice"
-                          value={formValues.unitPrice}
+                          className={errors.name && "is-invalid"}
+                          placeholder="Ad"
+                          name="name"
+                          value={formValues.name}
                           onChange={(e: any) => handleChangeInput(e, setFormValues)}
                         />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                        {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
-                </Row>
-              </Form>
-            )}
-          </Formik>
+                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup className="mb-3" controlId="addProductModalBarcodeNumberInput">
+                        <FormLabel>Barkod</FormLabel>
+                        <ReactInputMask
+                          id="addProductModalBarcodeNumberInput"
+                          className={errors.barcodeNumber ? "form-control is-invalid" : "form-control"}
+                          mask={"MB-0000000999"}
+                          placeholder="MB-0000000001"
+                          name="barcodeNumber"
+                          value={formValues.barcodeNumber}
+                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                        />
+                        {errors.barcodeNumber && <div className="invalid-feedback">{errors.barcodeNumber}</div>}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup className="mb-3" controlId="addProductModalModelNumberInput">
+                        <FormLabel>Model</FormLabel>
+                        <ReactInputMask
+                          id="addProductModalModelNumberInput"
+                          className={errors.modelNumber ? "form-control is-invalid" : "form-control"}
+                          mask={"MB-00999"}
+                          placeholder="MB-00001"
+                          name="modelNumber"
+                          value={formValues.modelNumber}
+                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                        />
+                        {errors.modelNumber && <div className="invalid-feedback">{errors.modelNumber}</div>}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup className="mb-3" controlId="addProductModalUnitPriceInput">
+                        <FormLabel>Alış Fiyatı</FormLabel>
+                        <InputGroup>
+                          <FormControl
+                            type="number"
+                            className={errors.unitPrice && "is-invalid"}
+                            placeholder="Alış Fiyatı"
+                            name="unitPrice"
+                            value={formValues.unitPrice}
+                            onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                          />
+                          <InputGroup.Text>₺</InputGroup.Text>
+                          {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup className="mb-3" controlId="addProductModalCategoryIdSelect">
+                        <FormLabel>Kategori</FormLabel>
+                        <FormSelect
+                          className={errors.categoryId && "is-invalid"}
+                          name="categoryId"
+                          value={formValues.categoryId}
+                          onChange={(e: any) => handleChangeSelect(e, setFormValues)}
+                        >
+                          <option value={0} disabled>
+                            Seçiniz
+                          </option>
+                          {categoriesResponse?.items
+                            ?.sort((a, b) => a.name.localeCompare(b.name))
+                            .map((category) => (
+                              <option key={category.id} value={category.id}>
+                                {category.name}
+                              </option>
+                            ))}
+                        </FormSelect>
+                        {errors.categoryId && <div className="invalid-feedback">{errors.categoryId}</div>}
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                </Form>
+              )}
+            </Formik>
+          ) : (
+            <CustomSpinner />
+          )}
         </Container>
       </CustomModal>
     </>
   );
 }
 
-const defaultFormValues: CreateProductCommand = { name: "", barcodeNumber: "", unitPrice: 0 };
+const defaultFormValues: CreateProductCommand = { categoryId: 0, name: "", barcodeNumber: "", modelNumber: "", unitPrice: 0 };
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";
 const formId = "addProductForm";
 
 interface Props {
   fetchProducts: () => void;
+  categoriesResponse: GetListResponse<GetListCategoryListItemDto>;
+  categoriesLoaded: boolean;
+  disabled: boolean;
 }

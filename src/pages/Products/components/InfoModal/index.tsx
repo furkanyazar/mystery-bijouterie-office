@@ -1,3 +1,4 @@
+import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faCircleCheck, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
@@ -33,24 +34,51 @@ export default function index({ product }: Props) {
         <Container>
           <Row>
             <Col md={12}>
-              <FormGroup className="mb-3" controlId="addProductModalNameInput">
+              <FormGroup className="mb-3" controlId="infoProductModalNameInput">
                 <FormLabel>Ad</FormLabel>
-                <FormControl placeholder="Ad" value={product.name} readOnly />
+                <InputGroup>
+                  <FormControl placeholder="Ad" value={product.name} readOnly />
+                  <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.name}>
+                    <FontAwesomeIcon icon={faCopy} />
+                  </Button>
+                </InputGroup>
               </FormGroup>
             </Col>
             <Col md={6}>
-              <FormGroup className="mb-3" controlId="addProductModalBarcodeNumberInput">
+              <FormGroup className="mb-3" controlId="infoProductModalBarcodeNumberInput">
                 <FormLabel>Barkod</FormLabel>
-                <FormControl placeholder="MB-0000000001" value={product.barcodeNumber} readOnly />
+                <InputGroup>
+                  <FormControl placeholder="MB-0000000001" value={product.barcodeNumber} readOnly />
+                  <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.barcodeNumber}>
+                    <FontAwesomeIcon icon={faCopy} />
+                  </Button>
+                </InputGroup>
               </FormGroup>
             </Col>
             <Col md={6}>
-              <FormGroup className="mb-3" controlId="addProductModalUnitPriceInput">
+              <FormGroup className="mb-3" controlId="infoProductModalModelNumberInput">
+                <FormLabel>Model</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="MB-00001" value={product.modelNumber} readOnly />
+                  <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.modelNumber}>
+                    <FontAwesomeIcon icon={faCopy} />
+                  </Button>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoProductModalUnitPriceInput">
                 <FormLabel>Alış Fiyatı</FormLabel>
                 <InputGroup>
                   <FormControl placeholder="Alış Fiyatı" value={product.unitPrice} readOnly />
                   <InputGroup.Text>₺</InputGroup.Text>
                 </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoProductModalCategoryNameInput">
+                <FormLabel>Kategori</FormLabel>
+                <FormControl placeholder="Kategori" value={product.categoryName} readOnly />
               </FormGroup>
             </Col>
           </Row>

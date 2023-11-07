@@ -7,10 +7,10 @@ export default function Header() {
       <Container>
         <Link to={"/"}>
           <Navbar.Brand>
-            <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie Ofis
+            <img src="/assets/img/logo128.png" width={30} height={30} className="d-inline-block align-top" /> Mystery Bijouterie
           </Navbar.Brand>
         </Link>
-        <Navbar.Text>Tüm hakları saklıdır | Mystery Bijouterie Ofis © 2023</Navbar.Text>
+        <Navbar.Text>Tüm hakları saklıdır | Mystery Bijouterie © 2023</Navbar.Text>
       </Container>
     </Navbar>
   );
