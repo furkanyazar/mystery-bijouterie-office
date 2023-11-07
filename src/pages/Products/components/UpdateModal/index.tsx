@@ -115,7 +115,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                     </Col>
                     <Col md={6}>
                       <FormGroup className="mb-3" controlId="updateProductModalBarcodeNumberInput">
-                        <FormLabel>Barkod</FormLabel>
+                        <FormLabel>Barkod No.</FormLabel>
                         <ReactInputMask
                           id="updateProductModalBarcodeNumberInput"
                           className={errors.barcodeNumber ? "form-control is-invalid" : "form-control"}
@@ -130,7 +130,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                     </Col>
                     <Col md={6}>
                       <FormGroup className="mb-3" controlId="updateProductModalModelNumberInput">
-                        <FormLabel>Model</FormLabel>
+                        <FormLabel>Model No.</FormLabel>
                         <ReactInputMask
                           id="updateProductModalModelNumberInput"
                           className={errors.modelNumber ? "form-control is-invalid" : "form-control"}
@@ -141,23 +141,6 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                           onChange={(e: any) => handleChangeInput(e, setFormValues)}
                         />
                         {errors.modelNumber && <div className="invalid-feedback">{errors.modelNumber}</div>}
-                      </FormGroup>
-                    </Col>
-                    <Col md={6}>
-                      <FormGroup className="mb-3" controlId="updateProductModalUnitPriceInput">
-                        <FormLabel>Alış Fiyatı</FormLabel>
-                        <InputGroup>
-                          <FormControl
-                            type="number"
-                            className={errors.unitPrice && "is-invalid"}
-                            placeholder="Alış Fiyatı"
-                            name="unitPrice"
-                            value={formValues.unitPrice}
-                            onChange={(e: any) => handleChangeInput(e, setFormValues)}
-                          />
-                          <InputGroup.Text>₺</InputGroup.Text>
-                          {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}
-                        </InputGroup>
                       </FormGroup>
                     </Col>
                     <Col md={6}>
@@ -181,6 +164,23 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                             ))}
                         </FormSelect>
                         {errors.categoryId && <div className="invalid-feedback">{errors.categoryId}</div>}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup className="mb-3" controlId="updateProductModalUnitPriceInput">
+                        <FormLabel>Alış Fiyatı</FormLabel>
+                        <InputGroup>
+                          <FormControl
+                            type="number"
+                            className={errors.unitPrice && "is-invalid"}
+                            placeholder="Alış Fiyatı"
+                            name="unitPrice"
+                            value={formValues.unitPrice}
+                            onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                          />
+                          <InputGroup.Text>₺</InputGroup.Text>
+                          {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}
+                        </InputGroup>
                       </FormGroup>
                     </Col>
                   </Row>

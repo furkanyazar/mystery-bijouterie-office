@@ -46,7 +46,7 @@ export default function index({ product }: Props) {
             </Col>
             <Col md={6}>
               <FormGroup className="mb-3" controlId="infoProductModalBarcodeNumberInput">
-                <FormLabel>Barkod</FormLabel>
+                <FormLabel>Barkod No.</FormLabel>
                 <InputGroup>
                   <FormControl placeholder="MB-0000000001" value={product.barcodeNumber} readOnly />
                   <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.barcodeNumber}>
@@ -57,7 +57,7 @@ export default function index({ product }: Props) {
             </Col>
             <Col md={6}>
               <FormGroup className="mb-3" controlId="infoProductModalModelNumberInput">
-                <FormLabel>Model</FormLabel>
+                <FormLabel>Model No.</FormLabel>
                 <InputGroup>
                   <FormControl placeholder="MB-00001" value={product.modelNumber} readOnly />
                   <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.modelNumber}>
@@ -67,18 +67,18 @@ export default function index({ product }: Props) {
               </FormGroup>
             </Col>
             <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoProductModalCategoryNameInput">
+                <FormLabel>Kategori</FormLabel>
+                <FormControl placeholder="Kategori" value={product.categoryName} readOnly />
+              </FormGroup>
+            </Col>
+            <Col md={6}>
               <FormGroup className="mb-3" controlId="infoProductModalUnitPriceInput">
                 <FormLabel>Alış Fiyatı</FormLabel>
                 <InputGroup>
                   <FormControl placeholder="Alış Fiyatı" value={product.unitPrice} readOnly />
                   <InputGroup.Text>₺</InputGroup.Text>
                 </InputGroup>
-              </FormGroup>
-            </Col>
-            <Col md={6}>
-              <FormGroup className="mb-3" controlId="infoProductModalCategoryNameInput">
-                <FormLabel>Kategori</FormLabel>
-                <FormControl placeholder="Kategori" value={product.categoryName} readOnly />
               </FormGroup>
             </Col>
           </Row>

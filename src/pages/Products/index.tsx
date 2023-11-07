@@ -237,7 +237,7 @@ export default function index() {
               <Col className="col-2">
                 <FormControl
                   name="barcodeNumber"
-                  placeholder="Barkod"
+                  placeholder="Barkod No."
                   value={searchValues.barcodeNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
@@ -245,7 +245,7 @@ export default function index() {
               <Col className="col-2">
                 <FormControl
                   name="modelNumber"
-                  placeholder="Model"
+                  placeholder="Model No."
                   value={searchValues.modelNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
@@ -297,14 +297,14 @@ export default function index() {
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
-                    title="Barkod"
+                    title="Barkod No."
                     value="barcodeNumber"
                   />
                   <CustomTHeadItem
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
-                    title="Model"
+                    title="Model No."
                     value="modelNumber"
                   />
                   <CustomTHeadItem
