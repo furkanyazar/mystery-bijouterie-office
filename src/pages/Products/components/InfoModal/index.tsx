@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
-import GetByIdProductResponse from "../../../../http/products/models/responses/getByIdProductResponse";
+import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 
 export default function index({ product }: Props) {
   const [show, setShow] = useState<boolean>(false);
@@ -69,7 +69,7 @@ export default function index({ product }: Props) {
             <Col md={6}>
               <FormGroup className="mb-3" controlId="infoProductModalCategoryNameInput">
                 <FormLabel>Kategori</FormLabel>
-                <FormControl placeholder="Kategori" value={product.categoryName} readOnly />
+                <FormControl placeholder="Kategori" value={product.categoryName ?? ""} readOnly />
               </FormGroup>
             </Col>
             <Col md={6}>

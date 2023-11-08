@@ -10,9 +10,9 @@ import CustomSpinner from "../../../../components/CustomSpinner";
 import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeInput, handleChangeSelect } from "../../../../functions";
-import GetListCategoryListItemDto from "../../../../http/categories/models/responses/getListCategoryListItemDto";
+import GetListCategoryListItemDto from "../../../../http/categories/models/queries/getList/getListCategoryListItemDto";
 import products from "../../../../http/products";
-import CreateProductCommand from "../../../../http/products/models/commands/createProductCommand";
+import CreateProductCommand from "../../../../http/products/models/commands/create/createProductCommand";
 import GetListResponse from "../../../../models/getListResponse";
 
 export default function index({ fetchProducts, categoriesLoaded, categoriesResponse, disabled }: Props) {
@@ -69,7 +69,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
   };
 
   const validationSchema = Yup.object({
-    categoryId: Yup.number().required(ValidationRequired).min(1, ValidationInvalid),
+    categoryId: Yup.number().notRequired().min(1, ValidationInvalid),
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
     barcodeNumber: Yup.string()
       .required(ValidationRequired)
@@ -148,7 +148,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                         <FormSelect
                           className={errors.categoryId && "is-invalid"}
                           name="categoryId"
-                          value={formValues.categoryId}
+                          value={formValues.categoryId ?? 0}
                           onChange={(e: any) => handleChangeSelect(e, setFormValues)}
                         >
                           <option value={0} disabled>
@@ -195,7 +195,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
   );
 }
 
-const defaultFormValues: CreateProductCommand = { categoryId: 0, name: "", barcodeNumber: "", modelNumber: "", unitPrice: 0 };
+const defaultFormValues: CreateProductCommand = { categoryId: null, name: "", barcodeNumber: "", modelNumber: "", unitPrice: 0 };
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";
 const formId = "addProductForm";

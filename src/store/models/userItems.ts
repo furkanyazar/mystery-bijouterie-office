@@ -1,4 +1,4 @@
-import GetByIdUserResponse from "../../http/users/models/responses/getByIdUserResponse";
+import GetByIdUserResponse from "../../http/users/models/queries/getByIdUserResponse";
 
 export const userItems: IUserItems = {
   user: null,

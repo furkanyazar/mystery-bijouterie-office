@@ -1,6 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import GetByIdUserResponse from "../../http/users/models/responses/getByIdUserResponse";
 import { userItems } from "../models/userItems";
+import GetByIdUserResponse from "../../http/users/models/queries/getByIdUserResponse";
 
 export const userSlice = createSlice({
   name: "user",

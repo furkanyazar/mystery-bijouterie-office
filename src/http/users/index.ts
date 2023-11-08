@@ -2,7 +2,7 @@ import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
 import { setUser } from "../../store/slices/userSlice";
 import { store } from "../../store/store";
-import GetByIdUserResponse from "./models/responses/getByIdUserResponse";
+import GetByIdUserResponse from "./models/queries/getByIdUserResponse";
 
 const instance = baseAxiosInstance;
 

@@ -13,9 +13,9 @@ import CustomTableFooter from "../../components/CustomTableFooter";
 import { formatCurrency, handleChangeInput } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
-import GetListCategoryListItemDto from "../../http/categories/models/responses/getListCategoryListItemDto";
+import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
 import products from "../../http/products";
-import GetListByDynamicProductListItemDto from "../../http/products/models/responses/getListByDynamicProductListItemDto";
+import GetListByDynamicProductListItemDto from "../../http/products/models/queries/getListByDynamic/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
 import PageRequest from "../../models/pageRequest";
@@ -126,14 +126,14 @@ export default function index() {
 
   const fetchProducts = async (dynamicQuery: DynamicQuery) =>
     await products
-      .getListByDynamicProduct(dynamicQuery, pageRequest)
+      .getListByDynamicProduct({ dynamicQuery, pageRequest })
       .then((response) => setProductsResponse(response.data))
       .catch((errorResponse) => {})
       .finally(() => setProductsLoaded(true));
 
   const fetchCategories = async () =>
     await categories
-      .getListCategory({ pageIndex: 0, pageSize: 0 })
+      .getListCategory()
       .then((response) => setCategoriesResponse(response.data))
       .catch((errorResponse) => {})
       .finally(() => setCategoriesLoaded(true));

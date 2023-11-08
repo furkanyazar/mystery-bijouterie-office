@@ -1,17 +1,18 @@
 import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
-import DynamicQuery from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
-import PageRequest from "../../models/pageRequest";
-import CreateProductCommand from "./models/commands/createProductCommand";
-import DeleteProductCommand from "./models/commands/deleteProductCommand";
-import UpdateProductCommand from "./models/commands/updateProductCommand";
-import CreatedProductResponse from "./models/responses/createdProductResponse";
-import DeletedProductResponse from "./models/responses/deletedProductResponse";
-import GetByIdProductResponse from "./models/responses/getByIdProductResponse";
-import GetListByDynamicProductListItemDto from "./models/responses/getListByDynamicProductListItemDto";
-import GetListProductListItemDto from "./models/responses/getListProductListItemDto";
-import UpdatedProductResponse from "./models/responses/updatedProductResponse";
+import CreateProductCommand from "./models/commands/create/createProductCommand";
+import CreatedProductResponse from "./models/commands/create/createdProductResponse";
+import DeleteProductCommand from "./models/commands/delete/deleteProductCommand";
+import DeletedProductResponse from "./models/commands/delete/deletedProductResponse";
+import UpdateProductCommand from "./models/commands/update/updateProductCommand";
+import UpdatedProductResponse from "./models/commands/update/updatedProductResponse";
+import GetByIdProductQuery from "./models/queries/getById/getByIdProductQuery";
+import GetByIdProductResponse from "./models/queries/getById/getByIdProductResponse";
+import GetListProductListItemDto from "./models/queries/getList/getListProductListItemDto";
+import GetListProductQuery from "./models/queries/getList/getListProductQuery";
+import GetListByDynamicProductListItemDto from "./models/queries/getListByDynamic/getListByDynamicProductListItemDto";
+import GetListByDynamicProductQuery from "./models/queries/getListByDynamic/getListByDynamicProductQuery";
 
 const instance = baseAxiosInstance;
 
@@ -36,28 +37,29 @@ const updateProduct = async (updateProductCommand: UpdateProductCommand): Promis
     data: updateProductCommand,
   });
 
-const getByIdProduct = async (id: number): Promise<AxiosResponse<GetByIdProductResponse>> =>
+const getByIdProduct = async (getByIdProductQuery: GetByIdProductQuery): Promise<AxiosResponse<GetByIdProductResponse>> =>
   await instance({
     method: "GET",
-    url: "Products/" + id,
+    url: "Products/" + getByIdProductQuery.id,
   });
 
-const getListProduct = async (pageRequest?: PageRequest): Promise<AxiosResponse<GetListResponse<GetListProductListItemDto>>> =>
+const getListProduct = async (
+  getListProductQuery?: GetListProductQuery
+): Promise<AxiosResponse<GetListResponse<GetListProductListItemDto>>> =>
   await instance({
     method: "GET",
     url: "Products",
-    params: pageRequest,
+    params: getListProductQuery?.pageRequest,
   });
 
 const getListByDynamicProduct = async (
-  dynamicQuery: DynamicQuery,
-  pageRequest?: PageRequest
+  getListByDynamicProductQuery: GetListByDynamicProductQuery
 ): Promise<AxiosResponse<GetListResponse<GetListByDynamicProductListItemDto>>> =>
   await instance({
     method: "POST",
     url: "Products/GetListByDynamic",
-    data: dynamicQuery,
-    params: pageRequest,
+    data: getListByDynamicProductQuery.dynamicQuery,
+    params: getListByDynamicProductQuery.pageRequest,
   });
 
 export default {

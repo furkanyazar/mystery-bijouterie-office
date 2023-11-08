@@ -1,17 +1,18 @@
 import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
-import DynamicQuery from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
-import PageRequest from "../../models/pageRequest";
-import CreatePartnerCommand from "./models/commands/createPartnerCommand";
-import DeletePartnerCommand from "./models/commands/deletePartnerCommand";
-import UpdatePartnerCommand from "./models/commands/updatePartnerCommand";
-import CreatedPartnerResponse from "./models/responses/createdPartnerResponse";
-import DeletedPartnerResponse from "./models/responses/deletedPartnerResponse";
-import GetByIdPartnerResponse from "./models/responses/getByIdPartnerResponse";
-import GetListByDynamicPartnerListItemDto from "./models/responses/getListByDynamicPartnerListItemDto";
-import GetListPartnerListItemDto from "./models/responses/getListPartnerListItemDto";
-import UpdatedPartnerResponse from "./models/responses/updatedPartnerResponse";
+import CreatePartnerCommand from "./models/commands/create/createPartnerCommand";
+import CreatedPartnerResponse from "./models/commands/create/createdPartnerResponse";
+import DeletePartnerCommand from "./models/commands/delete/deletePartnerCommand";
+import DeletedPartnerResponse from "./models/commands/delete/deletedPartnerResponse";
+import UpdatePartnerCommand from "./models/commands/update/updatePartnerCommand";
+import UpdatedPartnerResponse from "./models/commands/update/updatedPartnerResponse";
+import GetByIdPartnerQuery from "./models/queries/getById/getByIdPartnerQuery";
+import GetByIdPartnerResponse from "./models/queries/getById/getByIdPartnerResponse";
+import GetListPartnerListItemDto from "./models/queries/getList/getListPartnerListItemDto";
+import GetListPartnerQuery from "./models/queries/getList/getListPartnerQuery";
+import GetListByDynamicPartnerListItemDto from "./models/queries/getListByDynamic/getListByDynamicPartnerListItemDto";
+import GetListByDynamicPartnerQuery from "./models/queries/getListByDynamic/getListByDynamicPartnerQuery";
 
 const instance = baseAxiosInstance;
 
@@ -36,28 +37,29 @@ const updatePartner = async (updatePartnerCommand: UpdatePartnerCommand): Promis
     data: updatePartnerCommand,
   });
 
-const getByIdPartner = async (id: number): Promise<AxiosResponse<GetByIdPartnerResponse>> =>
+const getByIdPartner = async (getByIdPartnerQuery: GetByIdPartnerQuery): Promise<AxiosResponse<GetByIdPartnerResponse>> =>
   await instance({
     method: "GET",
-    url: "Partners/" + id,
+    url: "Partners/" + getByIdPartnerQuery.id,
   });
 
-const getListPartner = async (pageRequest?: PageRequest): Promise<AxiosResponse<GetListResponse<GetListPartnerListItemDto>>> =>
+const getListPartner = async (
+  getListPartnerQuery?: GetListPartnerQuery
+): Promise<AxiosResponse<GetListResponse<GetListPartnerListItemDto>>> =>
   await instance({
     method: "GET",
     url: "Partners",
-    params: pageRequest,
+    params: getListPartnerQuery?.pageRequest,
   });
 
 const getListByDynamicPartner = async (
-  dynamicQuery: DynamicQuery,
-  pageRequest?: PageRequest
+  getListByDynamicPartnerQuery: GetListByDynamicPartnerQuery
 ): Promise<AxiosResponse<GetListResponse<GetListByDynamicPartnerListItemDto>>> =>
   await instance({
     method: "POST",
     url: "Partners/GetListByDynamic",
-    data: dynamicQuery,
-    params: pageRequest,
+    data: getListByDynamicPartnerQuery.dynamicQuery,
+    params: getListByDynamicPartnerQuery.pageRequest,
   });
 
 export default {

@@ -1,17 +1,18 @@
 import { AxiosResponse } from "axios";
 import baseAxiosInstance from "..";
-import DynamicQuery from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
-import PageRequest from "../../models/pageRequest";
-import CreateCategoryCommand from "./models/commands/createCategoryCommand";
-import DeleteCategoryCommand from "./models/commands/deleteCategoryCommand";
-import UpdateCategoryCommand from "./models/commands/updateCategoryCommand";
-import CreatedCategoryResponse from "./models/responses/createdCategoryResponse";
-import DeletedCategoryResponse from "./models/responses/deletedCategoryResponse";
-import GetByIdCategoryResponse from "./models/responses/getByIdCategoryResponse";
-import GetListByDynamicCategoryListItemDto from "./models/responses/getListByDynamicCategoryListItemDto";
-import GetListCategoryListItemDto from "./models/responses/getListCategoryListItemDto";
-import UpdatedCategoryResponse from "./models/responses/updatedCategoryResponse";
+import CreateCategoryCommand from "./models/commands/create/createCategoryCommand";
+import CreatedCategoryResponse from "./models/commands/create/createdCategoryResponse";
+import DeleteCategoryCommand from "./models/commands/delete/deleteCategoryCommand";
+import DeletedCategoryResponse from "./models/commands/delete/deletedCategoryResponse";
+import UpdateCategoryCommand from "./models/commands/update/updateCategoryCommand";
+import UpdatedCategoryResponse from "./models/commands/update/updatedCategoryResponse";
+import GetByIdCategoryQuery from "./models/queries/getById/getByIdCategoryQuery";
+import GetByIdCategoryResponse from "./models/queries/getById/getByIdCategoryResponse";
+import GetListCategoryListItemDto from "./models/queries/getList/getListCategoryListItemDto";
+import GetListCategoryQuery from "./models/queries/getList/getListCategoryQuery";
+import GetListByDynamicCategoryListItemDto from "./models/queries/getListByDynamic/getListByDynamicCategoryListItemDto";
+import GetListByDynamicCategoryQuery from "./models/queries/getListByDynamic/getListByDynamicCategoryQuery";
 
 const instance = baseAxiosInstance;
 
@@ -36,28 +37,29 @@ const updateCategory = async (updateCategoryCommand: UpdateCategoryCommand): Pro
     data: updateCategoryCommand,
   });
 
-const getByIdCategory = async (id: number): Promise<AxiosResponse<GetByIdCategoryResponse>> =>
+const getByIdCategory = async (getByIdCategoryQuery: GetByIdCategoryQuery): Promise<AxiosResponse<GetByIdCategoryResponse>> =>
   await instance({
     method: "GET",
-    url: "Categories/" + id,
+    url: "Categories/" + getByIdCategoryQuery.id,
   });
 
-const getListCategory = async (pageRequest?: PageRequest): Promise<AxiosResponse<GetListResponse<GetListCategoryListItemDto>>> =>
+const getListCategory = async (
+  getListCategoryQuery?: GetListCategoryQuery
+): Promise<AxiosResponse<GetListResponse<GetListCategoryListItemDto>>> =>
   await instance({
     method: "GET",
     url: "Categories",
-    params: pageRequest,
+    params: getListCategoryQuery?.pageRequest,
   });
 
 const getListByDynamicCategory = async (
-  dynamicQuery: DynamicQuery,
-  pageRequest?: PageRequest
+  getListByDynamicCategoryQuery: GetListByDynamicCategoryQuery
 ): Promise<AxiosResponse<GetListResponse<GetListByDynamicCategoryListItemDto>>> =>
   await instance({
     method: "POST",
     url: "Categories/GetListByDynamic",
-    data: dynamicQuery,
-    params: pageRequest,
+    data: getListByDynamicCategoryQuery.dynamicQuery,
+    params: getListByDynamicCategoryQuery.pageRequest,
   });
 
 export default {

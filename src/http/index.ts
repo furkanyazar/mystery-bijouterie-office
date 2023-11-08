@@ -1,7 +1,9 @@
 import axios, { AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { getCookie, setCookie } from "../functions";
-import RefreshedTokenResponse from "./auth/models/responses/refreshedTokenResponse";
+import { setUser } from "../store/slices/userSlice";
+import { store } from "../store/store";
+import RefreshedTokenResponse from "./auth/models/commands/refreshToken/refreshedTokenResponse";
 
 const baseAxiosInstance = axios.create({
   baseURL: process.env.API_URL,
@@ -60,6 +62,7 @@ baseAxiosInstance.interceptors.response.use(
           })
           .catch((err) => {
             if (!axios.isCancel(err)) {
+              store.dispatch(setUser());
               processQueue(err);
               reject(err);
             }

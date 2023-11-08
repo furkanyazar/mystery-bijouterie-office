@@ -1,19 +1,16 @@
 import { faRightToBracket, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { AxiosError } from "axios";
 import { Form, Formik } from "formik";
 import { useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router";
-import { toast } from "react-toastify";
 import * as Yup from "yup";
 import { ValidationEmail, ValidationMinLength, ValidationRequired } from "../../constants/validationMessages";
 import { handleChangeInput } from "../../functions";
 import auth from "../../http/auth";
-import LoginCommand from "../../http/auth/models/commands/loginCommand";
 import users from "../../http/users";
-import ErrorResponse from "../../models/errorResponse";
+import LoginCommand from "../../http/auth/models/commands/login/loginCommand";
 
 export default function index() {
   const navigate = useNavigate();
