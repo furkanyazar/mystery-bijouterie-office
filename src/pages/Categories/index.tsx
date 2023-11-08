@@ -164,22 +164,22 @@ export default function index() {
         <Formik initialValues={searchValues} onSubmit={handleSubmit}>
           <Form>
             <Row className="g-2 d-flex align-items-center">
-              <Col className="col-3">
+              <div className="col-12 col-sm-6 col-md-4">
                 <FormControl
                   name="name"
                   placeholder="Ad"
                   value={searchValues.name}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
-              </Col>
-              <Col className="col-auto ms-auto">
+              </div>
+              <div className="col-auto ms-auto">
                 <Button type="submit" variant="primary" className="me-1" disabled={!categoriesLoaded}>
                   <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
                 </Button>
                 <Button variant="warning" className="text-white" onClick={handleClear} disabled={!categoriesLoaded}>
                   <FontAwesomeIcon icon={faTrash} className="me-1" /> Temizle
                 </Button>
-              </Col>
+              </div>
             </Row>
           </Form>
         </Formik>

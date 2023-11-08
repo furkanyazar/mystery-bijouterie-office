@@ -22,9 +22,9 @@ export const handleChangeInput = (e: React.ChangeEvent<HTMLInputElement>, setVal
   setValues((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
 
 export const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>, setValues: (newValues: any) => void) =>
-  setValues((prev: any) => ({ ...prev, [e.currentTarget.name]: e.currentTarget.value }));
+  setValues((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
 
 export const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>, setValues: (newValues: any) => void) =>
-  setValues((prev: any) => ({ ...prev, [e.currentTarget.name]: e.currentTarget.value }));
+  setValues((prev: any) => ({ ...prev, [e.target.name]: e.target.value }));
 
 export const formatCurrency = (price: number) => Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(price);

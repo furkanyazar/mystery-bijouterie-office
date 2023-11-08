@@ -94,7 +94,7 @@ export default function index({ fetchPartners, disabled }: Props) {
                         placeholder="Ad"
                         name="name"
                         value={formValues.name}
-                        onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                       />
                       {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                     </FormGroup>

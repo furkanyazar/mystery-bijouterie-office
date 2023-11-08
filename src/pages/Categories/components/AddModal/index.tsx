@@ -1,7 +1,7 @@
 import { faPlus, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -107,7 +107,7 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
                           placeholder="Ad"
                           name="name"
                           value={formValues.name}
-                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                         />
                         {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                       </FormGroup>

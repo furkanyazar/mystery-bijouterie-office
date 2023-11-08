@@ -4,13 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ClipboardJS from "clipboard";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, FormControl, Row, Table } from "react-bootstrap";
+import { Button, Col, Container, FormControl, FormSelect, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import CustomSpinner from "../../components/CustomSpinner";
 import CustomTHeadItem from "../../components/CustomTHeadItem";
 import CustomTableFooter from "../../components/CustomTableFooter";
-import { formatCurrency, handleChangeInput } from "../../functions";
+import { formatCurrency, handleChangeInput, handleChangeSelect } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
 import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
@@ -55,12 +55,21 @@ export default function index() {
     searchValues.orderBy.split(",").forEach((field) => dynamicQuery.sort.push({ field, dir }));
 
     const nameFilter: Filter = { field: "name", operator: "contains", value: searchValues.name };
+    const categoryIdFilter: Filter = { field: "categoryId", operator: "eq", value: searchValues.categoryId.toString() };
     const barcodeNumberFilter: Filter = { field: "barcodeNumber", operator: "contains", value: searchValues.barcodeNumber };
     const modelNumberFilter: Filter = { field: "modelNumber", operator: "contains", value: searchValues.modelNumber };
     const minUnitPriceFilter: Filter = { field: "unitPrice", operator: "gte", value: searchValues.minUnitPrice };
     const maxUnitPriceFilter: Filter = { field: "unitPrice", operator: "lte", value: searchValues.maxUnitPrice };
 
     if (nameFilter.value) dynamicQuery.filter = nameFilter;
+
+    if (categoryIdFilter.value !== "0") {
+      if (dynamicQuery.filter) {
+        dynamicQuery.filter.logic = "and";
+        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(categoryIdFilter);
+        else dynamicQuery.filter.filters = [categoryIdFilter];
+      } else dynamicQuery.filter = categoryIdFilter;
+    }
 
     if (barcodeNumberFilter.value) {
       if (dynamicQuery.filter) {
@@ -226,31 +235,49 @@ export default function index() {
         <Formik initialValues={searchValues} onSubmit={handleSubmit}>
           <Form>
             <Row className="g-2 d-flex align-items-center">
-              <Col className="col-2">
+              <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   name="name"
                   placeholder="Ad"
                   value={searchValues.name}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
-              </Col>
-              <Col className="col-2">
+              </div>
+              <div className="col-6 col-sm-4 col-md-3">
+                <FormSelect
+                  name="categoryId"
+                  value={searchValues.categoryId}
+                  onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
+                >
+                  <option value={0}>Kategori</option>
+                  {categoriesLoaded
+                    ? categoriesResponse?.items
+                        ?.sort((a, b) => a.name.localeCompare(b.name))
+                        .map((category) => (
+                          <option key={category.id} value={category.id}>
+                            {category.name}
+                          </option>
+                        ))
+                    : null}
+                </FormSelect>
+              </div>
+              <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   name="barcodeNumber"
                   placeholder="Barkod No."
                   value={searchValues.barcodeNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
-              </Col>
-              <Col className="col-2">
+              </div>
+              <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   name="modelNumber"
                   placeholder="Model No."
                   value={searchValues.modelNumber}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
-              </Col>
-              <Col className="col-2">
+              </div>
+              <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   type="number"
                   name="minUnitPrice"
@@ -258,8 +285,8 @@ export default function index() {
                   value={searchValues.minUnitPrice}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
-              </Col>
-              <Col className="col-2">
+              </div>
+              <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   type="number"
                   name="maxUnitPrice"
@@ -267,15 +294,15 @@ export default function index() {
                   value={searchValues.maxUnitPrice}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
-              </Col>
-              <Col className="col-auto ms-auto">
+              </div>
+              <div className="col-auto ms-auto">
                 <Button type="submit" variant="primary" className="me-1" disabled={!productsLoaded}>
                   <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
                 </Button>
                 <Button variant="warning" className="text-white" onClick={handleClear} disabled={!productsLoaded}>
                   <FontAwesomeIcon icon={faTrash} className="me-1" /> Temizle
                 </Button>
-              </Col>
+              </div>
             </Row>
           </Form>
         </Formik>
@@ -292,6 +319,13 @@ export default function index() {
                     setSearchValues={setSearchValues}
                     title="Ad"
                     value="name"
+                  />
+                  <CustomTHeadItem
+                    responsive={true}
+                    searchValues={searchValues}
+                    setSearchValues={setSearchValues}
+                    title="Kategori"
+                    value="category.name"
                   />
                   <CustomTHeadItem
                     responsive={true}
@@ -327,6 +361,7 @@ export default function index() {
                       </Button>
                       {product.name}
                     </td>
+                    <td>{product.categoryName}</td>
                     <td>
                       <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.barcodeNumber}>
                         <FontAwesomeIcon icon={faCopy} />
@@ -370,6 +405,7 @@ export default function index() {
 
 const defaultSearchValues = {
   name: "",
+  categoryId: 0,
   barcodeNumber: "",
   modelNumber: "",
   minUnitPrice: "",

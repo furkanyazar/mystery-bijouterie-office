@@ -108,7 +108,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                           placeholder="Ad"
                           name="name"
                           value={formValues.name}
-                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                         />
                         {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                       </FormGroup>
@@ -123,7 +123,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                           placeholder="MB-0000000001"
                           name="barcodeNumber"
                           value={formValues.barcodeNumber}
-                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                         />
                         {errors.barcodeNumber && <div className="invalid-feedback">{errors.barcodeNumber}</div>}
                       </FormGroup>
@@ -138,7 +138,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                           placeholder="MB-00001"
                           name="modelNumber"
                           value={formValues.modelNumber}
-                          onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                         />
                         {errors.modelNumber && <div className="invalid-feedback">{errors.modelNumber}</div>}
                       </FormGroup>
@@ -150,7 +150,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                           className={errors.categoryId && "is-invalid"}
                           name="categoryId"
                           value={formValues.categoryId ?? 0}
-                          onChange={(e: any) => handleChangeSelect(e, setFormValues)}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
                         >
                           <option value={0} disabled>
                             Seçiniz
@@ -176,7 +176,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                             placeholder="Alış Fiyatı"
                             name="unitPrice"
                             value={formValues.unitPrice}
-                            onChange={(e: any) => handleChangeInput(e, setFormValues)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                           />
                           <InputGroup.Text>₺</InputGroup.Text>
                           {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}

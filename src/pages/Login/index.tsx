@@ -73,7 +73,7 @@ export default function index() {
                       placeholder="E-posta adresinizi giriniz"
                       name="email"
                       value={loginModel.email}
-                      onChange={(e: any) => handleChangeInput(e, setLoginModel)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setLoginModel)}
                     />
                     <div className="invalid-feedback">{errors.email}</div>
                   </FormGroup>
@@ -85,7 +85,7 @@ export default function index() {
                       placeholder="Şifrenizi giriniz"
                       name="password"
                       value={loginModel.password}
-                      onChange={(e: any) => handleChangeInput(e, setLoginModel)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setLoginModel)}
                     />
                     <div className="invalid-feedback">{errors.password}</div>
                   </FormGroup>
