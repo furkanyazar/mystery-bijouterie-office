@@ -1,13 +1,13 @@
 import { faPlus, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { useEffect, useState } from "react";
-import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
+import React, { useEffect, useState } from "react";
+import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
 import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
-import { handleChangeInput } from "../../../../functions";
+import { handleChangeCheck, handleChangeInput } from "../../../../functions";
 import partners from "../../../../http/partners";
 import CreatePartnerCommand from "../../../../http/partners/models/commands/create/createPartnerCommand";
 
@@ -66,6 +66,8 @@ export default function index({ fetchPartners, disabled }: Props) {
 
   const validationSchema = Yup.object({
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
+    shippingCost: Yup.number().required(ValidationRequired),
+    freeShippingLowerLimit: Yup.number().required(ValidationRequired),
   });
 
   return (
@@ -99,6 +101,54 @@ export default function index({ fetchPartners, disabled }: Props) {
                       {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                     </FormGroup>
                   </Col>
+                  <Col md={6}>
+                    <FormGroup className="mb-3" controlId="addPartnerModalShippingCostInput">
+                      <FormLabel>Kargo Ücreti</FormLabel>
+                      <InputGroup>
+                        <FormControl
+                          type="number"
+                          step="any"
+                          className={errors.shippingCost && "is-invalid"}
+                          placeholder="Kargo Ücreti"
+                          name="shippingCost"
+                          value={formValues.shippingCost}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                        />
+                        <InputGroup.Text>₺</InputGroup.Text>
+                        {errors.shippingCost && <div className="invalid-feedback">{errors.shippingCost}</div>}
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup className="mb-3" controlId="addPartnerModalFreeShippingLowerLimitInput">
+                      <FormLabel>Ücretsiz Kargo Alt Limiti</FormLabel>
+                      <InputGroup>
+                        <FormControl
+                          type="number"
+                          step="any"
+                          className={errors.freeShippingLowerLimit && "is-invalid"}
+                          placeholder="Ücretsiz Kargo Alt Limiti"
+                          name="freeShippingLowerLimit"
+                          value={formValues.freeShippingLowerLimit}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                          disabled={!formValues.hasFreeShipping}
+                        />
+                        <InputGroup.Text>₺</InputGroup.Text>
+                        {errors.freeShippingLowerLimit && <div className="invalid-feedback">{errors.freeShippingLowerLimit}</div>}
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col>
+                    <FormGroup className="mb-3" controlId="addPartnerModalHasFreeShippingSInput">
+                      <FormCheck
+                        type="switch"
+                        label="Ücretsiz Kargo Alt Limiti"
+                        name="hasFreeShipping"
+                        checked={formValues.hasFreeShipping}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+                      />
+                    </FormGroup>
+                  </Col>
                 </Row>
               </Form>
             )}
@@ -109,7 +159,7 @@ export default function index({ fetchPartners, disabled }: Props) {
   );
 }
 
-const defaultFormValues: CreatePartnerCommand = { name: "" };
+const defaultFormValues: CreatePartnerCommand = { name: "", shippingCost: 0, freeShippingLowerLimit: 0, hasFreeShipping: true };
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";
 const formId = "addPartnerForm";

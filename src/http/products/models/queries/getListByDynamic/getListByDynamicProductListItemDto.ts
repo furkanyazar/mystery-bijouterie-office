@@ -1,3 +1,5 @@
+import GetListByDynamicProductCategoryCategoryPartnerListItemDto from "./getListByDynamicProductCategoryCategoryPartnerListItemDto";
+
 export default interface GetListByDynamicProductListItemDto {
   id: number;
   categoryId?: number;
@@ -6,4 +8,5 @@ export default interface GetListByDynamicProductListItemDto {
   unitPrice: number;
   categoryName?: string;
   modelNumber: string;
+  categoryCategoryPartners: GetListByDynamicProductCategoryCategoryPartnerListItemDto[];
 }

@@ -1,3 +1,5 @@
+import GetListProductCategoryCategoryPartnerListItemDto from "./getListProductCategoryCategoryPartnerListItemDto";
+
 export default interface GetListProductListItemDto {
   id: number;
   categoryId?: number;
@@ -6,4 +8,5 @@ export default interface GetListProductListItemDto {
   unitPrice: number;
   categoryName?: string;
   modelNumber: string;
+  categoryCategoryPartners: GetListProductCategoryCategoryPartnerListItemDto[];
 }

@@ -1,3 +1,5 @@
+import CreatedProductResponseCategoryCategoryPartnerListItemDto from "./createdProductResponseCategoryCategoryPartnerListItemDto";
+
 export default interface CreatedProductResponse {
   id: number;
   categoryId?: number;
@@ -6,4 +8,5 @@ export default interface CreatedProductResponse {
   unitPrice: number;
   categoryName?: string;
   modelNumber: string;
+  categoryCategoryPartners: CreatedProductResponseCategoryCategoryPartnerListItemDto[];
 }

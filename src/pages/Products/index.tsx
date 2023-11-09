@@ -14,6 +14,8 @@ import { formatCurrency, handleChangeInput, handleChangeSelect } from "../../fun
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
 import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
+import partners from "../../http/partners";
+import GetListPartnerListItemDto from "../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/queries/getListByDynamic/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
@@ -41,9 +43,11 @@ export default function index() {
   const [clipboard, setClipboard] = useState<ClipboardJS>(null);
   const [categoriesResponse, setCategoriesResponse] = useState<GetListResponse<GetListCategoryListItemDto>>(null);
   const [categoriesLoaded, setCategoriesLoaded] = useState<boolean>(false);
+  const [partnersResponse, setPartnersResponse] = useState<GetListResponse<GetListPartnerListItemDto>>(null);
+  const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchCategories();
+    fetchCategories().then(fetchPartners);
   }, []);
 
   useEffect(() => {
@@ -146,6 +150,13 @@ export default function index() {
       .then((response) => setCategoriesResponse(response.data))
       .catch((errorResponse) => {})
       .finally(() => setCategoriesLoaded(true));
+
+  const fetchPartners = async () =>
+    await partners
+      .getListPartner()
+      .then((response) => setPartnersResponse(response.data))
+      .catch((errorResponse) => {})
+      .finally(() => setPartnersLoaded(true));
 
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
@@ -280,6 +291,7 @@ export default function index() {
               <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   type="number"
+                  step="any"
                   name="minUnitPrice"
                   placeholder="Min. Alış Fiyatı"
                   value={searchValues.minUnitPrice}
@@ -289,6 +301,7 @@ export default function index() {
               <div className="col-6 col-sm-4 col-md-3">
                 <FormControl
                   type="number"
+                  step="any"
                   name="maxUnitPrice"
                   placeholder="Maks. Alış Fiyatı"
                   value={searchValues.maxUnitPrice}
@@ -376,7 +389,7 @@ export default function index() {
                     </td>
                     <td>{formatCurrency(product.unitPrice)}</td>
                     <td className="text-end">
-                      <InfoModal product={product} />
+                      <InfoModal product={product} partnersLoaded={partnersLoaded} partnersResponse={partnersResponse} />
                       <UpdateModal
                         fetchProducts={handleSubmit}
                         product={product}

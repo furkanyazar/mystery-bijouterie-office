@@ -171,6 +171,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                         <InputGroup>
                           <FormControl
                             type="number"
+                            step="any"
                             className={errors.unitPrice && "is-invalid"}
                             placeholder="Alış Fiyatı"
                             name="unitPrice"
