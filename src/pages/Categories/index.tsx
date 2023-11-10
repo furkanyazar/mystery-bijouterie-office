@@ -40,8 +40,8 @@ export default function index() {
   const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchPartners();
-  }, []);
+    if (categoriesLoaded && !partnersLoaded) fetchPartners();
+  }, [categoriesLoaded, partnersLoaded]);
 
   useEffect(() => {
     setCategoriesLoaded(false);

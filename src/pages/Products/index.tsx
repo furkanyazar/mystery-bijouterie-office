@@ -47,8 +47,8 @@ export default function index() {
   const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    fetchCategories().then(fetchPartners);
-  }, []);
+    if (productsLoaded && !categoriesLoaded && !partnersLoaded) fetchCategories().finally(fetchPartners);
+  }, [productsLoaded, categoriesLoaded, partnersLoaded]);
 
   useEffect(() => {
     setProductsLoaded(false);
