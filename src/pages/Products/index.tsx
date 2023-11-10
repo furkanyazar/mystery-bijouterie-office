@@ -423,8 +423,8 @@ const defaultSearchValues = {
   modelNumber: "",
   minUnitPrice: "",
   maxUnitPrice: "",
-  orderBy: "id",
-  descending: false,
+  orderBy: "barcodeNumber",
+  descending: true,
 };
 
 const defaultPageRequest = { pageIndex: 0, pageSize: 50 };
