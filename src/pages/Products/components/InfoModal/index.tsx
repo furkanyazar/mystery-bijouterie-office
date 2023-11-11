@@ -91,7 +91,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
             <Col md={12} lg={4} className="mb-3">
               <Row>
                 <Col md={12} className="mb-3">
-                  <FormLabel>Ürün Görseli</FormLabel>
+                  <FormLabel>Görsel</FormLabel>
                   <ModalImage
                     small={product.imageUrl ?? defaultImageUrl}
                     large={product.imageUrl ?? defaultImageUrl}
