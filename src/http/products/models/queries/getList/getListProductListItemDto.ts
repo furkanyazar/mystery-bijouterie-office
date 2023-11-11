@@ -8,5 +8,7 @@ export default interface GetListProductListItemDto {
   unitPrice: number;
   categoryName?: string;
   modelNumber: string;
+  description?: string;
+  imageUrl?: string;
   categoryCategoryPartners: GetListProductCategoryCategoryPartnerListItemDto[];
 }

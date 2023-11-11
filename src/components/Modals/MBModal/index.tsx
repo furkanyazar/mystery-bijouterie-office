@@ -4,14 +4,22 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ReactNode } from "react";
 import { Button, Modal } from "react-bootstrap";
 
-export default function index({ buttons, children, closable, handleClose, show, title }: Props) {
+export default function index({ buttons, children, closable, handleClose, show, title, size }: Props) {
   return (
-    <Modal show={show} onHide={handleClose} keyboard={closable} backdrop={closable ? undefined : "static"} scrollable fullscreen="sm-down">
+    <Modal
+      show={show}
+      onHide={handleClose}
+      keyboard={closable}
+      backdrop={closable ? undefined : "static"}
+      scrollable
+      fullscreen="sm-down"
+      size={size}
+    >
       <Modal.Header closeButton={closable}>
         <Modal.Title>{title}</Modal.Title>
       </Modal.Header>
       <Modal.Body>{children}</Modal.Body>
-      {buttons ? (
+      {buttons && (
         <Modal.Footer>
           {buttons.map((button) => (
             <Button
@@ -34,7 +42,7 @@ export default function index({ buttons, children, closable, handleClose, show, 
             </Button>
           ))}
         </Modal.Footer>
-      ) : null}
+      )}
     </Modal>
   );
 }
@@ -46,6 +54,7 @@ interface Props {
   buttons?: ButtonProps[];
   children: ReactNode;
   handleClose: () => void;
+  size?: "lg" | "sm" | "xl";
 }
 
 export interface ButtonProps {

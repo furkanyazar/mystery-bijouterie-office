@@ -7,9 +7,9 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormSelect, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
-import CustomSpinner from "../../components/CustomSpinner";
-import CustomTHeadItem from "../../components/CustomTHeadItem";
-import CustomTableFooter from "../../components/CustomTableFooter";
+import MBSpinner from "../../components/MBSpinner";
+import MBTHeadItem from "../../components/MBTHeadItem";
+import MBTableFooter from "../../components/MBTableFooter";
 import { formatCurrency, handleChangeInput, handleChangeSelect } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
@@ -261,15 +261,14 @@ export default function index() {
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
                 >
                   <option value={0}>Kategori</option>
-                  {categoriesLoaded
-                    ? categoriesResponse?.items
-                        ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map((category) => (
-                          <option key={category.id} value={category.id}>
-                            {category.name}
-                          </option>
-                        ))
-                    : null}
+                  {categoriesLoaded &&
+                    categoriesResponse?.items
+                      ?.sort((a, b) => a.name.localeCompare(b.name))
+                      .map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.name}
+                        </option>
+                      ))}
                 </FormSelect>
               </div>
               <div className="col-6 col-sm-4 col-md-3">
@@ -325,36 +324,30 @@ export default function index() {
             <Table striped hover responsive>
               <thead>
                 <tr>
-                  <CustomTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
-                  <CustomTHeadItem
-                    responsive={true}
-                    searchValues={searchValues}
-                    setSearchValues={setSearchValues}
-                    title="Ad"
-                    value="name"
-                  />
-                  <CustomTHeadItem
+                  <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
+                  <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
+                  <MBTHeadItem
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Kategori"
                     value="category.name"
                   />
-                  <CustomTHeadItem
+                  <MBTHeadItem
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Barkod No."
                     value="barcodeNumber"
                   />
-                  <CustomTHeadItem
+                  <MBTHeadItem
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Model No."
                     value="modelNumber"
                   />
-                  <CustomTHeadItem
+                  <MBTHeadItem
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
@@ -405,11 +398,11 @@ export default function index() {
               </tbody>
             </Table>
             {productsResponse && (
-              <CustomTableFooter data={productsResponse} setPage={setPageIndex} setPageSize={setPageSize} pageSize={pageRequest.pageSize} />
+              <MBTableFooter data={productsResponse} setPage={setPageIndex} setPageSize={setPageSize} pageSize={pageRequest.pageSize} />
             )}
           </>
         ) : (
-          <CustomSpinner />
+          <MBSpinner />
         )}
       </Container>
     </>

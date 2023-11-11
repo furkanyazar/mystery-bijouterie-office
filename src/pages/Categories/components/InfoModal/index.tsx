@@ -2,8 +2,8 @@ import { faCircleCheck, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
-import CustomSpinner from "../../../../components/CustomSpinner";
-import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import MBSpinner from "../../../../components/MBSpinner";
+import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import GetByIdCategoryResponse from "../../../../http/categories/models/queries/getById/getByIdCategoryResponse";
 import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import GetListResponse from "../../../../models/getListResponse";
@@ -32,7 +32,7 @@ export default function index({ category, partners, partnersLoaded }: Props) {
       <Button className="btn-sm ms-1" variant="primary" onClick={handleShow}>
         <FontAwesomeIcon icon={faInfoCircle} />
       </Button>
-      <CustomModal closable handleClose={handleClose} show={show} title="Kategori Detayı" buttons={modalButtons}>
+      <MBModal closable handleClose={handleClose} show={show} title="Kategori Detayı" buttons={modalButtons}>
         <Container>
           <Row>
             <Col md={12}>
@@ -55,11 +55,11 @@ export default function index({ category, partners, partnersLoaded }: Props) {
                 </Col>
               ))
             ) : (
-              <CustomSpinner />
+              <MBSpinner />
             )}
           </Row>
         </Container>
-      </CustomModal>
+      </MBModal>
     </>
   );
 }

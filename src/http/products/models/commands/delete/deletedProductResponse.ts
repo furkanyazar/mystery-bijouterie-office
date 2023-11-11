@@ -8,5 +8,7 @@ export default interface DeletedProductResponse {
   unitPrice: number;
   categoryName?: string;
   modelNumber: string;
+  description?: string;
+  imageUrl?: string;
   categoryCategoryPartners: DeletedProductResponseCategoryCategoryPartnerListItemDto[];
 }

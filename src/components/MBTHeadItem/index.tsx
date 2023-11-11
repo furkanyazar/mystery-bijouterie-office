@@ -1,7 +1,7 @@
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-const CustomTHeadItem = ({ responsive = true, searchValues, setSearchValues, title, value }: Props) => {
+export default function index({ responsive = true, searchValues, setSearchValues, title, value }: Props) {
   return (
     <th
       className={responsive ? "responsive-thead-item orderable" : "orderable"}
@@ -34,9 +34,7 @@ const CustomTHeadItem = ({ responsive = true, searchValues, setSearchValues, tit
       )}
     </th>
   );
-};
-
-export default CustomTHeadItem;
+}
 
 interface Props {
   responsive?: boolean;

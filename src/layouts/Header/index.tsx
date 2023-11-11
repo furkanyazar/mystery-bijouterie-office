@@ -8,7 +8,7 @@ import { hideNotification, setButtonDisabled, setButtonLoading, showNotification
 import auth from "../../http/auth";
 import { setUser } from "../../store/slices/userSlice";
 
-export default function Header() {
+export default function index() {
   const dispatch = useAppDispatch();
   const pathName = useLocation();
 

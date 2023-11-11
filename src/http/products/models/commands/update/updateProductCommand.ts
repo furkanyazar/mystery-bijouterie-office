@@ -5,4 +5,6 @@ export default interface UpdateProductCommand {
   barcodeNumber: string;
   unitPrice: number;
   modelNumber: string;
+  description?: string;
+  image?: FormData;
 }

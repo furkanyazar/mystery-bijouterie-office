@@ -4,4 +4,5 @@ export default interface UpdatePartnerCommand {
   shippingCost: number;
   hasFreeShipping: boolean;
   freeShippingLowerLimit: number;
+  serviceFee: number;
 }

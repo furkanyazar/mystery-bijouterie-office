@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeCheck, handleChangeInput } from "../../../../functions";
 import partners from "../../../../http/partners";
@@ -76,7 +76,7 @@ export default function index({ fetchPartners, partner }: Props) {
       <Button className="btn-sm text-white ms-1" variant="warning" onClick={handleShow}>
         <FontAwesomeIcon icon={faPen} />
       </Button>
-      <CustomModal closable={false} handleClose={handleClose} show={show} title="Partner Düzenle" buttons={modalButtons}>
+      <MBModal closable={false} handleClose={handleClose} show={show} title="Partner Düzenle" buttons={modalButtons}>
         <Container>
           <Formik
             initialValues={formValues}
@@ -121,6 +121,34 @@ export default function index({ fetchPartners, partner }: Props) {
                     </FormGroup>
                   </Col>
                   <Col md={6}>
+                    <FormGroup className="mb-3" controlId="updatePartnerModalServiceFeeInput">
+                      <FormLabel>Hizmet Bedeli</FormLabel>
+                      <InputGroup>
+                        <FormControl
+                          type="number"
+                          step="any"
+                          placeholder="Hizmet Bedeli"
+                          name="serviceFee"
+                          value={formValues.serviceFee}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                        />
+                        <InputGroup.Text>₺</InputGroup.Text>
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup className="mb-3" controlId="updatePartnerModalHasFreeShippingSInput">
+                      <FormLabel></FormLabel>
+                      <FormCheck
+                        type="switch"
+                        label="Ücretsiz Kargo Alt Limiti"
+                        name="hasFreeShipping"
+                        checked={formValues.hasFreeShipping}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
                     <FormGroup className="mb-3" controlId="updatePartnerModalFreeShippingLowerLimitInput">
                       <FormLabel>Ücretsiz Kargo Alt Limiti</FormLabel>
                       <InputGroup>
@@ -139,23 +167,12 @@ export default function index({ fetchPartners, partner }: Props) {
                       </InputGroup>
                     </FormGroup>
                   </Col>
-                  <Col>
-                    <FormGroup className="mb-3" controlId="updatePartnerModalHasFreeShippingSInput">
-                      <FormCheck
-                        type="switch"
-                        label="Ücretsiz Kargo Alt Limiti"
-                        name="hasFreeShipping"
-                        checked={formValues.hasFreeShipping}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
-                      />
-                    </FormGroup>
-                  </Col>
                 </Row>
               </Form>
             )}
           </Formik>
         </Container>
-      </CustomModal>
+      </MBModal>
     </>
   );
 }

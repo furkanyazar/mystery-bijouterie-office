@@ -1,24 +1,30 @@
-import { faPen, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
+import { faPen, faSave, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row } from "react-bootstrap";
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import CustomSpinner from "../../../../components/CustomSpinner";
-import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import MBSpinner from "../../../../components/MBSpinner";
+import MBTextEditor from "../../../../components/MBTextEditor";
+import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
-import { handleChangeInput, handleChangeSelect } from "../../../../functions";
+import { handleChangeEditor, handleChangeInput, handleChangeSelect } from "../../../../functions";
 import GetListCategoryListItemDto from "../../../../http/categories/models/queries/getList/getListCategoryListItemDto";
 import products from "../../../../http/products";
 import UpdateProductCommand from "../../../../http/products/models/commands/update/updateProductCommand";
+import { DefaultProductDescription } from "../../../../jsons/models/DefaultProductDescription";
 import GetListResponse from "../../../../models/getListResponse";
 
 export default function index({ fetchProducts, product, categoriesLoaded, categoriesResponse }: Props) {
+  const defaultProductDescriptions: DefaultProductDescription[] = require("../../../../jsons/defaultProductDescriptions.json");
+
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<UpdateProductCommand>({ ...product });
   const [loading, setLoading] = useState<boolean>(false);
+  const [file, setFile] = useState<File>(null);
+  const [defaultDescription, setDefaultDescription] = useState<number>(0);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
       key: cancelButtonKey,
@@ -48,11 +54,21 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
     ]);
   }, [loading]);
 
+  useEffect(() => {
+    if (defaultDescription !== 0) {
+      const description = defaultProductDescriptions.find((c) => c.id === defaultDescription);
+      if (description) setFormValues((prev) => ({ ...prev, description: description.description }));
+    }
+  }, [defaultDescription]);
+
   const handleSubmit = async () => {
     setLoading(true);
 
+    const image = file ? new FormData() : null;
+    if (image) image.append("formFile", file);
+
     await products
-      .updateProduct(formValues)
+      .updateProduct({ ...formValues, image })
       .then((response) => {
         toast.success("Ürün başarılı bir şekilde güncellendi.");
         handleClose();
@@ -68,6 +84,10 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
     setShow(false);
     setFormValues({ ...product });
   };
+
+  const handleChangeFileInput = (e: any) => setFile(e.target.files[0]);
+
+  const handleClickRemoveFile = () => setFile(null);
 
   const validationSchema = Yup.object({
     categoryId: Yup.number().notRequired().min(1, ValidationInvalid),
@@ -86,7 +106,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
       <Button className="btn-sm text-white ms-1" variant="warning" onClick={handleShow}>
         <FontAwesomeIcon icon={faPen} />
       </Button>
-      <CustomModal closable={false} handleClose={handleClose} show={show} title="Ürün Düzenle" buttons={modalButtons}>
+      <MBModal closable={false} handleClose={handleClose} show={show} title="Ürün Düzenle" buttons={modalButtons}>
         <Container>
           {categoriesLoaded ? (
             <Formik
@@ -184,15 +204,51 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                         </InputGroup>
                       </FormGroup>
                     </Col>
+                    <Col md={12} className="mb-3">
+                      <FormGroup controlId="updateProductModalDescriptionInput">
+                        <FormLabel>Açıklama</FormLabel>
+                        <FormSelect
+                          className="mb-1"
+                          value={defaultDescription}
+                          onChange={(e: ChangeEvent<HTMLSelectElement>) => setDefaultDescription(Number.parseInt(e.target.value))}
+                        >
+                          <option value={0}>Özel</option>
+                          {defaultProductDescriptions.map((description) => (
+                            <option key={description.id} value={description.id}>
+                              {description.name}
+                            </option>
+                          ))}
+                        </FormSelect>
+                      </FormGroup>
+                      <MBTextEditor
+                        id="updateProductModalDescriptionEditor"
+                        value={formValues.description ?? ""}
+                        onChange={(event: any, editor: any) => {
+                          setDefaultDescription(0);
+                          handleChangeEditor(event, editor, setFormValues);
+                        }}
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <FormGroup controlId="updateProductModalImageInput" className="mb-3">
+                        <FormLabel>Görsel Yükle</FormLabel>
+                        <InputGroup>
+                          <FormControl type="file" accept="image/*" onChange={handleChangeFileInput} disabled />
+                          <Button variant="danger" onClick={handleClickRemoveFile} disabled={!file}>
+                            <FontAwesomeIcon icon={faTrash} />
+                          </Button>
+                        </InputGroup>
+                      </FormGroup>
+                    </Col>
                   </Row>
                 </Form>
               )}
             </Formik>
           ) : (
-            <CustomSpinner />
+            <MBSpinner />
           )}
         </Container>
-      </CustomModal>
+      </MBModal>
     </>
   );
 }

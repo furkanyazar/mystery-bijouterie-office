@@ -5,8 +5,8 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import CustomSpinner from "../../../../components/CustomSpinner";
-import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import MBSpinner from "../../../../components/MBSpinner";
+import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeInput } from "../../../../functions";
 import categories from "../../../../http/categories";
@@ -98,7 +98,7 @@ export default function index({ fetchCategories, category, partnersLoaded, partn
       <Button className="btn-sm text-white ms-1" variant="warning" onClick={handleShow}>
         <FontAwesomeIcon icon={faPen} />
       </Button>
-      <CustomModal closable={false} handleClose={handleClose} show={show} title="Kategori Düzenle" buttons={modalButtons}>
+      <MBModal closable={false} handleClose={handleClose} show={show} title="Kategori Düzenle" buttons={modalButtons}>
         <Container>
           {partnersLoaded ? (
             <Formik
@@ -170,10 +170,10 @@ export default function index({ fetchCategories, category, partnersLoaded, partn
               )}
             </Formik>
           ) : (
-            <CustomSpinner />
+            <MBSpinner />
           )}
         </Container>
-      </CustomModal>
+      </MBModal>
     </>
   );
 }

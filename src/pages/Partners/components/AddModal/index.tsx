@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeCheck, handleChangeInput } from "../../../../functions";
 import partners from "../../../../http/partners";
@@ -75,7 +75,7 @@ export default function index({ fetchPartners, disabled }: Props) {
       <Button variant="success" onClick={handleShow} disabled={disabled}>
         <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
-      <CustomModal closable={false} handleClose={handleClose} show={show} title="Partner Ekle" buttons={modalButtons}>
+      <MBModal closable={false} handleClose={handleClose} show={show} title="Partner Ekle" buttons={modalButtons}>
         <Container>
           <Formik
             initialValues={formValues}
@@ -120,6 +120,34 @@ export default function index({ fetchPartners, disabled }: Props) {
                     </FormGroup>
                   </Col>
                   <Col md={6}>
+                    <FormGroup className="mb-3" controlId="addPartnerModalServiceFeeLimitInput">
+                      <FormLabel>Hizmet Bedeli</FormLabel>
+                      <InputGroup>
+                        <FormControl
+                          type="number"
+                          step="any"
+                          placeholder="Hizmet Bedeli"
+                          name="serviceFee"
+                          value={formValues.serviceFee}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                        />
+                        <InputGroup.Text>₺</InputGroup.Text>
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup className="mb-3" controlId="addPartnerModalHasFreeShippingSInput">
+                      <FormLabel></FormLabel>
+                      <FormCheck
+                        type="switch"
+                        label="Ücretsiz Kargo Alt Limiti"
+                        name="hasFreeShipping"
+                        checked={formValues.hasFreeShipping}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
                     <FormGroup className="mb-3" controlId="addPartnerModalFreeShippingLowerLimitInput">
                       <FormLabel>Ücretsiz Kargo Alt Limiti</FormLabel>
                       <InputGroup>
@@ -138,28 +166,23 @@ export default function index({ fetchPartners, disabled }: Props) {
                       </InputGroup>
                     </FormGroup>
                   </Col>
-                  <Col>
-                    <FormGroup className="mb-3" controlId="addPartnerModalHasFreeShippingSInput">
-                      <FormCheck
-                        type="switch"
-                        label="Ücretsiz Kargo Alt Limiti"
-                        name="hasFreeShipping"
-                        checked={formValues.hasFreeShipping}
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
-                      />
-                    </FormGroup>
-                  </Col>
                 </Row>
               </Form>
             )}
           </Formik>
         </Container>
-      </CustomModal>
+      </MBModal>
     </>
   );
 }
 
-const defaultFormValues: CreatePartnerCommand = { name: "", shippingCost: 0, freeShippingLowerLimit: 0, hasFreeShipping: true };
+const defaultFormValues: CreatePartnerCommand = {
+  name: "",
+  shippingCost: 0,
+  freeShippingLowerLimit: 0,
+  hasFreeShipping: true,
+  serviceFee: 0,
+};
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";
 const formId = "addPartnerForm";

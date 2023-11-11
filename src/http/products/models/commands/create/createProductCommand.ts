@@ -4,4 +4,6 @@ export default interface CreateProductCommand {
   barcodeNumber: string;
   unitPrice: number;
   modelNumber: string;
+  description?: string;
+  image?: FormData;
 }

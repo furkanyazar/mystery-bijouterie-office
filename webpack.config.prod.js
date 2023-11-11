@@ -3,6 +3,7 @@ const HtmlWebpackPlugin = require("html-webpack-plugin");
 const webpack = require("webpack");
 const CopyPlugin = require("copy-webpack-plugin");
 const dotenv = require("dotenv");
+const { styles } = require("@ckeditor/ckeditor5-dev-utils");
 
 module.exports = () => {
   const env = dotenv.config({ path: "./.env.prod" }).parsed;
@@ -27,14 +28,49 @@ module.exports = () => {
       path: path.resolve(__dirname, "dist"),
       filename: "[name].[contenthash].bundle.js",
       clean: true,
+      assetModuleFilename: "assets/loader-files/[hash][ext][query]",
     },
     module: {
       rules: [
         {
-          test: /\.(js|ts)x?$/,
-          exclude: /node_modules/,
+          test: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
+          use: ["raw-loader"],
+        },
+        {
+          test: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+          use: [
+            {
+              loader: "style-loader",
+              options: {
+                injectType: "singletonStyleTag",
+                attributes: {
+                  "data-cke": true,
+                },
+              },
+            },
+            "css-loader",
+            {
+              loader: "postcss-loader",
+              options: {
+                postcssOptions: styles.getPostCssConfig({
+                  themeImporter: {
+                    themePath: require.resolve("@ckeditor/ckeditor5-theme-lark"),
+                  },
+                  minify: true,
+                }),
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(js|jsx)$/,
+          include: [path.resolve(__dirname, "src")],
+          exclude: /(node_modules|bower_components)/,
           use: {
             loader: "babel-loader",
+            options: {
+              presets: ["@babel/preset-env"],
+            },
           },
         },
         {
@@ -44,10 +80,12 @@ module.exports = () => {
         },
         {
           test: /\.(sa|sc|c)ss$/,
-          use: ["style-loader", "css-loader"],
+          exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\].+\.css$/,
+          use: ["style-loader", "css-loader", "postcss-loader", "sass-loader"],
         },
         {
           test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
+          exclude: /ckeditor5-[^/\\]+[/\\]theme[/\\]icons[/\\][^/\\]+\.svg$/,
           type: "asset",
         },
       ],
@@ -66,10 +104,8 @@ module.exports = () => {
       }),
       new CopyPlugin({
         patterns: [
-          {
-            from: "src/assets",
-            to: "assets",
-          },
+          { from: "src/assets/img", to: "assets/img" },
+          { from: "src/assets/svg", to: "assets/svg" },
           {
             from: "public",
             to: path.join(__dirname, "dist"),
@@ -82,9 +118,7 @@ module.exports = () => {
         ],
       }),
       new webpack.DefinePlugin(envKeys),
-      new webpack.ProvidePlugin({
-        React: "react",
-      }),
+      new webpack.ProvidePlugin({ React: "react" }),
     ],
   };
 };

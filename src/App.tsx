@@ -15,7 +15,7 @@ import Partners from "./pages/Partners";
 import Products from "./pages/Products";
 import { hideNotification } from "./store/slices/notificationSlice";
 
-const App = () => {
+export default function App() {
   const dispatch = useAppDispatch();
 
   const { user } = useAppSelector((c) => c.userItems);
@@ -53,6 +53,4 @@ const App = () => {
       />
     </>
   );
-};
-
-export default App;
+}

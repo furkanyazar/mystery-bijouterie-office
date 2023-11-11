@@ -8,5 +8,7 @@ export default interface UpdatedProductResponse {
   unitPrice: number;
   categoryName?: string;
   modelNumber: string;
+  description?: string;
+  imageUrl?: string;
   categoryCategoryPartners: UpdatedProductResponseCategoryCategoryPartnerListItemDto[];
 }

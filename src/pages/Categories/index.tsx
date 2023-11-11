@@ -5,9 +5,9 @@ import { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
-import CustomSpinner from "../../components/CustomSpinner";
-import CustomTHeadItem from "../../components/CustomTHeadItem";
-import CustomTableFooter from "../../components/CustomTableFooter";
+import MBSpinner from "../../components/MBSpinner";
+import MBTHeadItem from "../../components/MBTHeadItem";
+import MBTableFooter from "../../components/MBTableFooter";
 import { handleChangeInput } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
@@ -189,8 +189,8 @@ export default function index() {
             <Table striped hover responsive>
               <thead>
                 <tr>
-                  <CustomTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
-                  <CustomTHeadItem
+                  <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
+                  <MBTHeadItem
                     responsive={true}
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
@@ -222,7 +222,7 @@ export default function index() {
               </tbody>
             </Table>
             {categoriesResponse && (
-              <CustomTableFooter
+              <MBTableFooter
                 data={categoriesResponse}
                 setPage={setPageIndex}
                 setPageSize={setPageSize}
@@ -231,7 +231,7 @@ export default function index() {
             )}
           </>
         ) : (
-          <CustomSpinner />
+          <MBSpinner />
         )}
       </Container>
     </>

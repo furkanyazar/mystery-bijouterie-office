@@ -2,7 +2,7 @@ import { faCircleCheck, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
-import CustomModal, { ButtonProps } from "../../../../components/Modals/CustomModal";
+import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import GetByIdPartnerResponse from "../../../../http/partners/models/queries/getById/getByIdPartnerResponse";
 
 export default function index({ partner }: Props) {
@@ -29,7 +29,7 @@ export default function index({ partner }: Props) {
       <Button className="btn-sm ms-1" variant="primary" onClick={handleShow}>
         <FontAwesomeIcon icon={faInfoCircle} />
       </Button>
-      <CustomModal closable handleClose={handleClose} show={show} title="Partner Detayı" buttons={modalButtons}>
+      <MBModal closable handleClose={handleClose} show={show} title="Partner Detayı" buttons={modalButtons}>
         <Container>
           <Row>
             <Col md={12}>
@@ -48,6 +48,21 @@ export default function index({ partner }: Props) {
               </FormGroup>
             </Col>
             <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalServiceFeeLimitSInput">
+                <FormLabel>Hizmet Bedeli</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="Hizmet Bedeli" value={partner.serviceFee} readOnly />
+                  <InputGroup.Text>₺</InputGroup.Text>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalHasFreeShippingSInput">
+                <FormLabel></FormLabel>
+                <FormCheck type="switch" label="Ücretsiz Kargo Alt Limiti" checked={partner.hasFreeShipping} readOnly />
+              </FormGroup>
+            </Col>
+            <Col md={6}>
               <FormGroup className="mb-3" controlId="infoPartnerModalFreeShippingLowerLimitSInput">
                 <FormLabel>Ücretsiz Kargo Alt Limiti</FormLabel>
                 <InputGroup>
@@ -56,14 +71,9 @@ export default function index({ partner }: Props) {
                 </InputGroup>
               </FormGroup>
             </Col>
-            <Col>
-              <FormGroup className="mb-3" controlId="infoPartnerModalHasFreeShippingSInput">
-                <FormCheck type="switch" label="Ücretsiz Kargo Alt Limiti" checked={partner.hasFreeShipping} readOnly />
-              </FormGroup>
-            </Col>
           </Row>
         </Container>
-      </CustomModal>
+      </MBModal>
     </>
   );
 }

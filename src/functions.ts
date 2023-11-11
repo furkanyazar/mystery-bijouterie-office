@@ -1,3 +1,6 @@
+import type { EventInfo } from "@ckeditor/ckeditor5-utils";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
+
 export const setCookie = (name: string, value: string, expiration: string): void => {
   const date = new Date(expiration);
   document.cookie = name = name + "=" + (value || "") + "; Path=/; Expires=" + date.toUTCString();
@@ -26,5 +29,8 @@ export const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>, setV
 
 export const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>, setValues: (newValues: any) => void) =>
   setValues((prev: any) => ({ ...prev, [e.target.name]: e.target.checked }));
+
+export const handleChangeEditor = (event: EventInfo<string, unknown>, editor: ClassicEditor, setValues: (newValues: any) => void) =>
+  setValues((prev: any) => ({ ...prev, [event.name]: editor.getData() }));
 
 export const formatCurrency = (price: number) => Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(price);

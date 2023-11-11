@@ -1,7 +1,7 @@
 import { Container, Navbar } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
-export default function Header() {
+export default function index() {
   return (
     <Navbar className="bg-body-tertiary" expand="lg">
       <Container>

@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "VIP",
+    "description": "<ul><li>Özel VIP Serisi ürünlerimiz free nikel üzeri rodyum kaplamadır.</li><li>Taşları zirkondur.</li><li>Antialerjiktir, tende kızarıklık, yara veya kaşıntı yapmaz.</li><li>Günlük kullanıma uygundur.</li><li>Su ile temas halinde kararma yapmaz.</li><li>Denize, havuza, hamama ve duşa %90'a kadar dayanıklıdır.</li><li>Parfüm ve benzeri kimyasallardan korunması halinde kararma yapmaz.</li></ul>"
+  },
+  {
+    "id": 2,
+    "name": "Çelik",
+    "description": "<ul><li>Çelik serisi ürünlerimiz Premium kalite 316L cerrahi çelik üzeri altın kaplamadır.</li><li>Taşları zirkondur.</li><li>Antialerjiktir, tende kızarıklık, yara veya kaşıntı yapmaz.</li><li>Günlük kullanıma uygundur.</li><li>Su ile temas halinde kararma yapmaz.</li><li>Denize, havuza, hamama ve duşa %90'a kadar dayanıklıdır.</li><li>Parfüm ve benzeri kimyasallardan korunması halinde kararma yapmaz.</li></ul>"
+  }
+]

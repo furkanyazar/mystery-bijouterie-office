@@ -1,7 +1,7 @@
 import { Pagination } from "react-bootstrap";
 import GetListResponse from "../../models/getListResponse";
 
-const CustomTableFooter = (props: Props) => {
+export default function index(props: Props) {
   return props.data.count > 0 ? (
     <div className="row mt-3">
       <div className="col-6 col-xl-4">
@@ -59,9 +59,7 @@ const CustomTableFooter = (props: Props) => {
       <span>Eşleşen öğe bulunamadı</span>
     </div>
   );
-};
-
-export default CustomTableFooter;
+}
 
 interface Props {
   data: GetListResponse<any>;
