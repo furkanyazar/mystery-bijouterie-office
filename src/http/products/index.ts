@@ -7,6 +7,7 @@ import DeleteProductCommand from "./models/commands/delete/deleteProductCommand"
 import DeletedProductResponse from "./models/commands/delete/deletedProductResponse";
 import UpdateProductCommand from "./models/commands/update/updateProductCommand";
 import UpdatedProductResponse from "./models/commands/update/updatedProductResponse";
+import UploadedImageResponse from "./models/commands/uploadImage/uploadedImageResponse";
 import GetByIdProductQuery from "./models/queries/getById/getByIdProductQuery";
 import GetByIdProductResponse from "./models/queries/getById/getByIdProductResponse";
 import GetListProductListItemDto from "./models/queries/getList/getListProductListItemDto";
@@ -62,6 +63,14 @@ const getListByDynamicProduct = async (
     params: getListByDynamicProductQuery.pageRequest,
   });
 
+const uploadImage = async (productId: number, formData: FormData): Promise<AxiosResponse<UploadedImageResponse>> =>
+  await instance({
+    method: "POST",
+    url: "Products/UploadImage/" + productId,
+    headers: { "Content-Type": "multipart/form-data" },
+    data: formData,
+  });
+
 export default {
   createProduct,
   deleteProduct,
@@ -69,4 +78,5 @@ export default {
   getByIdProduct,
   getListProduct,
   getListByDynamicProduct,
+  uploadImage,
 };

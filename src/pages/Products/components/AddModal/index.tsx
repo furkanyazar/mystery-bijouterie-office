@@ -16,6 +16,8 @@ import products from "../../../../http/products";
 import CreateProductCommand from "../../../../http/products/models/commands/create/createProductCommand";
 import { DefaultProductDescription } from "../../../../jsons/models/DefaultProductDescription";
 import GetListResponse from "../../../../models/getListResponse";
+import { AxiosResponse } from "axios";
+import CreatedProductResponse from "../../../../http/products/models/commands/create/createdProductResponse";
 
 export default function index({ fetchProducts, categoriesLoaded, categoriesResponse, disabled }: Props) {
   const defaultProductDescriptions: DefaultProductDescription[] = require("../../../../jsons/defaultProductDescriptions.json");
@@ -23,7 +25,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreateProductCommand>({ ...defaultFormValues });
   const [loading, setLoading] = useState<boolean>(false);
-  const [file, setFile] = useState<File>(null);
+  const [image, setImage] = useState<File>(null);
   const [defaultDescription, setDefaultDescription] = useState<number>(0);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
@@ -61,18 +63,37 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
   }, [defaultDescription]);
 
   const handleSubmit = async () => {
-    setLoading(true);
-
-    const image = file ? new FormData() : null;
-    if (image) image.append("formFile", file);
-
-    await products
-      .createProduct({ ...formValues, image })
-      .then((response) => {
-        toast.success("Ürün başarılı bir şekilde eklendi.");
+    await addProduct()
+      .then(async (addProductResponse: any) => {
+        if (image) {
+          const formData = new FormData();
+          formData.append("image", image);
+          await uploadImage(addProductResponse.data.id, formData);
+        }
+      })
+      .then(() => {
         handleClose();
         fetchProducts();
+      });
+  };
+
+  const addProduct = async () => {
+    setLoading(true);
+    return await products
+      .createProduct(formValues)
+      .then((response) => {
+        toast.success("Ürün başarılı bir şekilde eklendi.");
+        return response;
       })
+      .catch((errorResponse) => {})
+      .finally(() => setLoading(false));
+  };
+
+  const uploadImage = async (productId: number, formData: FormData) => {
+    setLoading(true);
+    await products
+      .uploadImage(productId, formData)
+      .then((response) => toast.success("Ürün görseli başarılı bir şekilde yüklendi."))
       .catch((errorResponse) => {})
       .finally(() => setLoading(false));
   };
@@ -84,9 +105,9 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
     setFormValues({ ...defaultFormValues });
   };
 
-  const handleChangeFileInput = (e: any) => setFile(e.target.files[0]);
+  const handleChangeFileInput = (e: any) => setImage(e.target.files[0]);
 
-  const handleClickRemoveFile = () => setFile(null);
+  const handleClickRemoveFile = () => setImage(null);
 
   const validationSchema = Yup.object({
     categoryId: Yup.number().notRequired().min(1, ValidationInvalid),
@@ -171,9 +192,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                           value={formValues.categoryId ?? 0}
                           onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
                         >
-                          <option value={0} disabled>
-                            Seçiniz
-                          </option>
+                          <option value={0}>Seçiniz</option>
                           {categoriesResponse?.items
                             ?.sort((a, b) => a.name.localeCompare(b.name))
                             .map((category) => (
@@ -232,8 +251,8 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                       <FormGroup controlId="addProductModalImageInput" className="mb-3">
                         <FormLabel>Görsel Yükle</FormLabel>
                         <InputGroup>
-                          <FormControl type="file" accept="image/*" onChange={handleChangeFileInput} disabled />
-                          <Button variant="danger" onClick={handleClickRemoveFile} disabled={!file}>
+                          <FormControl type="file" accept="image/*" onChange={handleChangeFileInput} />
+                          <Button variant="danger" onClick={handleClickRemoveFile} disabled={!image}>
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
                         </InputGroup>
@@ -252,7 +271,14 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
   );
 }
 
-const defaultFormValues: CreateProductCommand = { categoryId: null, name: "", barcodeNumber: "", modelNumber: "", unitPrice: 0 };
+const defaultFormValues: CreateProductCommand = {
+  categoryId: null,
+  name: "",
+  barcodeNumber: "",
+  modelNumber: "",
+  unitPrice: 0,
+  description: null,
+};
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";
 const formId = "addProductForm";

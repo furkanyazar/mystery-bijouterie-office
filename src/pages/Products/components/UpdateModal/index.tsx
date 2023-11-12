@@ -23,7 +23,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<UpdateProductCommand>({ ...product });
   const [loading, setLoading] = useState<boolean>(false);
-  const [file, setFile] = useState<File>(null);
+  const [image, setImage] = useState<File>(null);
   const [defaultDescription, setDefaultDescription] = useState<number>(0);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
@@ -62,18 +62,37 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
   }, [defaultDescription]);
 
   const handleSubmit = async () => {
-    setLoading(true);
-
-    const image = file ? new FormData() : null;
-    if (image) image.append("formFile", file);
-
-    await products
-      .updateProduct({ ...formValues, image })
-      .then((response) => {
-        toast.success("Ürün başarılı bir şekilde güncellendi.");
+    await updateProduct()
+      .then(async (updateProductResponse: any) => {
+        if (image) {
+          const formData = new FormData();
+          formData.append("image", image);
+          await uploadImage(updateProductResponse.data.id, formData);
+        }
+      })
+      .then(() => {
         handleClose();
         fetchProducts();
+      });
+  };
+
+  const updateProduct = async () => {
+    setLoading(true);
+    return await products
+      .updateProduct(formValues)
+      .then((response) => {
+        toast.success("Ürün başarılı bir şekilde güncellendi.");
+        return response;
       })
+      .catch((errorResponse) => {})
+      .finally(() => setLoading(false));
+  };
+
+  const uploadImage = async (productId: number, formData: FormData) => {
+    setLoading(true);
+    await products
+      .uploadImage(productId, formData)
+      .then((response) => toast.success("Ürün görseli başarılı bir şekilde güncellendi."))
       .catch((errorResponse) => {})
       .finally(() => setLoading(false));
   };
@@ -85,9 +104,9 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
     setFormValues({ ...product });
   };
 
-  const handleChangeFileInput = (e: any) => setFile(e.target.files[0]);
+  const handleChangeFileInput = (e: any) => setImage(e.target.files[0]);
 
-  const handleClickRemoveFile = () => setFile(null);
+  const handleClickRemoveFile = () => setImage(null);
 
   const validationSchema = Yup.object({
     categoryId: Yup.number().notRequired().min(1, ValidationInvalid),
@@ -233,8 +252,8 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                       <FormGroup controlId="updateProductModalImageInput" className="mb-3">
                         <FormLabel>Görsel Yükle</FormLabel>
                         <InputGroup>
-                          <FormControl type="file" accept="image/*" onChange={handleChangeFileInput} disabled />
-                          <Button variant="danger" onClick={handleClickRemoveFile} disabled={!file}>
+                          <FormControl type="file" accept="image/*" onChange={handleChangeFileInput} />
+                          <Button variant="danger" onClick={handleClickRemoveFile} disabled={!image}>
                             <FontAwesomeIcon icon={faTrash} />
                           </Button>
                         </InputGroup>

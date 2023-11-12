@@ -33,8 +33,9 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
             d.push(dist !== 0 ? -dist : dist);
           });
           const vatRate = Number.parseFloat(process.env.VAT_RATE);
-          const commissionRate =
-            roundWithPrecision(product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate) ?? 0;
+          const commissionRate = roundWithPrecision(
+            product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0
+          );
           const commissionAmount = roundWithPrecision((discountedPrice * commissionRate) / 100);
           const shippingCost = partner.hasFreeShipping
             ? discountedPrice >= partner.freeShippingLowerLimit
@@ -54,7 +55,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
             additionalExpenses: additionalExpenses !== 0 ? -additionalExpenses : additionalExpenses,
             totalVAT: totalVAT !== 0 ? -totalVAT : totalVAT,
             estimatedEarnings: roundWithPrecision(
-              discountedPrice - product.unitPrice - commissionAmount - shippingCost - additionalExpenses - totalVAT
+              discountedPrice - product.unitPrice - commissionAmount - shippingCost - additionalExpenses - totalVAT - partner.serviceFee
             ),
             discounts: d,
             serviceFee: partner.serviceFee !== 0 ? -partner.serviceFee : partner.serviceFee,
@@ -157,7 +158,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
               </Row>
             </Col>
           </Row>
-          {partnersLoaded && (
+          {partnersLoaded && product.unitPrice !== 0 && (
             <>
               <hr />
               <Row>
