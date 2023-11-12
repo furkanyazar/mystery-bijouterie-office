@@ -1,22 +1,24 @@
+import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
 import { faRightToBracket, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useState } from "react";
-import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
+import { Button, Col, Container, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { useNavigate } from "react-router";
 import * as Yup from "yup";
 import { ValidationEmail, ValidationMinLength, ValidationRequired } from "../../constants/validationMessages";
 import { handleChangeInput } from "../../functions";
 import auth from "../../http/auth";
-import users from "../../http/users";
 import LoginCommand from "../../http/auth/models/commands/login/loginCommand";
+import users from "../../http/users";
 
 export default function index() {
   const navigate = useNavigate();
 
   const [loginModel, setLoginModel] = useState<LoginCommand>({ ...defaultLoginModel });
   const [loading, setLoading] = useState<boolean>(false);
+  const [passwordInputType, setPasswordInputType] = useState<"text" | "password">("password");
 
   const handleSubmit = async () => {
     setLoading(true);
@@ -75,19 +77,27 @@ export default function index() {
                       value={loginModel.email}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setLoginModel)}
                     />
-                    <div className="invalid-feedback">{errors.email}</div>
+                    {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                   </FormGroup>
                   <FormGroup className="mb-3" controlId="loginFormPassword">
                     <FormLabel>Şifre</FormLabel>
-                    <FormControl
-                      className={errors.password && "is-invalid"}
-                      type="password"
-                      placeholder="Şifrenizi giriniz"
-                      name="password"
-                      value={loginModel.password}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setLoginModel)}
-                    />
-                    <div className="invalid-feedback">{errors.password}</div>
+                    <InputGroup>
+                      <FormControl
+                        className={errors.password && "is-invalid"}
+                        type={passwordInputType}
+                        placeholder="Şifrenizi giriniz"
+                        name="password"
+                        value={loginModel.password}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setLoginModel)}
+                      />
+                      <Button
+                        variant="secondary"
+                        onClick={() => setPasswordInputType(passwordInputType === "password" ? "text" : "password")}
+                      >
+                        <FontAwesomeIcon icon={passwordInputType === "password" ? faEye : faEyeSlash} />
+                      </Button>
+                      {errors.password && <div className="invalid-feedback">{errors.password}</div>}
+                    </InputGroup>
                   </FormGroup>
                   <Button variant="success" type="submit" disabled={loading}>
                     {loading ? (
