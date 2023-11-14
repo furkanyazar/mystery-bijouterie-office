@@ -1,3 +1,4 @@
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { faPen, faSave, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
@@ -57,7 +58,10 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
   useEffect(() => {
     if (defaultDescription !== 0) {
       const description = defaultProductDescriptions.find((c) => c.id === defaultDescription);
-      if (description) setFormValues((prev) => ({ ...prev, description: description.description }));
+      if (description) {
+        tempDescription = description.description;
+        setFormValues((prev) => ({ ...prev, description: description.description }));
+      }
     }
   }, [defaultDescription]);
 
@@ -242,8 +246,8 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                       <MBTextEditor
                         id="updateProductModalDescriptionEditor"
                         value={formValues.description ?? ""}
-                        onChange={(_: any, editor: any) => {
-                          setDefaultDescription(0);
+                        onChange={(_: any, editor: ClassicEditor) => {
+                          if (editor.getData() !== tempDescription) setDefaultDescription(0);
                           handleChangeEditor("description", editor, setFormValues);
                         }}
                       />
@@ -282,3 +286,5 @@ interface Props {
   categoriesResponse: GetListResponse<GetListCategoryListItemDto>;
   categoriesLoaded: boolean;
 }
+
+let tempDescription = "";

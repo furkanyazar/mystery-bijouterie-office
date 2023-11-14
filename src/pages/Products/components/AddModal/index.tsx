@@ -1,3 +1,4 @@
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { faPlus, faSave, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
@@ -16,8 +17,6 @@ import products from "../../../../http/products";
 import CreateProductCommand from "../../../../http/products/models/commands/create/createProductCommand";
 import { DefaultProductDescription } from "../../../../jsons/models/DefaultProductDescription";
 import GetListResponse from "../../../../models/getListResponse";
-import { AxiosResponse } from "axios";
-import CreatedProductResponse from "../../../../http/products/models/commands/create/createdProductResponse";
 
 export default function index({ fetchProducts, categoriesLoaded, categoriesResponse, disabled }: Props) {
   const defaultProductDescriptions: DefaultProductDescription[] = require("../../../../jsons/defaultProductDescriptions.json");
@@ -58,7 +57,10 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
   useEffect(() => {
     if (defaultDescription !== 0) {
       const description = defaultProductDescriptions.find((c) => c.id === defaultDescription);
-      if (description) setFormValues((prev) => ({ ...prev, description: description.description }));
+      if (description) {
+        tempDescription = description.description;
+        setFormValues((prev) => ({ ...prev, description: description.description }));
+      }
     }
   }, [defaultDescription]);
 
@@ -241,8 +243,8 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                       <MBTextEditor
                         id="addProductModalDescriptionEditor"
                         value={formValues.description ?? ""}
-                        onChange={(_: any, editor: any) => {
-                          setDefaultDescription(0);
+                        onChange={(_: any, editor: ClassicEditor) => {
+                          if (editor.getData() !== tempDescription) setDefaultDescription(0);
                           handleChangeEditor("description", editor, setFormValues);
                         }}
                       />
@@ -289,3 +291,5 @@ interface Props {
   categoriesLoaded: boolean;
   disabled: boolean;
 }
+
+let tempDescription = "";
