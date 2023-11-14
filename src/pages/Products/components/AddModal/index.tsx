@@ -241,9 +241,9 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                       <MBTextEditor
                         id="addProductModalDescriptionEditor"
                         value={formValues.description ?? ""}
-                        onChange={(event: any, editor: any) => {
+                        onChange={(_: any, editor: any) => {
                           setDefaultDescription(0);
-                          handleChangeEditor(event, editor, setFormValues);
+                          handleChangeEditor("description", editor, setFormValues);
                         }}
                       />
                     </Col>

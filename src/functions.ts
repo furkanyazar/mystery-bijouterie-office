@@ -30,7 +30,7 @@ export const handleChangeSelect = (e: React.ChangeEvent<HTMLSelectElement>, setV
 export const handleChangeCheck = (e: React.ChangeEvent<HTMLInputElement>, setValues: (newValues: any) => void) =>
   setValues((prev: any) => ({ ...prev, [e.target.name]: e.target.checked }));
 
-export const handleChangeEditor = (event: EventInfo<string, unknown>, editor: ClassicEditor, setValues: (newValues: any) => void) =>
-  setValues((prev: any) => ({ ...prev, [event.name]: editor.getData() }));
+export const handleChangeEditor = (name: string, editor: ClassicEditor, setValues: (newValues: any) => void) =>
+  setValues((prev: any) => ({ ...prev, [name]: editor.getData() }));
 
 export const formatCurrency = (price: number) => Intl.NumberFormat("tr-TR", { style: "currency", currency: "TRY" }).format(price);
