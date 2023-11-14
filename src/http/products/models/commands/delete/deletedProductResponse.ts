@@ -10,5 +10,6 @@ export default interface DeletedProductResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
+  status: boolean;
   categoryCategoryPartners: DeletedProductResponseCategoryCategoryPartnerListItemDto[];
 }

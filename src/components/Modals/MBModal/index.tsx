@@ -4,7 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ReactNode } from "react";
 import { Button, Modal } from "react-bootstrap";
 
-export default function index({ buttons, children, closable, handleClose, show, title, size }: Props) {
+export default function index({ buttons, children, closable, handleClose, show, title, size, footerLeft }: Props) {
   return (
     <Modal
       show={show}
@@ -21,6 +21,7 @@ export default function index({ buttons, children, closable, handleClose, show, 
       <Modal.Body>{children}</Modal.Body>
       {buttons && (
         <Modal.Footer>
+          {footerLeft && <div className="me-auto">{footerLeft}</div>}
           {buttons.map((button) => (
             <Button
               key={button.key}
@@ -55,6 +56,7 @@ interface Props {
   children: ReactNode;
   handleClose: () => void;
   size?: "lg" | "sm" | "xl";
+  footerLeft?: ReactNode;
 }
 
 export interface ButtonProps {

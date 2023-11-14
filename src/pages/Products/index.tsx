@@ -4,13 +4,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ClipboardJS from "clipboard";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, FormControl, FormSelect, Row, Table } from "react-bootstrap";
+import { Button, Col, Container, FormCheck, FormControl, FormSelect, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
 import { toast } from "react-toastify";
 import MBSpinner from "../../components/MBSpinner";
 import MBTHeadItem from "../../components/MBTHeadItem";
 import MBTableFooter from "../../components/MBTableFooter";
-import { formatCurrency, handleChangeInput, handleChangeSelect } from "../../functions";
+import { formatCurrency, handleChangeCheck, handleChangeInput, handleChangeSelect } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
 import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
@@ -64,6 +64,7 @@ export default function index() {
     const modelNumberFilter: Filter = { field: "modelNumber", operator: "contains", value: searchValues.modelNumber };
     const minUnitPriceFilter: Filter = { field: "unitPrice", operator: "gte", value: searchValues.minUnitPrice };
     const maxUnitPriceFilter: Filter = { field: "unitPrice", operator: "lte", value: searchValues.maxUnitPrice };
+    const statusFilter: Filter = { field: "status", operator: "eq", value: searchValues.status ? "true" : "false" };
 
     if (nameFilter.value) dynamicQuery.filter = nameFilter;
 
@@ -105,6 +106,14 @@ export default function index() {
         if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(maxUnitPriceFilter);
         else dynamicQuery.filter.filters = [maxUnitPriceFilter];
       } else dynamicQuery.filter = maxUnitPriceFilter;
+    }
+
+    if (statusFilter.value === "true") {
+      if (dynamicQuery.filter) {
+        dynamicQuery.filter.logic = "and";
+        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(statusFilter);
+        else dynamicQuery.filter.filters = [statusFilter];
+      } else dynamicQuery.filter = statusFilter;
     }
 
     fetchProducts(dynamicQuery);
@@ -307,6 +316,19 @@ export default function index() {
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
               </div>
+              <div className="col">
+                <FormCheck
+                  id="productsFilterStatusCheck"
+                  type="switch"
+                  name="status"
+                  label="Tükenenleri Gösterme"
+                  checked={searchValues.status}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                    handleChangeCheck(e, setSearchValues);
+                    handleSubmit();
+                  }}
+                />
+              </div>
               <div className="col-auto ms-auto">
                 <Button type="submit" variant="primary" className="me-1" disabled={!productsLoaded}>
                   <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
@@ -416,6 +438,7 @@ const defaultSearchValues = {
   modelNumber: "",
   minUnitPrice: "",
   maxUnitPrice: "",
+  status: true,
   orderBy: "barcodeNumber",
   descending: true,
 };

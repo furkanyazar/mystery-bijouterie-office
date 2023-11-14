@@ -2,8 +2,8 @@ import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 import { faPen, faSave, faTrash, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { ChangeEvent, useEffect, useState } from "react";
-import { Button, Col, Container, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row } from "react-bootstrap";
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -11,7 +11,7 @@ import MBSpinner from "../../../../components/MBSpinner";
 import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
-import { handleChangeEditor, handleChangeInput, handleChangeSelect } from "../../../../functions";
+import { handleChangeCheck, handleChangeEditor, handleChangeInput, handleChangeSelect } from "../../../../functions";
 import GetListCategoryListItemDto from "../../../../http/categories/models/queries/getList/getListCategoryListItemDto";
 import products from "../../../../http/products";
 import UpdateProductCommand from "../../../../http/products/models/commands/update/updateProductCommand";
@@ -129,7 +129,23 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
       <Button className="btn-sm text-white ms-1" variant="warning" onClick={handleShow}>
         <FontAwesomeIcon icon={faPen} />
       </Button>
-      <MBModal closable={false} handleClose={handleClose} show={show} title="Ürün Düzenle" buttons={modalButtons}>
+      <MBModal
+        closable={false}
+        handleClose={handleClose}
+        show={show}
+        title="Ürün Düzenle"
+        buttons={modalButtons}
+        footerLeft={
+          <FormCheck
+            type="switch"
+            id="updateProductModalStatusCheck"
+            label="Stokta Var"
+            name="status"
+            checked={formValues.status}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+          />
+        }
+      >
         <Container>
           {categoriesLoaded ? (
             <Formik
@@ -233,7 +249,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
                         <FormSelect
                           className="mb-1"
                           value={defaultDescription}
-                          onChange={(e: ChangeEvent<HTMLSelectElement>) => setDefaultDescription(Number.parseInt(e.target.value))}
+                          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => setDefaultDescription(Number.parseInt(e.target.value))}
                         >
                           <option value={0}>Özel</option>
                           {defaultProductDescriptions

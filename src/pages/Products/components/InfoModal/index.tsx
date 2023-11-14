@@ -86,7 +86,15 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
       <Button className="btn-sm ms-1" variant="primary" onClick={handleShow}>
         <FontAwesomeIcon icon={faInfoCircle} />
       </Button>
-      <MBModal closable handleClose={handleClose} show={show} title="Ürün Detayı" buttons={modalButtons} size="xl">
+      <MBModal
+        closable
+        handleClose={handleClose}
+        show={show}
+        title="Ürün Detayı"
+        buttons={modalButtons}
+        size="xl"
+        footerLeft={<FormCheck type="switch" id="infoProductModalStatusCheck" label="Stokta Var" checked={product.status} readOnly />}
+      >
         <Container>
           <Row>
             <Col md={12} lg={4} className="mb-3">

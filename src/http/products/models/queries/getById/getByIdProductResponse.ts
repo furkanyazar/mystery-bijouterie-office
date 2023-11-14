@@ -10,5 +10,6 @@ export default interface GetByIdProductResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
+  status: boolean;
   categoryCategoryPartners: GetByIdProductResponseCategoryCategoryPartnerListItemDto[];
 }

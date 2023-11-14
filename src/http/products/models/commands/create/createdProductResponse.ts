@@ -10,5 +10,6 @@ export default interface CreatedProductResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
+  status: boolean;
   categoryCategoryPartners: CreatedProductResponseCategoryCategoryPartnerListItemDto[];
 }

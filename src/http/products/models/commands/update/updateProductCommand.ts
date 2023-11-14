@@ -6,4 +6,5 @@ export default interface UpdateProductCommand {
   unitPrice: number;
   modelNumber: string;
   description?: string;
+  status: boolean;
 }

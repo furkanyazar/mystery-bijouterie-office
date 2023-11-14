@@ -10,5 +10,6 @@ export default interface UpdatedProductResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
+  status: boolean;
   categoryCategoryPartners: UpdatedProductResponseCategoryCategoryPartnerListItemDto[];
 }

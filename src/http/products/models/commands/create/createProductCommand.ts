@@ -5,4 +5,5 @@ export default interface CreateProductCommand {
   unitPrice: number;
   modelNumber: string;
   description?: string;
+  status: boolean;
 }
