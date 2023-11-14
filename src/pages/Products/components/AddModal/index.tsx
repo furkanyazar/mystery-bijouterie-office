@@ -233,11 +233,13 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                           onChange={(e: ChangeEvent<HTMLSelectElement>) => setDefaultDescription(Number.parseInt(e.target.value))}
                         >
                           <option value={0}>Özel</option>
-                          {defaultProductDescriptions.map((description) => (
-                            <option key={description.id} value={description.id}>
-                              {description.name}
-                            </option>
-                          ))}
+                          {defaultProductDescriptions
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((description) => (
+                              <option key={description.id} value={description.id}>
+                                {description.name}
+                              </option>
+                            ))}
                         </FormSelect>
                       </FormGroup>
                       <MBTextEditor

@@ -17,7 +17,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.unitPrice * 2);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
-  const [discounts, setDiscounts] = useState<DiscountItemDto[]>([]);
+  const [discounts, setDiscounts] = useState<DiscountItemDto[]>([{ id: ++currentDiscountId, type: "amount", amount: 10 }]);
 
   useEffect(() => {
     if (partnersLoaded && partnersResponse?.items) {
