@@ -129,6 +129,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
         <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
       <MBModal
+        id="addProductModal"
         closable={false}
         handleClose={handleClose}
         show={show}

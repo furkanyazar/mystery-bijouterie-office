@@ -29,7 +29,14 @@ export default function index({ partner }: Props) {
       <Button className="btn-sm ms-1" variant="primary" onClick={handleShow}>
         <FontAwesomeIcon icon={faInfoCircle} />
       </Button>
-      <MBModal closable handleClose={handleClose} show={show} title="Partner Detayı" buttons={modalButtons}>
+      <MBModal
+        id={`infoPartnerModal-${partner.id}`}
+        closable
+        handleClose={handleClose}
+        show={show}
+        title="Partner Detayı"
+        buttons={modalButtons}
+      >
         <Container>
           <Row>
             <Col md={12}>

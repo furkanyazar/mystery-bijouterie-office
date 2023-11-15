@@ -130,6 +130,7 @@ export default function index({ fetchProducts, product, categoriesLoaded, catego
         <FontAwesomeIcon icon={faPen} />
       </Button>
       <MBModal
+        id={`editProductModal-${product.id}`}
         closable={false}
         handleClose={handleClose}
         show={show}

@@ -75,7 +75,7 @@ export default function index({ fetchPartners, disabled }: Props) {
       <Button variant="success" onClick={handleShow} disabled={disabled}>
         <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
-      <MBModal closable={false} handleClose={handleClose} show={show} title="Partner Ekle" buttons={modalButtons}>
+      <MBModal id="addPartnerModal" closable={false} handleClose={handleClose} show={show} title="Partner Ekle" buttons={modalButtons}>
         <Container>
           <Formik
             initialValues={formValues}

@@ -12,8 +12,6 @@ import GetByIdProductResponse from "../../../../http/products/models/queries/get
 import GetListResponse from "../../../../models/getListResponse";
 
 export default function index({ product, partnersLoaded, partnersResponse }: Props) {
-  const defaultImageUrl = process.env.DEFAULT_IMAGE_URL;
-
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.unitPrice * 2);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
@@ -76,8 +74,8 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
       text: "Tamam",
       disabled: false,
       loading: false,
-      handleClick: handleClose,
       icon: faCircleCheck,
+      handleClick: handleClose,
     },
   ];
 
@@ -87,6 +85,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
         <FontAwesomeIcon icon={faInfoCircle} />
       </Button>
       <MBModal
+        id={`infoProductModal-${product.id}`}
         closable
         handleClose={handleClose}
         show={show}
@@ -166,7 +165,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
               </Row>
             </Col>
           </Row>
-          {partnersLoaded && product.unitPrice !== 0 && (
+          {partnersLoaded && product.unitPrice > 0 && (
             <>
               <hr />
               <Row>
@@ -472,3 +471,5 @@ const roundWithPrecision = (num: number) => {
 };
 
 let currentDiscountId = 0;
+
+const defaultImageUrl = process.env.DEFAULT_IMAGE_URL;

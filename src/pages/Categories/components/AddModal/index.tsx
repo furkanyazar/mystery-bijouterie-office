@@ -85,7 +85,7 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
       <Button variant="success" onClick={handleShow} disabled={disabled}>
         <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
-      <MBModal closable={false} handleClose={handleClose} show={show} title="Kategori Ekle" buttons={modalButtons}>
+      <MBModal id="addCategoryModal" closable={false} handleClose={handleClose} show={show} title="Kategori Ekle" buttons={modalButtons}>
         <Container>
           {partnersLoaded ? (
             <Formik

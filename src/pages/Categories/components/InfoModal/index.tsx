@@ -32,7 +32,14 @@ export default function index({ category, partners, partnersLoaded }: Props) {
       <Button className="btn-sm ms-1" variant="primary" onClick={handleShow}>
         <FontAwesomeIcon icon={faInfoCircle} />
       </Button>
-      <MBModal closable handleClose={handleClose} show={show} title="Kategori Detayı" buttons={modalButtons}>
+      <MBModal
+        id={`infoCategoryModal-${category.id}`}
+        closable
+        handleClose={handleClose}
+        show={show}
+        title="Kategori Detayı"
+        buttons={modalButtons}
+      >
         <Container>
           <Row>
             <Col md={12}>

@@ -4,9 +4,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ReactNode } from "react";
 import { Button, Modal } from "react-bootstrap";
 
-export default function index({ buttons, children, closable, handleClose, show, title, size, footerLeft }: Props) {
+export default function index({ buttons, children, closable, handleClose, show, title, size, footerLeft, id }: Props) {
   return (
     <Modal
+      id={id}
       show={show}
       onHide={handleClose}
       keyboard={closable}
@@ -57,6 +58,7 @@ interface Props {
   handleClose: () => void;
   size?: "lg" | "sm" | "xl";
   footerLeft?: ReactNode;
+  id: string;
 }
 
 export interface ButtonProps {
