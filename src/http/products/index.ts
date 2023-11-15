@@ -14,6 +14,8 @@ import GetListProductListItemDto from "./models/queries/getList/getListProductLi
 import GetListProductQuery from "./models/queries/getList/getListProductQuery";
 import GetListByDynamicProductListItemDto from "./models/queries/getListByDynamic/getListByDynamicProductListItemDto";
 import GetListByDynamicProductQuery from "./models/queries/getListByDynamic/getListByDynamicProductQuery";
+import UpdatedSalePriceResponse from "./models/commands/updateSalePrice/updatedSalePriceResponse";
+import UpdateSalePriceCommand from "./models/commands/updateSalePrice/updateSalePriceCommand";
 
 const instance = baseAxiosInstance;
 
@@ -63,12 +65,19 @@ const getListByDynamicProduct = async (
     params: getListByDynamicProductQuery.pageRequest,
   });
 
-const uploadImage = async (productId: number, formData: FormData): Promise<AxiosResponse<UploadedImageResponse>> =>
+const uploadImage = async (id: number, formData: FormData): Promise<AxiosResponse<UploadedImageResponse>> =>
   await instance({
-    method: "POST",
-    url: "Products/UploadImage/" + productId,
+    method: "PUT",
+    url: "Products/UploadImage/" + id,
     headers: { "Content-Type": "multipart/form-data" },
     data: formData,
+  });
+
+const updateSalePrice = async (updateSalePriceCommand: UpdateSalePriceCommand): Promise<AxiosResponse<UpdatedSalePriceResponse>> =>
+  await instance({
+    method: "PUT",
+    url: "Products/UpdateSalePrice",
+    data: updateSalePriceCommand,
   });
 
 export default {
@@ -79,4 +88,5 @@ export default {
   getListProduct,
   getListByDynamicProduct,
   uploadImage,
+  updateSalePrice,
 };

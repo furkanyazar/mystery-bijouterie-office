@@ -1,3 +1,4 @@
+import React from "react";
 import { Pagination } from "react-bootstrap";
 import GetListResponse from "../../models/getListResponse";
 
@@ -9,7 +10,7 @@ export default function index(props: Props) {
           className="form-select"
           style={{ maxWidth: "80px" }}
           value={props.pageSize}
-          onChange={(e) => props.setPageSize(e.currentTarget.value)}
+          onChange={(e: React.ChangeEvent<HTMLSelectElement>) => props.setPageSize(e.currentTarget.value)}
         >
           {[10, 25, 50, 100].map((size) => (
             <option key={size} value={size}>

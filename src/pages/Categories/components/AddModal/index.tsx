@@ -133,7 +133,7 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
                                   ? categoryPartner.commissionRate
                                   : ""
                               }
-                              onChange={(e) => {
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 setFormValues((prev) => ({
                                   ...prev,
                                   categoryPartners: [

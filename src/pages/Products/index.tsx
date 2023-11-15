@@ -62,8 +62,8 @@ export default function index() {
     const categoryIdFilter: Filter = { field: "categoryId", operator: "eq", value: searchValues.categoryId.toString() };
     const barcodeNumberFilter: Filter = { field: "barcodeNumber", operator: "contains", value: searchValues.barcodeNumber };
     const modelNumberFilter: Filter = { field: "modelNumber", operator: "contains", value: searchValues.modelNumber };
-    const minUnitPriceFilter: Filter = { field: "unitPrice", operator: "gte", value: searchValues.minUnitPrice };
-    const maxUnitPriceFilter: Filter = { field: "unitPrice", operator: "lte", value: searchValues.maxUnitPrice };
+    const minPurchasePriceFilter: Filter = { field: "purchasePrice", operator: "gte", value: searchValues.minPurchasePrice };
+    const maxPurchasePriceFilter: Filter = { field: "purchasePrice", operator: "lte", value: searchValues.maxPurchasePrice };
     const statusFilter: Filter = { field: "status", operator: "eq", value: searchValues.status ? "true" : "false" };
 
     if (nameFilter.value) dynamicQuery.filter = nameFilter;
@@ -92,20 +92,20 @@ export default function index() {
       } else dynamicQuery.filter = modelNumberFilter;
     }
 
-    if (minUnitPriceFilter.value) {
+    if (minPurchasePriceFilter.value) {
       if (dynamicQuery.filter) {
         dynamicQuery.filter.logic = "and";
-        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(minUnitPriceFilter);
-        else dynamicQuery.filter.filters = [minUnitPriceFilter];
-      } else dynamicQuery.filter = minUnitPriceFilter;
+        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(minPurchasePriceFilter);
+        else dynamicQuery.filter.filters = [minPurchasePriceFilter];
+      } else dynamicQuery.filter = minPurchasePriceFilter;
     }
 
-    if (maxUnitPriceFilter.value) {
+    if (maxPurchasePriceFilter.value) {
       if (dynamicQuery.filter) {
         dynamicQuery.filter.logic = "and";
-        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(maxUnitPriceFilter);
-        else dynamicQuery.filter.filters = [maxUnitPriceFilter];
-      } else dynamicQuery.filter = maxUnitPriceFilter;
+        if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(maxPurchasePriceFilter);
+        else dynamicQuery.filter.filters = [maxPurchasePriceFilter];
+      } else dynamicQuery.filter = maxPurchasePriceFilter;
     }
 
     if (statusFilter.value === "true") {
@@ -300,9 +300,9 @@ export default function index() {
                 <FormControl
                   type="number"
                   step="any"
-                  name="minUnitPrice"
+                  name="minPurchasePrice"
                   placeholder="Min. Alış Fiyatı"
-                  value={searchValues.minUnitPrice}
+                  value={searchValues.minPurchasePrice}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
               </div>
@@ -310,9 +310,9 @@ export default function index() {
                 <FormControl
                   type="number"
                   step="any"
-                  name="maxUnitPrice"
+                  name="maxPurchasePrice"
                   placeholder="Maks. Alış Fiyatı"
-                  value={searchValues.maxUnitPrice}
+                  value={searchValues.maxPurchasePrice}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setSearchValues)}
                 />
               </div>
@@ -374,7 +374,7 @@ export default function index() {
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Alış Fiyatı"
-                    value="unitPrice"
+                    value="purchasePrice"
                   />
                   <th className="responsive-thead-item"></th>
                 </tr>
@@ -402,7 +402,7 @@ export default function index() {
                       </Button>
                       {product.modelNumber}
                     </td>
-                    <td>{formatCurrency(product.unitPrice)}</td>
+                    <td>{formatCurrency(product.purchasePrice)}</td>
                     <td className="text-end">
                       <InfoModal product={product} partnersLoaded={partnersLoaded} partnersResponse={partnersResponse} />
                       <UpdateModal
@@ -410,6 +410,7 @@ export default function index() {
                         product={product}
                         categoriesResponse={categoriesResponse}
                         categoriesLoaded={categoriesLoaded}
+                        imageUrl={product.imageUrl}
                       />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(product.id, product.name)}>
                         <FontAwesomeIcon icon={faTrash} />
@@ -436,8 +437,8 @@ const defaultSearchValues = {
   categoryId: 0,
   barcodeNumber: "",
   modelNumber: "",
-  minUnitPrice: "",
-  maxUnitPrice: "",
+  minPurchasePrice: "",
+  maxPurchasePrice: "",
   status: true,
   orderBy: "barcodeNumber",
   descending: true,

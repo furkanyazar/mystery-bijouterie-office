@@ -120,7 +120,7 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
     modelNumber: Yup.string()
       .required(ValidationRequired)
       .matches(/^MB-\d{5}$/, ValidationInvalid),
-    unitPrice: Yup.number().required(ValidationRequired),
+    purchasePrice: Yup.number().required(ValidationRequired),
   });
 
   return (
@@ -230,14 +230,14 @@ export default function index({ fetchProducts, categoriesLoaded, categoriesRespo
                           <FormControl
                             type="number"
                             step="any"
-                            className={errors.unitPrice && "is-invalid"}
+                            className={errors.purchasePrice && "is-invalid"}
                             placeholder="Alış Fiyatı"
-                            name="unitPrice"
-                            value={formValues.unitPrice}
+                            name="purchasePrice"
+                            value={formValues.purchasePrice}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                           />
                           <InputGroup.Text>₺</InputGroup.Text>
-                          {errors.unitPrice && <div className="invalid-feedback">{errors.unitPrice}</div>}
+                          {errors.purchasePrice && <div className="invalid-feedback">{errors.purchasePrice}</div>}
                         </InputGroup>
                       </FormGroup>
                     </Col>
@@ -297,7 +297,7 @@ const defaultFormValues: CreateProductCommand = {
   name: "",
   barcodeNumber: "",
   modelNumber: "",
-  unitPrice: 0,
+  purchasePrice: 0,
   description: null,
   status: true,
 };

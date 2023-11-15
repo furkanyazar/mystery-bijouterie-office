@@ -1,21 +1,39 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faCircleCheck, faInfoCircle, faPlus, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faInfoCircle, faPlus, faSave, faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row, Table } from "react-bootstrap";
 import ModalImage from "react-modal-image";
+import { toast } from "react-toastify";
+import * as Yup from "yup";
 import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
+import { ValidationRequired } from "../../../../constants/validationMessages";
 import { formatCurrency } from "../../../../functions";
 import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
+import products from "../../../../http/products";
+import UpdateSalePriceCommand from "../../../../http/products/models/commands/updateSalePrice/updateSalePriceCommand";
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 import GetListResponse from "../../../../models/getListResponse";
+import { Form, Formik } from "formik";
 
 export default function index({ product, partnersLoaded, partnersResponse }: Props) {
   const [show, setShow] = useState<boolean>(false);
-  const [price, setPrice] = useState<number>(product.unitPrice * 2);
+  const [price, setPrice] = useState<number>(product.salePrice);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
   const [discounts, setDiscounts] = useState<DiscountItemDto[]>([{ id: ++currentDiscountId, type: "amount", amount: 10 }]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
+    {
+      key: "ok",
+      variant: "primary",
+      text: "Tamam",
+      disabled: loading,
+      loading: false,
+      icon: faCircleCheck,
+      handleClick: () => handleClose(),
+    },
+  ]);
 
   useEffect(() => {
     if (partnersLoaded && partnersResponse?.items) {
@@ -47,13 +65,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
             partnerId: partner.id,
             price: p,
             discountedPrice: roundWithPrecision(discountedPrice),
-            unitPrice: product.unitPrice !== 0 ? -product.unitPrice : product.unitPrice,
+            purchasePrice: product.purchasePrice !== 0 ? -product.purchasePrice : product.purchasePrice,
             commissionAmount: commissionAmount !== 0 ? -commissionAmount : commissionAmount,
             shippingCost: shippingCost !== 0 ? -shippingCost : shippingCost,
             additionalExpenses: additionalExpenses !== 0 ? -additionalExpenses : additionalExpenses,
             totalVAT: totalVAT !== 0 ? -totalVAT : totalVAT,
             estimatedEarnings: roundWithPrecision(
-              discountedPrice - product.unitPrice - commissionAmount - shippingCost - additionalExpenses - totalVAT - partner.serviceFee
+              discountedPrice - product.purchasePrice - commissionAmount - shippingCost - additionalExpenses - totalVAT - partner.serviceFee
             ),
             discounts: d,
             serviceFee: partner.serviceFee !== 0 ? -partner.serviceFee : partner.serviceFee,
@@ -63,21 +81,27 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
     }
   }, [partnersLoaded, partnersResponse, price, discounts]);
 
+  useEffect(() => {
+    setModalButtons((prev) => [...prev.map((c) => ({ ...c, disabled: loading }))]);
+  }, [loading]);
+
+  const handleSubmitSalePrice = async () => {
+    setLoading(true);
+    const updateSalePriceCommand: UpdateSalePriceCommand = { id: product.id, salePrice: price };
+    await products
+      .updateSalePrice(updateSalePriceCommand)
+      .then((response) => toast.success("Satış fiyatı başarılı bir şekilde güncellendi."))
+      .catch((errorResponse) => {})
+      .finally(() => setLoading(false));
+  };
+
   const handleShow = () => setShow(true);
 
   const handleClose = () => setShow(false);
 
-  const modalButtons: ButtonProps[] = [
-    {
-      key: "ok",
-      variant: "primary",
-      text: "Tamam",
-      disabled: false,
-      loading: false,
-      icon: faCircleCheck,
-      handleClick: handleClose,
-    },
-  ];
+  const validationSchema = Yup.object({
+    salePrice: Yup.string().matches(/^(?:(?!NaN).)*$/, ValidationRequired),
+  });
 
   return (
     <>
@@ -86,7 +110,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
       </Button>
       <MBModal
         id={`infoProductModal-${product.id}`}
-        closable
+        closable={!loading}
         handleClose={handleClose}
         show={show}
         title="Ürün Detayı"
@@ -153,7 +177,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                   <FormGroup className="mb-3" controlId="infoProductModalUnitPriceInput">
                     <FormLabel>Alış Fiyatı</FormLabel>
                     <InputGroup>
-                      <FormControl placeholder="Alış Fiyatı" value={product.unitPrice} readOnly />
+                      <FormControl placeholder="Alış Fiyatı" value={product.purchasePrice} readOnly />
                       <InputGroup.Text>₺</InputGroup.Text>
                     </InputGroup>
                   </FormGroup>
@@ -165,7 +189,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
               </Row>
             </Col>
           </Row>
-          {partnersLoaded && product.unitPrice > 0 && (
+          {partnersLoaded && product.purchasePrice > 0 && (
             <>
               <hr />
               <Row>
@@ -174,22 +198,51 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                 </Col>
                 <Col md={12} lg={4}>
                   <Row>
-                    <Col xs={6}>
-                      <FormGroup className="mb-3" controlId="infoProductModalPriceInput">
-                        <FormLabel>Satış Fiyatı</FormLabel>
-                        <InputGroup>
-                          <FormControl
-                            type="number"
-                            step="any"
-                            placeholder="Fiyat Hesapla"
-                            value={!isNaN(price) ? price : ""}
-                            onChange={(e) => setPrice(Number.parseFloat(e.target.value))}
-                          />
-                          <InputGroup.Text>₺</InputGroup.Text>
-                        </InputGroup>
-                      </FormGroup>
+                    <Col xs={8} lg={12} xl={8}>
+                      <Formik
+                        initialValues={{ salePrice: price }}
+                        onSubmit={handleSubmitSalePrice}
+                        enableReinitialize
+                        validationSchema={validationSchema}
+                        validateOnChange={false}
+                        validateOnBlur={false}
+                      >
+                        {({ errors }) => (
+                          <Form id="updateSalePriceForm">
+                            <FormGroup className="mb-3" controlId="infoProductModalPriceInput">
+                              <FormLabel>Satış Fiyatı</FormLabel>
+                              <InputGroup>
+                                <FormControl
+                                  type="number"
+                                  step="any"
+                                  className={errors.salePrice && "is-invalid"}
+                                  placeholder="Fiyat Hesapla"
+                                  name="salePrice"
+                                  value={!isNaN(price) ? price : ""}
+                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrice(Number.parseFloat(e.target.value))}
+                                />
+                                <InputGroup.Text>₺</InputGroup.Text>
+                                <Button
+                                  type="submit"
+                                  form="updateSalePriceForm"
+                                  variant="warning"
+                                  className="text-white"
+                                  disabled={loading}
+                                >
+                                  {loading ? (
+                                    <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
+                                  ) : (
+                                    <FontAwesomeIcon icon={faSave} />
+                                  )}
+                                </Button>
+                                {errors.salePrice && <div className="invalid-feedback">{errors.salePrice}</div>}
+                              </InputGroup>
+                            </FormGroup>
+                          </Form>
+                        )}
+                      </Formik>
                     </Col>
-                    <Col xs={6} className="mb-3">
+                    <Col xs={4} lg={12} xl={4} className="mb-3">
                       <FormLabel>İndirimler</FormLabel>
                       <br />
                       <Button
@@ -333,9 +386,11 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.unitPrice < 0 ? "text-danger" : partnerPrice.unitPrice > 0 ? "text-success" : ""}
+                                className={
+                                  partnerPrice.purchasePrice < 0 ? "text-danger" : partnerPrice.purchasePrice > 0 ? "text-success" : ""
+                                }
                               >
-                                {formatCurrency(partnerPrice.unitPrice)}
+                                {formatCurrency(partnerPrice.purchasePrice)}
                               </td>
                             ))}
                           </tr>
@@ -357,6 +412,17 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             ))}
                           </tr>
                           <tr>
+                            <th>Hizmet Bedeli</th>
+                            {partnerPrices.map((partnerPrice) => (
+                              <td
+                                key={partnerPrice.partnerId}
+                                className={partnerPrice.serviceFee < 0 ? "text-danger" : partnerPrice.serviceFee > 0 ? "text-success" : ""}
+                              >
+                                {formatCurrency(partnerPrice.serviceFee)}
+                              </td>
+                            ))}
+                          </tr>
+                          <tr>
                             <th>Kargo Ücreti</th>
                             {partnerPrices.map((partnerPrice) => (
                               <td
@@ -366,17 +432,6 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 }
                               >
                                 {formatCurrency(partnerPrice.shippingCost)}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <th>Hizmet Bedeli</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={partnerPrice.serviceFee < 0 ? "text-danger" : partnerPrice.serviceFee > 0 ? "text-success" : ""}
-                              >
-                                {formatCurrency(partnerPrice.serviceFee)}
                               </td>
                             ))}
                           </tr>
@@ -449,7 +504,7 @@ interface PriceItemDto {
   partnerId: number;
   price: number;
   discountedPrice: number;
-  unitPrice: number;
+  purchasePrice: number;
   commissionAmount: number;
   shippingCost: number;
   additionalExpenses: number;

@@ -1,7 +1,7 @@
 import { faPen, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -153,7 +153,7 @@ export default function index({ fetchCategories, category, partnersLoaded, partn
                                   ? categoryPartner.commissionRate
                                   : ""
                               }
-                              onChange={(e) => {
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                                 setFormValues((prev) => ({
                                   ...prev,
                                   categoryPartners: [

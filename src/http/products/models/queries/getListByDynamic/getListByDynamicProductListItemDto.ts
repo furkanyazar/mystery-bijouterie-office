@@ -5,7 +5,8 @@ export default interface GetListByDynamicProductListItemDto {
   categoryId?: number;
   name: string;
   barcodeNumber: string;
-  unitPrice: number;
+  purchasePrice: number;
+  salePrice: number;
   categoryName?: string;
   modelNumber: string;
   description?: string;
