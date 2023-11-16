@@ -353,9 +353,9 @@ export default function index() {
                     setSearchValues={setSearchValues}
                     title="#"
                     value="id"
-                    style={{ width: "75px" }}
+                    style={{ minWidth: "75px", width: "75px" }}
                   />
-                  <th style={{ width: "100px" }}>Görsel</th>
+                  <th style={{ minWidth: "100px", width: "100px" }}>Görsel</th>
                   <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
                   <MBTHeadItem
                     responsive={true}
@@ -385,7 +385,7 @@ export default function index() {
                     title="Alış Fiyatı"
                     value="purchasePrice"
                   />
-                  <th style={{ width: "125px" }}></th>
+                  <th style={{ minWidth: "125px", width: "125px" }}></th>
                 </tr>
               </thead>
               <tbody>
