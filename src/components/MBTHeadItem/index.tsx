@@ -1,9 +1,11 @@
 import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import React from "react";
 
-export default function index({ responsive = true, searchValues, setSearchValues, title, value }: Props) {
+export default function index({ responsive = true, searchValues, setSearchValues, title, value, style }: Props) {
   return (
     <th
+      style={style}
       className={responsive ? "responsive-thead-item orderable" : "orderable"}
       onClick={() =>
         setSearchValues({
@@ -42,4 +44,5 @@ interface Props {
   searchValues: any;
   title: string;
   value: string;
+  style?: React.CSSProperties;
 }

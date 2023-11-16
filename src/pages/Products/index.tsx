@@ -32,6 +32,7 @@ import {
 import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
+import ModalImage from "react-modal-image";
 
 export default function index() {
   const dispatch = useAppDispatch();
@@ -346,7 +347,15 @@ export default function index() {
             <Table striped hover responsive>
               <thead>
                 <tr>
-                  <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
+                  <MBTHeadItem
+                    responsive={false}
+                    searchValues={searchValues}
+                    setSearchValues={setSearchValues}
+                    title="#"
+                    value="id"
+                    style={{ width: "75px" }}
+                  />
+                  <th style={{ width: "100px" }}>Görsel</th>
                   <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
                   <MBTHeadItem
                     responsive={true}
@@ -376,13 +385,20 @@ export default function index() {
                     title="Alış Fiyatı"
                     value="purchasePrice"
                   />
-                  <th className="responsive-thead-item"></th>
+                  <th style={{ width: "125px" }}></th>
                 </tr>
               </thead>
               <tbody>
                 {productsResponse?.items.map((product) => (
                   <tr key={product.id}>
                     <td>{product.id}</td>
+                    <td>
+                      <ModalImage
+                        small={product.imageUrl ?? defaultImageUrl}
+                        large={product.imageUrl ?? defaultImageUrl}
+                        className="img-thumbnail"
+                      />
+                    </td>
                     <td>
                       <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.name}>
                         <FontAwesomeIcon icon={faCopy} />
@@ -445,3 +461,5 @@ const defaultSearchValues = {
 };
 
 const defaultPageRequest = { pageIndex: 0, pageSize: 50 };
+
+const defaultImageUrl = process.env.DEFAULT_IMAGE_URL;
