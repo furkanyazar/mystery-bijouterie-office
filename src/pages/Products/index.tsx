@@ -323,6 +323,7 @@ export default function index() {
                   type="switch"
                   name="status"
                   label="Tükenenleri Gösterme"
+                  disabled={!productsLoaded}
                   checked={searchValues.status}
                   onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                     handleChangeCheck(e, setSearchValues);
@@ -356,30 +357,30 @@ export default function index() {
                     style={{ minWidth: "75px", width: "75px" }}
                   />
                   <th style={{ minWidth: "100px", width: "100px" }}>Görsel</th>
-                  <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
+                  <MBTHeadItem responsive searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
                   <MBTHeadItem
-                    responsive={true}
+                    responsive
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Kategori"
                     value="category.name"
                   />
                   <MBTHeadItem
-                    responsive={true}
+                    responsive
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Barkod No."
                     value="barcodeNumber"
                   />
                   <MBTHeadItem
-                    responsive={true}
+                    responsive
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Model No."
                     value="modelNumber"
                   />
                   <MBTHeadItem
-                    responsive={true}
+                    responsive
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Alış Fiyatı"

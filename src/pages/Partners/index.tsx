@@ -169,9 +169,9 @@ export default function index() {
             <Table striped hover responsive>
               <thead>
                 <tr>
-                  <MBTHeadItem responsive={true} searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
+                  <MBTHeadItem responsive searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
                   <MBTHeadItem
-                    responsive={true}
+                    responsive
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
                     title="Ad"
