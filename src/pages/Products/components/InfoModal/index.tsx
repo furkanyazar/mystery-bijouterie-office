@@ -1,6 +1,7 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
 import { faCircleCheck, faInfoCircle, faPlus, faSave, faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row, Table } from "react-bootstrap";
 import ModalImage from "react-modal-image";
@@ -15,13 +16,11 @@ import products from "../../../../http/products";
 import UpdateSalePriceCommand from "../../../../http/products/models/commands/updateSalePrice/updateSalePriceCommand";
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 import GetListResponse from "../../../../models/getListResponse";
-import { Form, Formik } from "formik";
 
 export default function index({ product, partnersLoaded, partnersResponse }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.salePrice);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
-  const [discounts, setDiscounts] = useState<DiscountItemDto[]>([{ id: ++currentDiscountId, type: "amount", amount: 10 }]);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
@@ -34,52 +33,60 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
       handleClick: () => handleClose(),
     },
   ]);
+  const [currentDiscounts, setCurrentDiscounts] = useState<DiscountItemDto[]>([
+    { id: ++currentDiscountId, type: "percent", amount: 15 },
+    { id: ++currentDiscountId, type: "amount", amount: 10 },
+  ]);
 
   useEffect(() => {
     if (partnersLoaded && partnersResponse?.items) {
       setPartnerPrices([
         ...partnersResponse.items.map((partner) => {
-          const p = price && !isNaN(price) ? price : 0;
-          let discountedPrice = p;
-          const d: number[] = [];
-          discounts.forEach((discount) => {
-            let dis = discount && !isNaN(discount.amount) ? discount.amount : 0;
-            let dist = discount.type === "amount" ? roundWithPrecision(dis) : roundWithPrecision((discountedPrice * dis) / 100);
-            discountedPrice -= dist;
-            d.push(dist !== 0 ? -dist : dist);
+          let partnerId: number = partner.id;
+          let salePrice: number = price && !isNaN(price) ? price : 0;
+          let discountedPrice: number = salePrice;
+          let purchasePrice: number = product.purchasePrice;
+          let discounts: number[] = [];
+
+          currentDiscounts.forEach((currentDiscount) => {
+            let discountAmount: number = currentDiscount && !isNaN(currentDiscount.amount) ? currentDiscount.amount : 0;
+            let discount: number = currentDiscount.type === "amount" ? discountAmount : (discountedPrice * discountAmount) / 100;
+            discountedPrice -= discount;
+            discounts.push(discount);
           });
-          const vatRate = Number.parseFloat(process.env.VAT_RATE);
-          const commissionRate = roundWithPrecision(
-            product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0
-          );
-          const commissionAmount = roundWithPrecision((discountedPrice * commissionRate) / 100);
-          const shippingCost = partner.hasFreeShipping
+
+          let commissionRate: number = product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
+          let commissionAmount: number = (discountedPrice * commissionRate) / 100;
+          let shippingCost: number = partner.hasFreeShipping
             ? discountedPrice >= partner.freeShippingLowerLimit
-              ? roundWithPrecision(partner.shippingCost)
+              ? partner.shippingCost
               : 0
-            : roundWithPrecision(partner.shippingCost);
-          const additionalExpenses = Number.parseFloat(process.env.ADDITIONAL_EXPENSES);
-          const totalVAT =
-            roundWithPrecision((commissionAmount * vatRate) / 100 + (shippingCost * vatRate) / 100) + (partner.serviceFee * vatRate) / 100;
+            : partner.shippingCost;
+          let serviceFee: number = partner.serviceFee;
+
+          let additionalExpenses: number = Number.parseFloat(process.env.ADDITIONAL_EXPENSES);
+          let vatRate: number = Number.parseFloat(process.env.VAT_RATE);
+          let totalVAT: number = (commissionAmount * vatRate) / 100 + (shippingCost * vatRate) / 100 + (serviceFee * vatRate) / 100;
+          let estimatedEarnings: number =
+            discountedPrice - purchasePrice - commissionAmount - shippingCost - additionalExpenses - totalVAT - serviceFee;
+
           return {
-            partnerId: partner.id,
-            price: p,
-            discountedPrice: roundWithPrecision(discountedPrice),
-            purchasePrice: product.purchasePrice !== 0 ? -product.purchasePrice : product.purchasePrice,
-            commissionAmount: commissionAmount !== 0 ? -commissionAmount : commissionAmount,
-            shippingCost: shippingCost !== 0 ? -shippingCost : shippingCost,
-            additionalExpenses: additionalExpenses !== 0 ? -additionalExpenses : additionalExpenses,
-            totalVAT: totalVAT !== 0 ? -totalVAT : totalVAT,
-            estimatedEarnings: roundWithPrecision(
-              discountedPrice - product.purchasePrice - commissionAmount - shippingCost - additionalExpenses - totalVAT - partner.serviceFee
-            ),
-            discounts: d,
-            serviceFee: partner.serviceFee !== 0 ? -partner.serviceFee : partner.serviceFee,
+            partnerId,
+            salePrice,
+            discountedPrice,
+            purchasePrice,
+            commissionAmount,
+            shippingCost,
+            additionalExpenses,
+            totalVAT,
+            estimatedEarnings,
+            discounts,
+            serviceFee,
           };
         }),
       ]);
     }
-  }, [partnersLoaded, partnersResponse, price, discounts]);
+  }, [partnersLoaded, partnersResponse, price, currentDiscounts]);
 
   useEffect(() => {
     setModalButtons((prev) => [...prev.map((c) => ({ ...c, disabled: loading }))]);
@@ -247,13 +254,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                       <br />
                       <Button
                         variant="success"
-                        onClick={() => setDiscounts((prev) => [...prev, { id: ++currentDiscountId, type: "amount", amount: 0 }])}
+                        onClick={() => setCurrentDiscounts((prev) => [...prev, { id: ++currentDiscountId, type: "amount", amount: 0 }])}
                       >
                         <FontAwesomeIcon icon={faPlus} className="me-1" />
                         Ekle
                       </Button>
                     </Col>
-                    {discounts.map((discount, index) => (
+                    {currentDiscounts.map((discount, index) => (
                       <Row key={discount.id}>
                         <hr />
                         <h6>{index + 1}. İndirim</h6>
@@ -267,7 +274,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             checked={discount.type === "amount"}
                             onChange={(e: any) => {
                               if (e.target.checked)
-                                setDiscounts((prev) => [
+                                setCurrentDiscounts((prev) => [
                                   ...prev.map((p) => ({ ...p, type: discount.id === p.id ? e.target.value : p.type })),
                                 ]);
                             }}
@@ -281,7 +288,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             checked={discount.type === "percent"}
                             onChange={(e: any) => {
                               if (e.target.checked)
-                                setDiscounts((prev) => [
+                                setCurrentDiscounts((prev) => [
                                   ...prev.map((p) => ({ ...p, type: discount.id === p.id ? e.target.value : p.type })),
                                 ]);
                             }}
@@ -297,7 +304,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 placeholder={discount.type === "amount" ? "İndirim Tutarı" : "İndirim Oranı"}
                                 value={!isNaN(discount.amount) ? discount.amount : ""}
                                 onChange={(e: any) => {
-                                  setDiscounts((prev) => [
+                                  setCurrentDiscounts((prev) => [
                                     ...prev.map((p) => ({ ...p, amount: discount.id === p.id ? e.target.value : p.amount })),
                                   ]);
                                 }}
@@ -305,7 +312,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <InputGroup.Text>{discount.type === "amount" ? "₺" : "%"}</InputGroup.Text>
                               <Button
                                 variant="danger"
-                                onClick={() => setDiscounts((prev) => [...prev.filter((p) => p.id !== discount.id)])}
+                                onClick={() => setCurrentDiscounts((prev) => [...prev.filter((p) => p.id !== discount.id)])}
                               >
                                 <FontAwesomeIcon icon={faTrash} />
                               </Button>
@@ -334,13 +341,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.price < 0 ? "text-danger" : partnerPrice.price > 0 ? "text-success" : ""}
+                                className={partnerPrice.salePrice < 0 ? "text-danger" : partnerPrice.salePrice > 0 ? "text-success" : ""}
                               >
-                                {formatCurrency(partnerPrice.price)}
+                                {formatCurrency(partnerPrice.salePrice)}
                               </td>
                             ))}
                           </tr>
-                          {discounts.map((discount, index) => (
+                          {currentDiscounts.map((discount, index) => (
                             <tr key={index}>
                               <th>
                                 {index + 1}. İndirim ({discount.type === "amount" ? formatCurrency(discount.amount) : discount.amount + "%"}
@@ -351,18 +358,18 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                   key={partnerPrice.partnerId}
                                   className={
                                     partnerPrice.discounts[index] < 0
-                                      ? "text-danger"
-                                      : partnerPrice.discounts[index] > 0
                                       ? "text-success"
+                                      : partnerPrice.discounts[index] > 0
+                                      ? "text-danger"
                                       : ""
                                   }
                                 >
-                                  {formatCurrency(partnerPrice.discounts[index])}
+                                  {formatCurrency(-partnerPrice.discounts[index])}
                                 </td>
                               ))}
                             </tr>
                           ))}
-                          {discounts.length > 0 && (
+                          {currentDiscounts.length > 0 && (
                             <tr>
                               <th>İndirimli Satış Fiyatı</th>
                               {partnerPrices.map((partnerPrice) => (
@@ -387,10 +394,10 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.purchasePrice < 0 ? "text-danger" : partnerPrice.purchasePrice > 0 ? "text-success" : ""
+                                  partnerPrice.purchasePrice < 0 ? "text-success" : partnerPrice.purchasePrice > 0 ? "text-danger" : ""
                                 }
                               >
-                                {formatCurrency(partnerPrice.purchasePrice)}
+                                {formatCurrency(-partnerPrice.purchasePrice)}
                               </td>
                             ))}
                           </tr>
@@ -401,13 +408,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 key={partnerPrice.partnerId}
                                 className={
                                   partnerPrice.commissionAmount < 0
-                                    ? "text-danger"
-                                    : partnerPrice.commissionAmount > 0
                                     ? "text-success"
+                                    : partnerPrice.commissionAmount > 0
+                                    ? "text-danger"
                                     : ""
                                 }
                               >
-                                {formatCurrency(partnerPrice.commissionAmount)}
+                                {formatCurrency(-partnerPrice.commissionAmount)}
                               </td>
                             ))}
                           </tr>
@@ -416,9 +423,9 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.serviceFee < 0 ? "text-danger" : partnerPrice.serviceFee > 0 ? "text-success" : ""}
+                                className={partnerPrice.serviceFee < 0 ? "text-success" : partnerPrice.serviceFee > 0 ? "text-danger" : ""}
                               >
-                                {formatCurrency(partnerPrice.serviceFee)}
+                                {formatCurrency(-partnerPrice.serviceFee)}
                               </td>
                             ))}
                           </tr>
@@ -428,10 +435,10 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.shippingCost < 0 ? "text-danger" : partnerPrice.shippingCost > 0 ? "text-success" : ""
+                                  partnerPrice.shippingCost < 0 ? "text-success" : partnerPrice.shippingCost > 0 ? "text-danger" : ""
                                 }
                               >
-                                {formatCurrency(partnerPrice.shippingCost)}
+                                {formatCurrency(-partnerPrice.shippingCost)}
                               </td>
                             ))}
                           </tr>
@@ -440,9 +447,9 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.totalVAT < 0 ? "text-danger" : partnerPrice.totalVAT > 0 ? "text-success" : ""}
+                                className={partnerPrice.totalVAT < 0 ? "text-success" : partnerPrice.totalVAT > 0 ? "text-danger" : ""}
                               >
-                                {formatCurrency(partnerPrice.totalVAT)}
+                                {formatCurrency(-partnerPrice.totalVAT)}
                               </td>
                             ))}
                           </tr>
@@ -453,13 +460,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 key={partnerPrice.partnerId}
                                 className={
                                   partnerPrice.additionalExpenses < 0
-                                    ? "text-danger"
-                                    : partnerPrice.additionalExpenses < 0
                                     ? "text-success"
+                                    : partnerPrice.additionalExpenses > 0
+                                    ? "text-danger"
                                     : ""
                                 }
                               >
-                                {formatCurrency(partnerPrice.additionalExpenses)}
+                                {formatCurrency(-partnerPrice.additionalExpenses)}
                               </td>
                             ))}
                           </tr>
@@ -502,7 +509,7 @@ interface Props {
 
 interface PriceItemDto {
   partnerId: number;
-  price: number;
+  salePrice: number;
   discountedPrice: number;
   purchasePrice: number;
   commissionAmount: number;
