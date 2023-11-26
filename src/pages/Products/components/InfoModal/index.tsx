@@ -33,10 +33,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
       handleClick: () => handleClose(),
     },
   ]);
-  const [currentDiscounts, setCurrentDiscounts] = useState<DiscountItemDto[]>([
-    { id: ++currentDiscountId, type: "percent", amount: 15 },
-    { id: ++currentDiscountId, type: "amount", amount: 10 },
-  ]);
+  const [currentDiscounts, setCurrentDiscounts] = useState<DiscountItemDto[]>([{ id: ++currentDiscountId, type: "amount", amount: 10 }]);
 
   useEffect(() => {
     if (partnersLoaded && partnersResponse?.items) {
