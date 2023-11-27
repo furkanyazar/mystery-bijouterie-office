@@ -332,7 +332,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.salePrice < 0 ? "text-danger" : partnerPrice.salePrice > 0 ? "text-success" : ""}
+                                className={
+                                  formatCurrency(partnerPrice.salePrice).startsWith("-")
+                                    ? "text-danger"
+                                    : formatCurrency(partnerPrice.salePrice) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
+                                }
                               >
                                 {formatCurrency(partnerPrice.salePrice)}
                               </td>
@@ -348,11 +354,19 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 <td
                                   key={partnerPrice.partnerId}
                                   className={
-                                    partnerPrice.currentDiscounts[index] < 0
-                                      ? "text-success"
-                                      : partnerPrice.currentDiscounts[index] > 0
+                                    formatCurrency(
+                                      partnerPrice.currentDiscounts[index] !== 0
+                                        ? -partnerPrice.currentDiscounts[index]
+                                        : partnerPrice.currentDiscounts[index]
+                                    ).startsWith("-")
                                       ? "text-danger"
-                                      : ""
+                                      : formatCurrency(
+                                          partnerPrice.currentDiscounts[index] !== 0
+                                            ? -partnerPrice.currentDiscounts[index]
+                                            : partnerPrice.currentDiscounts[index]
+                                        ) === "₺0,00"
+                                      ? ""
+                                      : "text-success"
                                   }
                                 >
                                   {formatCurrency(
@@ -371,11 +385,11 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 <td
                                   key={partnerPrice.partnerId}
                                   className={
-                                    partnerPrice.discountedPrice < 0
+                                    formatCurrency(partnerPrice.discountedPrice).startsWith("-")
                                       ? "text-danger"
-                                      : partnerPrice.discountedPrice > 0
-                                      ? "text-success"
-                                      : ""
+                                      : formatCurrency(partnerPrice.discountedPrice) === "₺0,00"
+                                      ? ""
+                                      : "text-success"
                                   }
                                 >
                                   {formatCurrency(partnerPrice.discountedPrice)}
@@ -389,7 +403,15 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.purchasePrice < 0 ? "text-success" : partnerPrice.purchasePrice > 0 ? "text-danger" : ""
+                                  formatCurrency(
+                                    partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
+                                  ).startsWith("-")
+                                    ? "text-danger"
+                                    : formatCurrency(
+                                        partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
+                                      ) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
                                 }
                               >
                                 {formatCurrency(
@@ -404,11 +426,15 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.commissionAmount < 0
-                                    ? "text-success"
-                                    : partnerPrice.commissionAmount > 0
+                                  formatCurrency(
+                                    partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
+                                  ).startsWith("-")
                                     ? "text-danger"
-                                    : ""
+                                    : formatCurrency(
+                                        partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
+                                      ) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
                                 }
                               >
                                 {formatCurrency(
@@ -422,13 +448,18 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.serviceFee < 0 ? "text-success" : partnerPrice.serviceFee > 0 ? "text-danger" : ""}
+                                className={
+                                  formatCurrency(
+                                    partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee
+                                  ).startsWith("-")
+                                    ? "text-danger"
+                                    : formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee) ===
+                                      "₺0,00"
+                                    ? ""
+                                    : "text-success"
+                                }
                               >
-                                {formatCurrency(
-                                  partnerPrice.serviceFee !== 0
-                                    ? partnerPrice.serviceFee - partnerPrice.serviceFee
-                                    : partnerPrice.serviceFee
-                                )}
+                                {formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee)}
                               </td>
                             ))}
                           </tr>
@@ -438,7 +469,15 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.shippingCost < 0 ? "text-success" : partnerPrice.shippingCost > 0 ? "text-danger" : ""
+                                  formatCurrency(
+                                    partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost
+                                  ).startsWith("-")
+                                    ? "text-danger"
+                                    : formatCurrency(
+                                        partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost
+                                      ) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
                                 }
                               >
                                 {formatCurrency(partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost)}
@@ -450,7 +489,16 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             {partnerPrices.map((partnerPrice) => (
                               <td
                                 key={partnerPrice.partnerId}
-                                className={partnerPrice.totalVAT < 0 ? "text-success" : partnerPrice.totalVAT > 0 ? "text-danger" : ""}
+                                className={
+                                  formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT).startsWith(
+                                    "-"
+                                  )
+                                    ? "text-danger"
+                                    : formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT) ===
+                                      "₺0,00"
+                                    ? ""
+                                    : "text-success"
+                                }
                               >
                                 {formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT)}
                               </td>
@@ -462,11 +510,19 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.additionalExpenses < 0
-                                    ? "text-success"
-                                    : partnerPrice.additionalExpenses > 0
+                                  formatCurrency(
+                                    partnerPrice.additionalExpenses !== 0
+                                      ? -partnerPrice.additionalExpenses
+                                      : partnerPrice.additionalExpenses
+                                  ).startsWith("-")
                                     ? "text-danger"
-                                    : ""
+                                    : formatCurrency(
+                                        partnerPrice.additionalExpenses !== 0
+                                          ? -partnerPrice.additionalExpenses
+                                          : partnerPrice.additionalExpenses
+                                      ) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
                                 }
                               >
                                 {formatCurrency(
@@ -481,11 +537,11 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               <td
                                 key={partnerPrice.partnerId}
                                 className={
-                                  partnerPrice.estimatedEarnings < 0
+                                  formatCurrency(partnerPrice.estimatedEarnings).startsWith("-")
                                     ? "text-danger"
-                                    : partnerPrice.estimatedEarnings > 0
-                                    ? "text-success"
-                                    : ""
+                                    : formatCurrency(partnerPrice.estimatedEarnings) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
                                 }
                               >
                                 {formatCurrency(partnerPrice.estimatedEarnings)}
