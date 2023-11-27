@@ -22,7 +22,7 @@ export default function index() {
         {buttons.map((button) => (
           <Button key={button.key} variant={button.variant} onClick={button.handleClick} disabled={button.disabled}>
             {button.loading ? (
-              <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
+              <FontAwesomeIcon icon={faCircleNotch} className="fa-spin" />
             ) : (
               <>
                 {button.icon && <FontAwesomeIcon icon={button.icon} className="me-1" />}

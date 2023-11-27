@@ -101,7 +101,7 @@ export default function index() {
                   </FormGroup>
                   <Button variant="success" type="submit" disabled={loading}>
                     {loading ? (
-                      <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
+                      <FontAwesomeIcon icon={faCircleNotch} className="fa-spin" />
                     ) : (
                       <>
                         <FontAwesomeIcon icon={faRightToBracket} className="me-1" />

@@ -243,7 +243,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                   disabled={loading}
                                 >
                                   {loading ? (
-                                    <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
+                                    <FontAwesomeIcon icon={faCircleNotch} className="fa-spin" />
                                   ) : (
                                     <FontAwesomeIcon icon={faSave} />
                                   )}
