@@ -1,5 +1,5 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faCircleCheck, faInfoCircle, faPlus, faSave, faSpinner, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faInfoCircle, faPlus, faSave, faCircleNotch, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
@@ -60,11 +60,14 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
 
           let commissionRate: number = product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
           let commissionAmount: number = (discountedPrice * commissionRate) / 100;
-          let shippingCost: number = partner.hasFreeShipping
-            ? discountedPrice >= partner.freeShippingLowerLimit
-              ? partner.shippingCost
-              : 0
-            : partner.shippingCost;
+          let shippingCost: number =
+            partner.hasFirstScale && discountedPrice >= partner.firstScaleLowerLimit && discountedPrice <= partner.firstScaleUpperLimit
+              ? partner.firstScaleShippingFee
+              : partner.hasSecondScale &&
+                discountedPrice >= partner.secondScaleLowerLimit &&
+                discountedPrice <= partner.secondScaleUpperLimit
+              ? partner.secondScaleShippingFee
+              : partner.shippingCost;
           let serviceFee: number = partner.serviceFee;
 
           let additionalExpenses: number = Number.parseFloat(process.env.ADDITIONAL_EXPENSES);
@@ -240,7 +243,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                   disabled={loading}
                                 >
                                   {loading ? (
-                                    <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
+                                    <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
                                   ) : (
                                     <FontAwesomeIcon icon={faSave} />
                                   )}

@@ -1,5 +1,5 @@
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ReactNode } from "react";
 import { Button, Modal } from "react-bootstrap";
@@ -34,7 +34,7 @@ export default function index({ buttons, children, closable, handleClose, show, 
               className={button.className}
             >
               {button.loading ? (
-                <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
+                <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
               ) : (
                 <>
                   {button.icon && <FontAwesomeIcon icon={button.icon} className="me-1" />}

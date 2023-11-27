@@ -1,5 +1,5 @@
 import { faEye, faEyeSlash } from "@fortawesome/free-regular-svg-icons";
-import { faRightToBracket, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faRightToBracket, faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useState } from "react";
@@ -101,7 +101,7 @@ export default function index() {
                   </FormGroup>
                   <Button variant="success" type="submit" disabled={loading}>
                     {loading ? (
-                      <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
+                      <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
                     ) : (
                       <>
                         <FontAwesomeIcon icon={faRightToBracket} className="me-1" />

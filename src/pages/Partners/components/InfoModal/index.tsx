@@ -64,16 +64,65 @@ export default function index({ partner }: Props) {
               </FormGroup>
             </Col>
             <Col md={6}>
-              <FormGroup className="mb-3" controlId="infoPartnerModalHasFreeShippingSInput">
-                <FormLabel></FormLabel>
-                <FormCheck type="switch" label="Ücretsiz Kargo Alt Limiti" checked={partner.hasFreeShipping} readOnly />
+              <FormGroup className="mb-3" controlId="infoPartnerModalHasFirstScaleInput">
+                <FormCheck type="switch" label="1. Barem" checked={partner.hasFirstScale} readOnly />
               </FormGroup>
             </Col>
             <Col md={6}>
-              <FormGroup className="mb-3" controlId="infoPartnerModalFreeShippingLowerLimitSInput">
-                <FormLabel>Ücretsiz Kargo Alt Limiti</FormLabel>
+              <FormGroup className="mb-3" controlId="infoPartnerModalHasSecondScaleInput">
+                <FormCheck type="switch" label="2. Barem" checked={partner.hasSecondScale} readOnly />
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalFirstScaleLowerLimitInput">
+                <FormLabel>1. Barem Alt Limit</FormLabel>
                 <InputGroup>
-                  <FormControl placeholder="Ücretsiz Kargo Alt Limiti" value={partner.freeShippingLowerLimit} readOnly />
+                  <FormControl placeholder="1. Barem Alt Limit" value={partner.firstScaleLowerLimit} readOnly />
+                  <InputGroup.Text>₺</InputGroup.Text>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalSecondScaleLowerLimitInput">
+                <FormLabel>2. Barem Alt Limit</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="2. Barem Alt Limit" value={partner.secondScaleLowerLimit} readOnly />
+                  <InputGroup.Text>₺</InputGroup.Text>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalFirstScaleUpperLimitInput">
+                <FormLabel>1. Barem Üst Limit</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="1. Barem Üst Limit" value={partner.firstScaleUpperLimit} readOnly />
+                  <InputGroup.Text>₺</InputGroup.Text>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalSecondScaleUpperLimitInput">
+                <FormLabel>2. Barem Üst Limit</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="2. Barem Üst Limit" value={partner.secondScaleUpperLimit} readOnly />
+                  <InputGroup.Text>₺</InputGroup.Text>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalFirstScaleShippingFeeInput">
+                <FormLabel>1. Barem Kargo Ücreti</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="1. Barem Kargo Ücreti" value={partner.firstScaleShippingFee} readOnly />
+                  <InputGroup.Text>₺</InputGroup.Text>
+                </InputGroup>
+              </FormGroup>
+            </Col>
+            <Col md={6}>
+              <FormGroup className="mb-3" controlId="infoPartnerModalSecondScaleShippingFeeInput">
+                <FormLabel>2. Barem Kargo Ücreti</FormLabel>
+                <InputGroup>
+                  <FormControl placeholder="2. Barem Kargo Ücreti" value={partner.secondScaleShippingFee} readOnly />
                   <InputGroup.Text>₺</InputGroup.Text>
                 </InputGroup>
               </FormGroup>

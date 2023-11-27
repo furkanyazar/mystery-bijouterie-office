@@ -3,7 +3,7 @@ import { Button, Modal } from "react-bootstrap";
 import { useAppDispatch } from "../../../hooks/useAppDispatch";
 import { useAppSelector } from "../../../hooks/useAppSelector";
 import { hideNotification } from "../../../store/slices/notificationSlice";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCircleNotch } from "@fortawesome/free-solid-svg-icons";
 
 export default function index() {
   const dispatch = useAppDispatch();
@@ -22,7 +22,7 @@ export default function index() {
         {buttons.map((button) => (
           <Button key={button.key} variant={button.variant} onClick={button.handleClick} disabled={button.disabled}>
             {button.loading ? (
-              <FontAwesomeIcon icon={faSpinner} className="fa-spin-pulse" />
+              <FontAwesomeIcon icon={faCircleNotch} className="fa-spin-pulse" />
             ) : (
               <>
                 {button.icon && <FontAwesomeIcon icon={button.icon} className="me-1" />}
