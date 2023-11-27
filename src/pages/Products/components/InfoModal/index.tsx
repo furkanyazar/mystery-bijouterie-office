@@ -11,13 +11,20 @@ import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationRequired } from "../../../../constants/validationMessages";
 import { formatCurrency } from "../../../../functions";
+import { useAppDispatch } from "../../../../hooks/useAppDispatch";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import products from "../../../../http/products";
 import UpdateSalePriceCommand from "../../../../http/products/models/commands/updateSalePrice/updateSalePriceCommand";
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 import GetListResponse from "../../../../models/getListResponse";
+import { addDiscount, removeDiscount, updateDiscount } from "../../../../store/slices/appSlice";
 
 export default function index({ product, partnersLoaded, partnersResponse }: Props) {
+  const dispatch = useAppDispatch();
+
+  const { discounts } = useAppSelector((state) => state.appItems);
+
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.salePrice);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
@@ -33,7 +40,6 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
       handleClick: () => handleClose(),
     },
   ]);
-  const [currentDiscounts, setCurrentDiscounts] = useState<DiscountItemDto[]>([{ id: ++currentDiscountId, type: "amount", amount: 10 }]);
 
   useEffect(() => {
     if (partnersLoaded && partnersResponse?.items) {
@@ -43,13 +49,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
           let salePrice: number = price && !isNaN(price) ? price : 0;
           let discountedPrice: number = salePrice;
           let purchasePrice: number = product.purchasePrice;
-          let discounts: number[] = [];
+          let currentDiscounts: number[] = [];
 
-          currentDiscounts.forEach((currentDiscount) => {
-            let discountAmount: number = currentDiscount && !isNaN(currentDiscount.amount) ? currentDiscount.amount : 0;
-            let discount: number = currentDiscount.type === "amount" ? discountAmount : (discountedPrice * discountAmount) / 100;
-            discountedPrice -= discount;
-            discounts.push(discount);
+          discounts.forEach((discount) => {
+            let discountAmount: number = discount && !isNaN(discount.amount) ? discount.amount : 0;
+            let discountPrice: number = discount.type === "amount" ? discountAmount : (discountedPrice * discountAmount) / 100;
+            discountedPrice -= discountPrice;
+            currentDiscounts.push(discountPrice);
           });
 
           let commissionRate: number = product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
@@ -77,13 +83,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
             additionalExpenses,
             totalVAT,
             estimatedEarnings,
-            discounts,
+            currentDiscounts,
             serviceFee,
           };
         }),
       ]);
     }
-  }, [partnersLoaded, partnersResponse, price, currentDiscounts]);
+  }, [partnersLoaded, partnersResponse, price, discounts]);
 
   useEffect(() => {
     setModalButtons((prev) => [...prev.map((c) => ({ ...c, disabled: loading }))]);
@@ -249,15 +255,12 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                     <Col xs={4} lg={12} xl={4} className="mb-3">
                       <FormLabel>İndirimler</FormLabel>
                       <br />
-                      <Button
-                        variant="success"
-                        onClick={() => setCurrentDiscounts((prev) => [...prev, { id: ++currentDiscountId, type: "amount", amount: 0 }])}
-                      >
+                      <Button variant="success" onClick={() => dispatch(addDiscount({ amount: 0, type: "amount" }))}>
                         <FontAwesomeIcon icon={faPlus} className="me-1" />
                         Ekle
                       </Button>
                     </Col>
-                    {currentDiscounts.map((discount, index) => (
+                    {discounts.map((discount, index) => (
                       <Row key={discount.id}>
                         <hr />
                         <h6>{index + 1}. İndirim</h6>
@@ -271,9 +274,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             checked={discount.type === "amount"}
                             onChange={(e: any) => {
                               if (e.target.checked)
-                                setCurrentDiscounts((prev) => [
-                                  ...prev.map((p) => ({ ...p, type: discount.id === p.id ? e.target.value : p.type })),
-                                ]);
+                                dispatch(updateDiscount({ id: discount.id, amount: discount.amount, type: e.target.value }));
                             }}
                           />
                           <FormCheck
@@ -285,9 +286,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                             checked={discount.type === "percent"}
                             onChange={(e: any) => {
                               if (e.target.checked)
-                                setCurrentDiscounts((prev) => [
-                                  ...prev.map((p) => ({ ...p, type: discount.id === p.id ? e.target.value : p.type })),
-                                ]);
+                                dispatch(updateDiscount({ id: discount.id, amount: discount.amount, type: e.target.value }));
                             }}
                           />
                         </Col>
@@ -300,17 +299,12 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 step="any"
                                 placeholder={discount.type === "amount" ? "İndirim Tutarı" : "İndirim Oranı"}
                                 value={!isNaN(discount.amount) ? discount.amount : ""}
-                                onChange={(e: any) => {
-                                  setCurrentDiscounts((prev) => [
-                                    ...prev.map((p) => ({ ...p, amount: discount.id === p.id ? e.target.value : p.amount })),
-                                  ]);
-                                }}
+                                onChange={(e: any) =>
+                                  dispatch(updateDiscount({ id: discount.id, amount: e.target.value, type: discount.type }))
+                                }
                               />
                               <InputGroup.Text>{discount.type === "amount" ? "₺" : "%"}</InputGroup.Text>
-                              <Button
-                                variant="danger"
-                                onClick={() => setCurrentDiscounts((prev) => [...prev.filter((p) => p.id !== discount.id)])}
-                              >
+                              <Button variant="danger" onClick={() => dispatch(removeDiscount(discount.id))}>
                                 <FontAwesomeIcon icon={faTrash} />
                               </Button>
                             </InputGroup>
@@ -344,7 +338,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                               </td>
                             ))}
                           </tr>
-                          {currentDiscounts.map((discount, index) => (
+                          {discounts.map((discount, index) => (
                             <tr key={index}>
                               <th>
                                 {index + 1}. İndirim ({discount.type === "amount" ? formatCurrency(discount.amount) : discount.amount + "%"}
@@ -354,19 +348,19 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 <td
                                   key={partnerPrice.partnerId}
                                   className={
-                                    partnerPrice.discounts[index] < 0
+                                    partnerPrice.currentDiscounts[index] < 0
                                       ? "text-success"
-                                      : partnerPrice.discounts[index] > 0
+                                      : partnerPrice.currentDiscounts[index] > 0
                                       ? "text-danger"
                                       : ""
                                   }
                                 >
-                                  {formatCurrency(-partnerPrice.discounts[index])}
+                                  {formatCurrency(-partnerPrice.currentDiscounts[index])}
                                 </td>
                               ))}
                             </tr>
                           ))}
-                          {currentDiscounts.length > 0 && (
+                          {discounts.length > 0 && (
                             <tr>
                               <th>İndirimli Satış Fiyatı</th>
                               {partnerPrices.map((partnerPrice) => (
@@ -514,21 +508,8 @@ interface PriceItemDto {
   additionalExpenses: number;
   totalVAT: number;
   estimatedEarnings: number;
-  discounts: number[];
+  currentDiscounts: number[];
   serviceFee: number;
 }
-
-interface DiscountItemDto {
-  id: number;
-  type: "amount" | "percent";
-  amount: number;
-}
-
-const roundWithPrecision = (num: number) => {
-  const factor = Math.pow(10, 2);
-  return Math.floor(num * factor) / factor;
-};
-
-let currentDiscountId = 0;
 
 const defaultImageUrl = process.env.DEFAULT_IMAGE_URL;
