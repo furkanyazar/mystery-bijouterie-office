@@ -355,7 +355,11 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                       : ""
                                   }
                                 >
-                                  {formatCurrency(-partnerPrice.currentDiscounts[index])}
+                                  {formatCurrency(
+                                    partnerPrice.currentDiscounts[index] !== 0
+                                      ? -partnerPrice.currentDiscounts[index]
+                                      : partnerPrice.currentDiscounts[index]
+                                  )}
                                 </td>
                               ))}
                             </tr>
@@ -388,7 +392,9 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                   partnerPrice.purchasePrice < 0 ? "text-success" : partnerPrice.purchasePrice > 0 ? "text-danger" : ""
                                 }
                               >
-                                {formatCurrency(-partnerPrice.purchasePrice)}
+                                {formatCurrency(
+                                  partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
+                                )}
                               </td>
                             ))}
                           </tr>
@@ -405,7 +411,9 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                     : ""
                                 }
                               >
-                                {formatCurrency(-partnerPrice.commissionAmount)}
+                                {formatCurrency(
+                                  partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
+                                )}
                               </td>
                             ))}
                           </tr>
@@ -416,7 +424,11 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 key={partnerPrice.partnerId}
                                 className={partnerPrice.serviceFee < 0 ? "text-success" : partnerPrice.serviceFee > 0 ? "text-danger" : ""}
                               >
-                                {formatCurrency(-partnerPrice.serviceFee)}
+                                {formatCurrency(
+                                  partnerPrice.serviceFee !== 0
+                                    ? partnerPrice.serviceFee - partnerPrice.serviceFee
+                                    : partnerPrice.serviceFee
+                                )}
                               </td>
                             ))}
                           </tr>
@@ -429,7 +441,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                   partnerPrice.shippingCost < 0 ? "text-success" : partnerPrice.shippingCost > 0 ? "text-danger" : ""
                                 }
                               >
-                                {formatCurrency(-partnerPrice.shippingCost)}
+                                {formatCurrency(partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost)}
                               </td>
                             ))}
                           </tr>
@@ -440,7 +452,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                 key={partnerPrice.partnerId}
                                 className={partnerPrice.totalVAT < 0 ? "text-success" : partnerPrice.totalVAT > 0 ? "text-danger" : ""}
                               >
-                                {formatCurrency(-partnerPrice.totalVAT)}
+                                {formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT)}
                               </td>
                             ))}
                           </tr>
@@ -457,7 +469,9 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                                     : ""
                                 }
                               >
-                                {formatCurrency(-partnerPrice.additionalExpenses)}
+                                {formatCurrency(
+                                  partnerPrice.additionalExpenses !== 0 ? -partnerPrice.additionalExpenses : partnerPrice.additionalExpenses
+                                )}
                               </td>
                             ))}
                           </tr>

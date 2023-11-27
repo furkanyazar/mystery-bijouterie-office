@@ -269,6 +269,7 @@ export default function index() {
                   name="categoryId"
                   value={searchValues.categoryId}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
+                  disabled={!categoriesLoaded}
                 >
                   <option value={0}>Kategori</option>
                   {categoriesLoaded &&
