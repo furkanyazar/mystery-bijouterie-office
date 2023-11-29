@@ -86,6 +86,11 @@ export default function index() {
                     Ürünler
                   </Nav.Link>
                 </Link>
+                <Link to={"/materyaller"}>
+                  <Nav.Link as={"span"} active={pathName.pathname === "/materyaller"}>
+                    Materyaller
+                  </Nav.Link>
+                </Link>
               </Nav>
               <Navbar.Text>Yönetim Paneli</Navbar.Text>
               <Button variant="danger" className="ms-3" onClick={handleClickLogout}>

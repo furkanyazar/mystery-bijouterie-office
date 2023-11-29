@@ -11,6 +11,7 @@ import Categories from "./pages/Categories";
 import Error from "./pages/Error";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Materials from "./pages/Materials";
 import Partners from "./pages/Partners";
 import Products from "./pages/Products";
 import { hideNotification } from "./store/slices/notificationSlice";
@@ -34,6 +35,7 @@ export default function App() {
         <Route path="/urunler" element={user ? <Products /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/kategoriler" element={user ? <Categories /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/partnerler" element={user ? <Partners /> : <Navigate to={"/giris-yap"} />} />
+        <Route path="/materyaller" element={user ? <Materials /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/hata/:code" element={<Error />} />
         <Route path="*" element={<Navigate to={"/hata/404"} />} />
       </Routes>
