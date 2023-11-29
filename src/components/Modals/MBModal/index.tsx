@@ -34,7 +34,10 @@ export default function index({ buttons, children, closable, handleClose, show, 
               className={button.className}
             >
               {button.loading ? (
-                <FontAwesomeIcon icon={faCircleNotch} className="fa-spin" />
+                <>
+                  <FontAwesomeIcon icon={faCircleNotch} className="fa-spin me-1" />
+                  {button.text}
+                </>
               ) : (
                 <>
                   {button.icon && <FontAwesomeIcon icon={button.icon} className="me-1" />}

@@ -103,13 +103,13 @@ export default function index({ fetchMaterials, disabled }: Props) {
                   </Col>
                   <Col md={6}>
                     <FormGroup className="mb-3" controlId="addMaterialModalPurchasePriceInput">
-                      <FormLabel>Kargo Ücreti</FormLabel>
+                      <FormLabel>Alış Fiyatı</FormLabel>
                       <InputGroup>
                         <FormControl
                           type="number"
                           step="any"
                           className={errors.purchasePrice && "is-invalid"}
-                          placeholder="Kargo Ücreti"
+                          placeholder="Alış Fiyatı"
                           name="purchasePrice"
                           value={formValues.purchasePrice}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
@@ -121,12 +121,12 @@ export default function index({ fetchMaterials, disabled }: Props) {
                   </Col>
                   <Col md={6}>
                     <FormGroup className="mb-3" controlId="addMaterialModalUnitsInStockInput">
-                      <FormLabel>Hizmet Bedeli</FormLabel>
+                      <FormLabel>Stok Miktarı</FormLabel>
                       <FormControl
                         type="number"
                         step="any"
                         className={errors.unitsInStock && "is-invalid"}
-                        placeholder="Hizmet Bedeli"
+                        placeholder="Stok Miktarı"
                         name="unitsInStock"
                         value={formValues.unitsInStock}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
