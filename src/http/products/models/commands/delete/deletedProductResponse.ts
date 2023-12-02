@@ -1,4 +1,5 @@
 import DeletedProductResponseCategoryCategoryPartnerListItemDto from "./deletedProductResponseCategoryCategoryPartnerListItemDto";
+import DeletedProductResponseProductMaterialListItemDto from "./deletedProductResponseProductMaterialListItemDto";
 
 export default interface DeletedProductResponse {
   id: number;
@@ -13,4 +14,5 @@ export default interface DeletedProductResponse {
   imageUrl?: string;
   status: boolean;
   categoryCategoryPartners: DeletedProductResponseCategoryCategoryPartnerListItemDto[];
+  productMaterials: DeletedProductResponseProductMaterialListItemDto[];
 }

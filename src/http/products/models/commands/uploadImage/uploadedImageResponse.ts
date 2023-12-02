@@ -1,4 +1,5 @@
 import UploadedImageResponseCategoryCategoryPartnerListItemDto from "./uploadedImageResponseCategoryCategoryPartnerListItemDto";
+import UploadedImageResponseProductMaterialListItemDto from "./uploadedImageResponseProductMaterialListItemDto";
 
 export default interface UploadedImageResponse {
   id: number;
@@ -13,4 +14,5 @@ export default interface UploadedImageResponse {
   imageUrl?: string;
   status: boolean;
   categoryCategoryPartners: UploadedImageResponseCategoryCategoryPartnerListItemDto[];
+  productMaterials: UploadedImageResponseProductMaterialListItemDto[];
 }

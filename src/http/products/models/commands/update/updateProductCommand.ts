@@ -1,3 +1,5 @@
+import UpdateProductCommandProductMaterialListItemDto from "./updateProductCommandProductMaterialListItemDto";
+
 export default interface UpdateProductCommand {
   id: number;
   categoryId?: number;
@@ -7,4 +9,5 @@ export default interface UpdateProductCommand {
   modelNumber: string;
   description?: string;
   status: boolean;
+  productMaterials: UpdateProductCommandProductMaterialListItemDto[];
 }

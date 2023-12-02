@@ -6,6 +6,7 @@ import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormSelect, Row, Table } from "react-bootstrap";
 import { Helmet } from "react-helmet";
+import ModalImage from "react-modal-image";
 import { toast } from "react-toastify";
 import MBSpinner from "../../components/MBSpinner";
 import MBTHeadItem from "../../components/MBTHeadItem";
@@ -14,6 +15,8 @@ import { formatCurrency, handleChangeCheck, handleChangeInput, handleChangeSelec
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
 import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
+import materials from "../../http/materials";
+import GetListMaterialListItemDto from "../../http/materials/models/queries/getList/getListMaterialListItemDto";
 import partners from "../../http/partners";
 import GetListPartnerListItemDto from "../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import products from "../../http/products";
@@ -32,7 +35,6 @@ import {
 import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
-import ModalImage from "react-modal-image";
 
 export default function index() {
   const dispatch = useAppDispatch();
@@ -46,10 +48,13 @@ export default function index() {
   const [categoriesLoaded, setCategoriesLoaded] = useState<boolean>(false);
   const [partnersResponse, setPartnersResponse] = useState<GetListResponse<GetListPartnerListItemDto>>(null);
   const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
+  const [materialsResponse, setMaterialsResponse] = useState<GetListResponse<GetListMaterialListItemDto>>(null);
+  const [materialsLoaded, setMaterialsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    if (productsLoaded && !categoriesLoaded && !partnersLoaded) fetchCategories().finally(fetchPartners);
-  }, [productsLoaded, categoriesLoaded, partnersLoaded]);
+    if (productsLoaded && !categoriesLoaded && !partnersLoaded && !materialsLoaded)
+      fetchCategories().finally(fetchPartners).finally(fetchMaterials);
+  }, [productsLoaded, categoriesLoaded, partnersLoaded, materialsLoaded]);
 
   useEffect(() => {
     setProductsLoaded(false);
@@ -168,6 +173,13 @@ export default function index() {
       .catch((errorResponse) => {})
       .finally(() => setPartnersLoaded(true));
 
+  const fetchMaterials = async () =>
+    await materials
+      .getListMaterial()
+      .then((response) => setMaterialsResponse(response.data))
+      .catch((errorResponse) => {})
+      .finally(() => setMaterialsLoaded(true));
+
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
   const setPageSize = (pageSize: number) => setPageRequest({ pageIndex: 0, pageSize });
@@ -249,6 +261,8 @@ export default function index() {
               categoriesResponse={categoriesResponse}
               categoriesLoaded={categoriesLoaded}
               disabled={!productsLoaded}
+              materialsResponse={materialsResponse}
+              materialsLoaded={materialsLoaded}
             />
           </Col>
         </Row>
@@ -422,13 +436,21 @@ export default function index() {
                     </td>
                     <td>{formatCurrency(product.purchasePrice)}</td>
                     <td className="text-end">
-                      <InfoModal product={product} partnersLoaded={partnersLoaded} partnersResponse={partnersResponse} />
+                      <InfoModal
+                        product={product}
+                        partnersLoaded={partnersLoaded}
+                        partnersResponse={partnersResponse}
+                        materialsLoaded={materialsLoaded}
+                        materialsResponse={materialsResponse}
+                      />
                       <UpdateModal
                         fetchProducts={handleSubmit}
                         product={product}
                         categoriesResponse={categoriesResponse}
                         categoriesLoaded={categoriesLoaded}
                         imageUrl={product.imageUrl}
+                        materialsResponse={materialsResponse}
+                        materialsLoaded={materialsLoaded}
                       />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(product.id, product.name)}>
                         <FontAwesomeIcon icon={faTrash} />

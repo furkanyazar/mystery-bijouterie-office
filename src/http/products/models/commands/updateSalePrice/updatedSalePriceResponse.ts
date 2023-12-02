@@ -1,4 +1,5 @@
 import UpdatedSalePriceResponseCategoryCategoryPartnerListItemDto from "./updatedSalePriceResponseCategoryCategoryPartnerListItemDto";
+import UpdatedSalePriceResponseProductMaterialListItemDto from "./updatedSalePriceResponseProductMaterialListItemDto";
 
 export default interface UpdatedSalePriceResponse {
   id: number;
@@ -13,4 +14,5 @@ export default interface UpdatedSalePriceResponse {
   imageUrl?: string;
   status: boolean;
   categoryCategoryPartners: UpdatedSalePriceResponseCategoryCategoryPartnerListItemDto[];
+  productMaterials: UpdatedSalePriceResponseProductMaterialListItemDto[];
 }

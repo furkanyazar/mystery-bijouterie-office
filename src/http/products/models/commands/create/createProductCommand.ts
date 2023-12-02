@@ -1,3 +1,5 @@
+import CreateProductCommandProductMaterialListItemDto from "./createProductCommandProductMaterialListItemDto";
+
 export default interface CreateProductCommand {
   categoryId?: number;
   name: string;
@@ -6,4 +8,5 @@ export default interface CreateProductCommand {
   modelNumber: string;
   description?: string;
   status: boolean;
+  productMaterials: CreateProductCommandProductMaterialListItemDto[];
 }

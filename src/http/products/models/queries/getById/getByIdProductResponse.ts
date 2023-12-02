@@ -1,4 +1,5 @@
 import GetByIdProductResponseCategoryCategoryPartnerListItemDto from "./getByIdProductResponseCategoryCategoryPartnerListItemDto";
+import GetByIdProductResponseProductMaterialListItemDto from "./getByIdProductResponseProductMaterialListItemDto";
 
 export default interface GetByIdProductResponse {
   id: number;
@@ -13,4 +14,5 @@ export default interface GetByIdProductResponse {
   imageUrl?: string;
   status: boolean;
   categoryCategoryPartners: GetByIdProductResponseCategoryCategoryPartnerListItemDto[];
+  productMaterials: GetByIdProductResponseProductMaterialListItemDto[];
 }

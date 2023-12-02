@@ -1,5 +1,5 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faCircleCheck, faInfoCircle, faPlus, faSave, faCircleNotch, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCircleNotch, faInfoCircle, faPlus, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
@@ -7,6 +7,7 @@ import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, I
 import ModalImage from "react-modal-image";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import MBSpinner from "../../../../components/MBSpinner";
 import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationRequired } from "../../../../constants/validationMessages";
@@ -19,8 +20,9 @@ import UpdateSalePriceCommand from "../../../../http/products/models/commands/up
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 import GetListResponse from "../../../../models/getListResponse";
 import { addDiscount, removeDiscount, updateDiscount } from "../../../../store/slices/appSlice";
+import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
 
-export default function index({ product, partnersLoaded, partnersResponse }: Props) {
+export default function index({ product, partnersLoaded, partnersResponse, materialsLoaded, materialsResponse }: Props) {
   const dispatch = useAppDispatch();
 
   const { discounts } = useAppSelector((state) => state.appItems);
@@ -42,13 +44,13 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
   ]);
 
   useEffect(() => {
-    if (partnersLoaded && partnersResponse?.items) {
+    if (show) {
       setPartnerPrices([
-        ...partnersResponse.items.map((partner) => {
+        ...partnersResponse?.items?.map((partner) => {
           let partnerId: number = partner.id;
           let salePrice: number = price && !isNaN(price) ? price : 0;
           let discountedPrice: number = salePrice;
-          let purchasePrice: number = product.purchasePrice;
+          let purchasePrice: number = product?.purchasePrice;
           let currentDiscounts: number[] = [];
 
           discounts.forEach((discount) => {
@@ -58,7 +60,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
             currentDiscounts.push(discountPrice);
           });
 
-          let commissionRate: number = product.categoryCategoryPartners.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
+          let commissionRate: number = product?.categoryCategoryPartners?.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
           let commissionAmount: number = (discountedPrice * commissionRate) / 100;
           let shippingCost: number =
             partner.hasFirstScale && discountedPrice >= partner.firstScaleLowerLimit && discountedPrice <= partner.firstScaleUpperLimit
@@ -70,7 +72,11 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
               : partner.shippingCost;
           let serviceFee: number = partner.serviceFee;
 
-          let additionalExpenses: number = Number.parseFloat(process.env.ADDITIONAL_EXPENSES);
+          let additionalExpenses: number = 0;
+          product?.productMaterials?.forEach(
+            (productMaterial) => (additionalExpenses += productMaterial.materialPurchasePrice / productMaterial.materialUnitsInStock)
+          );
+
           let vatRate: number = Number.parseFloat(process.env.VAT_RATE);
           let totalVAT: number = (commissionAmount * vatRate) / 100 + (shippingCost * vatRate) / 100 + (serviceFee * vatRate) / 100;
           let estimatedEarnings: number =
@@ -92,7 +98,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
         }),
       ]);
     }
-  }, [partnersLoaded, partnersResponse, price, discounts]);
+  }, [show, price, discounts, partnersResponse, product]);
 
   useEffect(() => {
     setModalButtons((prev) => [...prev.map((c) => ({ ...c, disabled: loading }))]);
@@ -143,6 +149,29 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                     className="img-thumbnail"
                   />
                 </Col>
+                {materialsLoaded ? (
+                  <>
+                    <hr />
+                    <Col md={12} className="text-center mb-3">
+                      <h6>Materyaller</h6>
+                    </Col>
+                    {materialsResponse?.items
+                      ?.sort((a, b) => a.name.localeCompare(b.name))
+                      .map((material) => (
+                        <Col className="col-auto mb-1" key={material.id}>
+                          <FormGroup controlId={`infoProductModalMaterialInput-${material.id}`}>
+                            <FormCheck
+                              label={material.name}
+                              checked={product.productMaterials.map((c) => c.materialId).includes(material.id)}
+                              readOnly
+                            />
+                          </FormGroup>
+                        </Col>
+                      ))}
+                  </>
+                ) : (
+                  <MBSpinner />
+                )}
               </Row>
             </Col>
             <Col md={12} lg={8}>
@@ -202,7 +231,7 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
               </Row>
             </Col>
           </Row>
-          {partnersLoaded && product.purchasePrice > 0 && (
+          {partnersLoaded ? (
             <>
               <hr />
               <Row>
@@ -558,6 +587,8 @@ export default function index({ product, partnersLoaded, partnersResponse }: Pro
                 </Col>
               </Row>
             </>
+          ) : (
+            <MBSpinner />
           )}
         </Container>
       </MBModal>
@@ -569,6 +600,8 @@ interface Props {
   product: GetByIdProductResponse;
   partnersResponse: GetListResponse<GetListPartnerListItemDto>;
   partnersLoaded: boolean;
+  materialsResponse: GetListResponse<GetListMaterialListItemDto>;
+  materialsLoaded: boolean;
 }
 
 interface PriceItemDto {

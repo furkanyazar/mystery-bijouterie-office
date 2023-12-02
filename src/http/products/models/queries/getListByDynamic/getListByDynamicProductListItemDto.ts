@@ -1,4 +1,5 @@
 import GetListByDynamicProductCategoryCategoryPartnerListItemDto from "./getListByDynamicProductCategoryCategoryPartnerListItemDto";
+import GetListByDynamicProductProductMaterialListItemDto from "./getListByDynamicProductProductMaterialListItemDto";
 
 export default interface GetListByDynamicProductListItemDto {
   id: number;
@@ -13,4 +14,5 @@ export default interface GetListByDynamicProductListItemDto {
   imageUrl?: string;
   status: boolean;
   categoryCategoryPartners: GetListByDynamicProductCategoryCategoryPartnerListItemDto[];
+  productMaterials: GetListByDynamicProductProductMaterialListItemDto[];
 }
