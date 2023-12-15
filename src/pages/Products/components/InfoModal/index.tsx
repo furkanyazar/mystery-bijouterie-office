@@ -14,13 +14,13 @@ import { ValidationRequired } from "../../../../constants/validationMessages";
 import { formatCurrency } from "../../../../functions";
 import { useAppDispatch } from "../../../../hooks/useAppDispatch";
 import { useAppSelector } from "../../../../hooks/useAppSelector";
+import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
 import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import products from "../../../../http/products";
 import UpdateSalePriceCommand from "../../../../http/products/models/commands/updateSalePrice/updateSalePriceCommand";
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 import GetListResponse from "../../../../models/getListResponse";
 import { addDiscount, removeDiscount, updateDiscount } from "../../../../store/slices/appSlice";
-import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
 
 export default function index({ product, partnersLoaded, partnersResponse, materialsLoaded, materialsResponse }: Props) {
   const dispatch = useAppDispatch();
@@ -271,11 +271,7 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                                   className="text-white"
                                   disabled={loading}
                                 >
-                                  {loading ? (
-                                    <FontAwesomeIcon icon={faCircleNotch} className="fa-spin" />
-                                  ) : (
-                                    <FontAwesomeIcon icon={faSave} />
-                                  )}
+                                  <FontAwesomeIcon icon={loading ? faCircleNotch : faSave} className={loading ? "fa-spin" : undefined} />
                                 </Button>
                                 {errors.salePrice && <div className="invalid-feedback">{errors.salePrice}</div>}
                               </InputGroup>

@@ -100,14 +100,8 @@ export default function index() {
                     </InputGroup>
                   </FormGroup>
                   <Button variant="success" type="submit" disabled={loading}>
-                    {loading ? (
-                      <FontAwesomeIcon icon={faCircleNotch} className="fa-spin" />
-                    ) : (
-                      <>
-                        <FontAwesomeIcon icon={faRightToBracket} className="me-1" />
-                        Giriş Yap
-                      </>
-                    )}
+                    <FontAwesomeIcon icon={loading ? faCircleNotch : faRightToBracket} className={loading ? "fa-spin me-1" : "me-1"} />
+                    Giriş Yap
                   </Button>
                 </Form>
               )}

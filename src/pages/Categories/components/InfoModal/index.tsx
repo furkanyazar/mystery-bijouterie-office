@@ -54,7 +54,7 @@ export default function index({ category, partners, partnersLoaded }: Props) {
                   <FormGroup className="mb-3" controlId={"infoCategoryModalPartnerInput-" + partner.id}>
                     <FormLabel>{partner.name} Komisyon O.</FormLabel>
                     <FormControl
-                      placeholder={partner.name + "Komisyon O."}
+                      placeholder={partner.name + " Komisyon O."}
                       value={category.categoryPartners?.find((cp) => cp.partnerId === partner.id)?.commissionRate ?? ""}
                       readOnly
                     />
