@@ -37,8 +37,6 @@ a {
 
 .orderable {
   cursor: pointer;
-  position: relative;
-  color: #212529;
 }
 
 .orderable svg {

@@ -173,11 +173,11 @@ export default function index() {
                 />
               </div>
               <div className="col-auto ms-auto">
-                <Button type="submit" variant="primary" className="me-1" disabled={!categoriesLoaded}>
-                  <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
-                </Button>
                 <Button variant="warning" className="text-white" onClick={handleClear} disabled={!categoriesLoaded}>
                   <FontAwesomeIcon icon={faTrash} className="me-1" /> Temizle
+                </Button>
+                <Button type="submit" variant="primary" className="ms-1" disabled={!categoriesLoaded}>
+                  <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
                 </Button>
               </div>
             </Row>
@@ -190,13 +190,7 @@ export default function index() {
               <thead>
                 <tr>
                   <MBTHeadItem responsive searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
-                  <MBTHeadItem
-                    responsive
-                    searchValues={searchValues}
-                    setSearchValues={setSearchValues}
-                    title="Ad"
-                    value="name"
-                  />
+                  <MBTHeadItem responsive searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
                   <th className="responsive-thead-item"></th>
                 </tr>
               </thead>
@@ -222,12 +216,7 @@ export default function index() {
               </tbody>
             </Table>
             {categoriesResponse && (
-              <MBTableFooter
-                data={categoriesResponse}
-                setPage={setPageIndex}
-                setPageSize={setPageSize}
-                pageSize={pageRequest.pageSize}
-              />
+              <MBTableFooter data={categoriesResponse} setPage={setPageIndex} setPageSize={setPageSize} pageSize={pageRequest.pageSize} />
             )}
           </>
         ) : (

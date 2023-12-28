@@ -347,11 +347,11 @@ export default function index() {
                 />
               </div>
               <div className="col-auto ms-auto">
-                <Button type="submit" variant="primary" className="me-1" disabled={!productsLoaded}>
-                  <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
-                </Button>
                 <Button variant="warning" className="text-white" onClick={handleClear} disabled={!productsLoaded}>
                   <FontAwesomeIcon icon={faTrash} className="me-1" /> Temizle
+                </Button>
+                <Button type="submit" variant="primary" className="ms-1" disabled={!productsLoaded}>
+                  <FontAwesomeIcon icon={faSearch} className="me-1" /> Ara
                 </Button>
               </div>
             </Row>
