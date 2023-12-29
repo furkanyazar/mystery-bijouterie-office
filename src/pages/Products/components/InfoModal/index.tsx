@@ -211,8 +211,13 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                   <FormGroup className="mb-3" controlId="infoProductModalStockKodeInput">
                     <FormLabel>Stok Kodu</FormLabel>
                     <InputGroup>
-                      <FormControl placeholder="Stok Kodu" value={product.stockCode} readOnly />
-                      <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.stockCode}>
+                      <FormControl placeholder="Stok Kodu" value={product.stockCode ?? ""} readOnly />
+                      <Button
+                        variant="secondary"
+                        className="btn-clipboard"
+                        data-clipboard-text={product.stockCode}
+                        disabled={!product.stockCode}
+                      >
                         <FontAwesomeIcon icon={faCopy} />
                       </Button>
                     </InputGroup>

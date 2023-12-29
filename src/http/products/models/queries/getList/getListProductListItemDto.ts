@@ -15,5 +15,5 @@ export default interface GetListProductListItemDto {
   unitsInStock: number;
   categoryCategoryPartners: GetListProductCategoryCategoryPartnerListItemDto[];
   productMaterials: GetListProductProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

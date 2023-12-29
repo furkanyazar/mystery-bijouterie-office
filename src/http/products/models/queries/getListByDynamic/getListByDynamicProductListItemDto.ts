@@ -15,5 +15,5 @@ export default interface GetListByDynamicProductListItemDto {
   unitsInStock: number;
   categoryCategoryPartners: GetListByDynamicProductCategoryCategoryPartnerListItemDto[];
   productMaterials: GetListByDynamicProductProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

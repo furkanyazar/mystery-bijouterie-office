@@ -9,5 +9,5 @@ export default interface CreateProductCommand {
   description?: string;
   unitsInStock: number;
   productMaterials: CreateProductCommandProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

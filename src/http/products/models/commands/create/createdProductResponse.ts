@@ -15,5 +15,5 @@ export default interface CreatedProductResponse {
   unitsInStock: number;
   categoryCategoryPartners: CreatedProductResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: CreatedProductResponseProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

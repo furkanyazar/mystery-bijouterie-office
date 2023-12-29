@@ -15,5 +15,5 @@ export default interface UploadedImageResponse {
   unitsInStock: number;
   categoryCategoryPartners: UploadedImageResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: UploadedImageResponseProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

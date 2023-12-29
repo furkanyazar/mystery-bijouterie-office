@@ -15,5 +15,5 @@ export default interface DeletedProductResponse {
   unitsInStock: number;
   categoryCategoryPartners: DeletedProductResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: DeletedProductResponseProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

@@ -10,5 +10,5 @@ export default interface UpdateProductCommand {
   description?: string;
   unitsInStock: number;
   productMaterials: UpdateProductCommandProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

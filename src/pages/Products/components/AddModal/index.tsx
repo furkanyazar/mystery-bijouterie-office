@@ -129,7 +129,6 @@ export default function index({
       .required(ValidationRequired)
       .matches(/^MB-\d{5}$/, ValidationInvalid),
     purchasePrice: Yup.number().required(ValidationRequired),
-    stockCode: Yup.string().required(ValidationRequired),
     unitsInStock: Yup.number().required(ValidationRequired),
   });
 
@@ -179,7 +178,7 @@ export default function index({
                         className={errors.stockCode && "is-invalid"}
                         placeholder="Stok Kodu"
                         name="stockCode"
-                        value={formValues.stockCode}
+                        value={formValues.stockCode ?? ""}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                       />
                       {errors.stockCode && <div className="invalid-feedback">{errors.stockCode}</div>}
@@ -359,7 +358,7 @@ const defaultFormValues: CreateProductCommand = {
   purchasePrice: 0,
   description: null,
   productMaterials: [],
-  stockCode: "",
+  stockCode: null,
   unitsInStock: 0,
 };
 const cancelButtonKey = "cancel";

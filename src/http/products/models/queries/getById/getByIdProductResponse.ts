@@ -15,5 +15,5 @@ export default interface GetByIdProductResponse {
   unitsInStock: number;
   categoryCategoryPartners: GetByIdProductResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: GetByIdProductResponseProductMaterialListItemDto[];
-  stockCode: string;
+  stockCode?: string;
 }

@@ -69,6 +69,7 @@ export default function index({ fetchPartners, partner }: Props) {
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
     shippingCost: Yup.number().required(ValidationRequired),
     serviceFee: Yup.number().required(ValidationRequired),
+    transactionFee: Yup.number().required(ValidationRequired),
   });
 
   return (

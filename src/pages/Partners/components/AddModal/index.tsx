@@ -68,6 +68,7 @@ export default function index({ fetchPartners, disabled }: Props) {
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
     shippingCost: Yup.number().required(ValidationRequired),
     serviceFee: Yup.number().required(ValidationRequired),
+    transactionFee: Yup.number().required(ValidationRequired),
   });
 
   return (
@@ -154,12 +155,14 @@ export default function index({ fetchPartners, disabled }: Props) {
                         <FormControl
                           type="number"
                           step="any"
+                          className={errors.serviceFee && "is-invalid"}
                           placeholder="Hizmet Bedeli"
                           name="serviceFee"
                           value={formValues.serviceFee}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                         />
                         <InputGroup.Text>₺</InputGroup.Text>
+                        {errors.serviceFee && <div className="invalid-feedback">{errors.serviceFee}</div>}
                       </InputGroup>
                     </FormGroup>
                   </Col>
@@ -180,12 +183,14 @@ export default function index({ fetchPartners, disabled }: Props) {
                         <FormControl
                           type="number"
                           step="any"
+                          className={errors.transactionFee && "is-invalid"}
                           placeholder="İşlem Bedeli"
                           name="transactionFee"
                           value={formValues.transactionFee}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                         />
                         <InputGroup.Text>₺</InputGroup.Text>
+                        {errors.transactionFee && <div className="invalid-feedback">{errors.transactionFee}</div>}
                       </InputGroup>
                     </FormGroup>
                   </Col>

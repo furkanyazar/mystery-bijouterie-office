@@ -377,13 +377,6 @@ export default function index() {
                     responsive
                     searchValues={searchValues}
                     setSearchValues={setSearchValues}
-                    title="Kategori"
-                    value="category.name"
-                  />
-                  <MBTHeadItem
-                    responsive
-                    searchValues={searchValues}
-                    setSearchValues={setSearchValues}
                     title="Barkod No."
                     value="barcodeNumber"
                   />
@@ -400,6 +393,13 @@ export default function index() {
                     setSearchValues={setSearchValues}
                     title="Alış Fiyatı"
                     value="purchasePrice"
+                  />
+                  <MBTHeadItem
+                    responsive
+                    searchValues={searchValues}
+                    setSearchValues={setSearchValues}
+                    title="Stok Miktarı"
+                    value="unitsInStock"
                   />
                   <th style={{ minWidth: "125px", width: "125px" }}></th>
                 </tr>
@@ -421,7 +421,6 @@ export default function index() {
                       </Button>
                       {product.name}
                     </td>
-                    <td>{product.categoryName}</td>
                     <td>
                       <Button variant="secondary" className="btn-sm me-2 btn-clipboard" data-clipboard-text={product.barcodeNumber}>
                         <FontAwesomeIcon icon={faCopy} />
@@ -435,6 +434,7 @@ export default function index() {
                       {product.modelNumber}
                     </td>
                     <td>{formatCurrency(product.purchasePrice)}</td>
+                    <td>{product.unitsInStock}</td>
                     <td className="text-end">
                       <InfoModal
                         product={product}
@@ -480,7 +480,7 @@ const defaultSearchValues = {
   minPurchasePrice: "",
   maxPurchasePrice: "",
   status: true,
-  orderBy: "barcodeNumber",
+  orderBy: "id",
   descending: true,
 };
 
