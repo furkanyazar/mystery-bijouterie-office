@@ -70,7 +70,7 @@ export default function index() {
     const modelNumberFilter: Filter = { field: "modelNumber", operator: "contains", value: searchValues.modelNumber };
     const minPurchasePriceFilter: Filter = { field: "purchasePrice", operator: "gte", value: searchValues.minPurchasePrice };
     const maxPurchasePriceFilter: Filter = { field: "purchasePrice", operator: "lte", value: searchValues.maxPurchasePrice };
-    const statusFilter: Filter = { field: "status", operator: "eq", value: searchValues.status ? "true" : "false" };
+    const statusFilter: Filter = searchValues.status ? { field: "unitsInStock", operator: "gt", value: "0" } : null;
 
     if (nameFilter.value) dynamicQuery.filter = nameFilter;
 
@@ -114,7 +114,7 @@ export default function index() {
       } else dynamicQuery.filter = maxPurchasePriceFilter;
     }
 
-    if (statusFilter.value === "true") {
+    if (statusFilter) {
       if (dynamicQuery.filter) {
         dynamicQuery.filter.logic = "and";
         if (dynamicQuery.filter.filters) dynamicQuery.filter.filters.push(statusFilter);

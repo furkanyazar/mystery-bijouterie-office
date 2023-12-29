@@ -12,7 +12,8 @@ export default interface UploadedImageResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
-  status: boolean;
+  unitsInStock: number;
   categoryCategoryPartners: UploadedImageResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: UploadedImageResponseProductMaterialListItemDto[];
+  stockCode: string;
 }

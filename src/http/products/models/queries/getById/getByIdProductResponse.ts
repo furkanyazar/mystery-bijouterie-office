@@ -12,7 +12,8 @@ export default interface GetByIdProductResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
-  status: boolean;
+  unitsInStock: number;
   categoryCategoryPartners: GetByIdProductResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: GetByIdProductResponseProductMaterialListItemDto[];
+  stockCode: string;
 }

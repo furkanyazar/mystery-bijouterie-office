@@ -75,7 +75,15 @@ export default function index({ fetchPartners, disabled }: Props) {
       <Button variant="success" onClick={handleShow} disabled={disabled}>
         <FontAwesomeIcon icon={faPlus} className="me-1" /> Ekle
       </Button>
-      <MBModal id="addPartnerModal" closable={false} handleClose={handleClose} show={show} title="Partner Ekle" buttons={modalButtons}>
+      <MBModal
+        id="addPartnerModal"
+        size="lg"
+        closable={false}
+        handleClose={handleClose}
+        show={show}
+        title="Partner Ekle"
+        buttons={modalButtons}
+      >
         <Container>
           <Formik
             initialValues={formValues}
@@ -88,7 +96,7 @@ export default function index({ fetchPartners, disabled }: Props) {
             {({ errors }) => (
               <Form id={formId}>
                 <Row>
-                  <Col md={12}>
+                  <Col md={6}>
                     <FormGroup className="mb-3" controlId="addPartnerModalNameInput">
                       <FormLabel>Ad</FormLabel>
                       <FormControl
@@ -105,6 +113,16 @@ export default function index({ fetchPartners, disabled }: Props) {
                     <FormGroup className="mb-3" controlId="addPartnerModalShippingCostInput">
                       <FormLabel>Kargo Ücreti</FormLabel>
                       <InputGroup>
+                        <InputGroup.Text>
+                          <FormCheck
+                            type="switch"
+                            label="KDV Dahil"
+                            id="addPartnerModalHasTaxShippingCoast"
+                            name="hasTaxShippingCost"
+                            checked={formValues.hasTaxShippingCost}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+                          />
+                        </InputGroup.Text>
                         <FormControl
                           type="number"
                           step="any"
@@ -123,6 +141,16 @@ export default function index({ fetchPartners, disabled }: Props) {
                     <FormGroup className="mb-3" controlId="addPartnerModalServiceFeeLimitInput">
                       <FormLabel>Hizmet Bedeli</FormLabel>
                       <InputGroup>
+                        <InputGroup.Text>
+                          <FormCheck
+                            type="switch"
+                            label="KDV Dahil"
+                            id="addPartnerModalHasTaxServiceFee"
+                            name="hasTaxServiceFee"
+                            checked={formValues.hasTaxServiceFee}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+                          />
+                        </InputGroup.Text>
                         <FormControl
                           type="number"
                           step="any"
@@ -136,12 +164,38 @@ export default function index({ fetchPartners, disabled }: Props) {
                     </FormGroup>
                   </Col>
                   <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalHasFirstScaleInput">
+                    <FormGroup className="mb-3" controlId="addPartnerModalHasTaxTransactionFeeInput">
+                      <FormLabel>İşlem Ücreti</FormLabel>
+                      <InputGroup>
+                        <InputGroup.Text>
+                          <FormCheck
+                            type="switch"
+                            label="KDV Dahil"
+                            id="addPartnerModalHasTaxTransactionFee"
+                            name="hasTaxTransactionFee"
+                            checked={formValues.hasTaxTransactionFee}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
+                          />
+                        </InputGroup.Text>
+                        <FormControl
+                          type="number"
+                          step="any"
+                          placeholder="İşlem Bedeli"
+                          name="transactionFee"
+                          value={formValues.transactionFee}
+                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                        />
+                        <InputGroup.Text>₺</InputGroup.Text>
+                      </InputGroup>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup className="mb-3" controlId="addPartnerModalHasTaxCommissionsInput">
                       <FormCheck
                         type="switch"
-                        label="1. Barem"
-                        name="hasFirstScale"
-                        checked={formValues.hasFirstScale}
+                        label="Komisyonlara KDV Dahil"
+                        name="hasTaxCommissions"
+                        checked={formValues.hasTaxCommissions}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
                       />
                     </FormGroup>
@@ -150,115 +204,113 @@ export default function index({ fetchPartners, disabled }: Props) {
                     <FormGroup className="mb-3" controlId="addPartnerModalHasSecondScaleInput">
                       <FormCheck
                         type="switch"
-                        label="2. Barem"
-                        name="hasSecondScale"
-                        checked={formValues.hasSecondScale}
+                        label="Kargo Barem Uygulaması"
+                        name="hasShippingScale"
+                        checked={formValues.hasShippingScale}
                         onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
                       />
                     </FormGroup>
                   </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalFirstScaleLowerLimitInput">
-                      <FormLabel>1. Barem Alt Limit</FormLabel>
-                      <InputGroup>
-                        <FormControl
-                          type="number"
-                          step="any"
-                          placeholder="1. Barem Alt Limit"
-                          name="firstScaleLowerLimit"
-                          value={formValues.firstScaleLowerLimit}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                          disabled={!formValues.hasFirstScale}
-                        />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalSecondScaleLowerLimitInput">
-                      <FormLabel>2. Barem Alt Limit</FormLabel>
-                      <InputGroup>
-                        <FormControl
-                          type="number"
-                          step="any"
-                          placeholder="2. Barem Alt Limit"
-                          name="secondScaleLowerLimit"
-                          value={formValues.secondScaleLowerLimit}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                          disabled={!formValues.hasSecondScale}
-                        />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalFirstScaleUpperLimitInput">
-                      <FormLabel>1. Barem Üst Limit</FormLabel>
-                      <InputGroup>
-                        <FormControl
-                          type="number"
-                          step="any"
-                          placeholder="1. Barem Üst Limit"
-                          name="firstScaleUpperLimit"
-                          value={formValues.firstScaleUpperLimit}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                          disabled={!formValues.hasFirstScale}
-                        />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalSecondScaleUpperLimitInput">
-                      <FormLabel>2. Barem Üst Limit</FormLabel>
-                      <InputGroup>
-                        <FormControl
-                          type="number"
-                          step="any"
-                          placeholder="2. Barem Üst Limit"
-                          name="secondScaleUpperLimit"
-                          value={formValues.secondScaleUpperLimit}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                          disabled={!formValues.hasSecondScale}
-                        />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalFirstScaleShippingFeeInput">
-                      <FormLabel>1. Barem Kargo Ücreti</FormLabel>
-                      <InputGroup>
-                        <FormControl
-                          type="number"
-                          step="any"
-                          placeholder="1. Barem Kargo Ücreti"
-                          name="firstScaleShippingFee"
-                          value={formValues.firstScaleShippingFee}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                          disabled={!formValues.hasFirstScale}
-                        />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup className="mb-3" controlId="addPartnerModalSecondScaleShippingFeeInput">
-                      <FormLabel>2. Barem Kargo Ücreti</FormLabel>
-                      <InputGroup>
-                        <FormControl
-                          type="number"
-                          step="any"
-                          placeholder="2. Barem Kargo Ücreti"
-                          name="secondScaleShippingFee"
-                          value={formValues.secondScaleShippingFee}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                          disabled={!formValues.hasSecondScale}
-                        />
-                        <InputGroup.Text>₺</InputGroup.Text>
-                      </InputGroup>
-                    </FormGroup>
-                  </Col>
+                  {formValues.hasShippingScale && (
+                    <>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="addPartnerModalFirstScaleLowerLimitInput">
+                          <FormLabel>1. Barem Alt Limit</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              placeholder="1. Barem Alt Limit"
+                              name="firstScaleLowerLimit"
+                              value={formValues.firstScaleLowerLimit}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="addPartnerModalFirstScaleUpperLimitInput">
+                          <FormLabel>1. Barem Üst Limit</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              placeholder="1. Barem Üst Limit"
+                              name="firstScaleUpperLimit"
+                              value={formValues.firstScaleUpperLimit}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="addPartnerModalFirstScaleShippingFeeInput">
+                          <FormLabel>1. Barem Kargo Ücreti</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              placeholder="1. Barem Kargo Ücreti"
+                              name="firstScaleShippingFee"
+                              value={formValues.firstScaleShippingFee}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="addPartnerModalSecondScaleLowerLimitInput">
+                          <FormLabel>2. Barem Alt Limit</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              placeholder="2. Barem Alt Limit"
+                              name="secondScaleLowerLimit"
+                              value={formValues.secondScaleLowerLimit}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="addPartnerModalSecondScaleUpperLimitInput">
+                          <FormLabel>2. Barem Üst Limit</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              placeholder="2. Barem Üst Limit"
+                              name="secondScaleUpperLimit"
+                              value={formValues.secondScaleUpperLimit}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="addPartnerModalSecondScaleShippingFeeInput">
+                          <FormLabel>2. Barem Kargo Ücreti</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              placeholder="2. Barem Kargo Ücreti"
+                              name="secondScaleShippingFee"
+                              value={formValues.secondScaleShippingFee}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                          </InputGroup>
+                        </FormGroup>
+                      </Col>
+                    </>
+                  )}
                 </Row>
               </Form>
             )}
@@ -273,14 +325,18 @@ const defaultFormValues: CreatePartnerCommand = {
   name: "",
   shippingCost: 0,
   serviceFee: 0,
-  hasFirstScale: true,
-  hasSecondScale: true,
+  hasShippingScale: false,
   firstScaleLowerLimit: 0,
   firstScaleShippingFee: 0,
   firstScaleUpperLimit: 0,
   secondScaleLowerLimit: 0,
   secondScaleShippingFee: 0,
   secondScaleUpperLimit: 0,
+  transactionFee: 0,
+  hasTaxCommissions: false,
+  hasTaxServiceFee: false,
+  hasTaxShippingCost: false,
+  hasTaxTransactionFee: false,
 };
 const cancelButtonKey = "cancel";
 const submitButtonKey = "submit";

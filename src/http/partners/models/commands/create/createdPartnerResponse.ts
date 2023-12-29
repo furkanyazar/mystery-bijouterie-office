@@ -3,12 +3,16 @@ export default interface CreatedPartnerResponse {
   name: string;
   shippingCost: number;
   serviceFee: number;
-  hasFirstScale: boolean;
-  hasSecondScale: boolean;
+  hasShippingScale: boolean;
   firstScaleLowerLimit?: number;
   firstScaleUpperLimit?: number;
   secondScaleLowerLimit?: number;
   secondScaleUpperLimit?: number;
   firstScaleShippingFee?: number;
   secondScaleShippingFee?: number;
+  transactionFee: number;
+  hasTaxShippingCost: boolean;
+  hasTaxServiceFee: boolean;
+  hasTaxTransactionFee: boolean;
+  hasTaxCommissions: boolean;
 }

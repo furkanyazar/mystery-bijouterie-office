@@ -12,7 +12,8 @@ export default interface GetListByDynamicProductListItemDto {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
-  status: boolean;
+  unitsInStock: number;
   categoryCategoryPartners: GetListByDynamicProductCategoryCategoryPartnerListItemDto[];
   productMaterials: GetListByDynamicProductProductMaterialListItemDto[];
+  stockCode: string;
 }

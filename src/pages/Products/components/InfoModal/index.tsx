@@ -30,6 +30,7 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.salePrice);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
+  const [productMaterials, setProductMaterials] = useState(product?.productMaterials);
   const [loading, setLoading] = useState<boolean>(false);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
@@ -63,24 +64,29 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
           let commissionRate: number = product?.categoryCategoryPartners?.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
           let commissionAmount: number = (discountedPrice * commissionRate) / 100;
           let shippingCost: number =
-            partner.hasFirstScale && discountedPrice >= partner.firstScaleLowerLimit && discountedPrice <= partner.firstScaleUpperLimit
+            partner.hasShippingScale && discountedPrice >= partner.firstScaleLowerLimit && discountedPrice <= partner.firstScaleUpperLimit
               ? partner.firstScaleShippingFee
-              : partner.hasSecondScale &&
+              : partner.hasShippingScale &&
                 discountedPrice >= partner.secondScaleLowerLimit &&
                 discountedPrice <= partner.secondScaleUpperLimit
               ? partner.secondScaleShippingFee
               : partner.shippingCost;
           let serviceFee: number = partner.serviceFee;
+          let transactionFee: number = partner.transactionFee;
 
           let additionalExpenses: number = 0;
-          product?.productMaterials?.forEach(
+          productMaterials?.forEach(
             (productMaterial) => (additionalExpenses += productMaterial.materialPurchasePrice / productMaterial.materialUnitsInStock)
           );
 
           let vatRate: number = Number.parseFloat(process.env.VAT_RATE);
-          let totalVAT: number = (commissionAmount * vatRate) / 100 + (shippingCost * vatRate) / 100 + (serviceFee * vatRate) / 100;
+          if (!partner.hasTaxCommissions) commissionAmount += (commissionAmount * vatRate) / 100;
+          if (!partner.hasTaxShippingCost) shippingCost += (shippingCost * vatRate) / 100;
+          if (!partner.hasTaxServiceFee) serviceFee += (serviceFee * vatRate) / 100;
+          if (!partner.hasTaxTransactionFee) transactionFee += (transactionFee * 20) / 100;
+
           let estimatedEarnings: number =
-            discountedPrice - purchasePrice - commissionAmount - shippingCost - additionalExpenses - totalVAT - serviceFee;
+            discountedPrice - purchasePrice - commissionAmount - shippingCost - additionalExpenses - serviceFee - transactionFee;
 
           return {
             partnerId,
@@ -90,15 +96,14 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
             commissionAmount,
             shippingCost,
             additionalExpenses,
-            totalVAT,
             estimatedEarnings,
             currentDiscounts,
-            serviceFee,
+            serviceFee: serviceFee + transactionFee,
           };
         }),
       ]);
     }
-  }, [show, price, discounts, partnersResponse, product]);
+  }, [show, price, discounts, partnersResponse, product, productMaterials]);
 
   useEffect(() => {
     setModalButtons((prev) => [...prev.map((c) => ({ ...c, disabled: loading }))]);
@@ -135,7 +140,9 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
         title="Ürün Detayı"
         buttons={modalButtons}
         size="xl"
-        footerLeft={<FormCheck type="switch" id="infoProductModalStatusCheck" label="Stokta Var" checked={product.status} readOnly />}
+        footerLeft={
+          <FormCheck type="switch" id="infoProductModalStatusCheck" label="Stokta Var" checked={product.unitsInStock > 0} readOnly />
+        }
       >
         <Container>
           <Row>
@@ -162,8 +169,21 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                           <FormGroup controlId={`infoProductModalMaterialInput-${material.id}`}>
                             <FormCheck
                               label={material.name}
-                              checked={product.productMaterials.map((c) => c.materialId).includes(material.id)}
-                              readOnly
+                              checked={productMaterials?.map((c) => c.materialId).includes(material.id)}
+                              onChange={(e) => {
+                                if (e.target.checked)
+                                  setProductMaterials((prev) => [
+                                    ...prev,
+                                    {
+                                      id: Math.random(),
+                                      materialId: material.id,
+                                      materialName: material.name,
+                                      materialPurchasePrice: material.purchasePrice,
+                                      materialUnitsInStock: material.unitsInStock,
+                                    },
+                                  ]);
+                                else setProductMaterials((prev) => [...prev.filter((c) => c.materialId !== material.id)]);
+                              }}
                             />
                           </FormGroup>
                         </Col>
@@ -187,7 +207,18 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                     </InputGroup>
                   </FormGroup>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
+                  <FormGroup className="mb-3" controlId="infoProductModalStockKodeInput">
+                    <FormLabel>Stok Kodu</FormLabel>
+                    <InputGroup>
+                      <FormControl placeholder="Stok Kodu" value={product.stockCode} readOnly />
+                      <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.stockCode}>
+                        <FontAwesomeIcon icon={faCopy} />
+                      </Button>
+                    </InputGroup>
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
                   <FormGroup className="mb-3" controlId="infoProductModalBarcodeNumberInput">
                     <FormLabel>Barkod No.</FormLabel>
                     <InputGroup>
@@ -198,7 +229,7 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                     </InputGroup>
                   </FormGroup>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <FormGroup className="mb-3" controlId="infoProductModalModelNumberInput">
                     <FormLabel>Model No.</FormLabel>
                     <InputGroup>
@@ -209,19 +240,25 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                     </InputGroup>
                   </FormGroup>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <FormGroup className="mb-3" controlId="infoProductModalCategoryNameInput">
                     <FormLabel>Kategori</FormLabel>
                     <FormControl placeholder="Kategori" value={product.categoryName ?? ""} readOnly />
                   </FormGroup>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <FormGroup className="mb-3" controlId="infoProductModalUnitPriceInput">
                     <FormLabel>Alış Fiyatı</FormLabel>
                     <InputGroup>
                       <FormControl placeholder="Alış Fiyatı" value={product.purchasePrice} readOnly />
                       <InputGroup.Text>₺</InputGroup.Text>
                     </InputGroup>
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup className="mb-3" controlId="infoProductModalUnitsInStockInput">
+                    <FormLabel>Stok Miktarı</FormLabel>
+                    <FormControl placeholder="Stok Miktarı" value={product.unitsInStock} readOnly />
                   </FormGroup>
                 </Col>
                 <Col md={12}>
@@ -513,26 +550,6 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                             ))}
                           </tr>
                           <tr>
-                            <th>Toplam KDV</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT).startsWith(
-                                    "-"
-                                  )
-                                    ? "text-danger"
-                                    : formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT) ===
-                                      "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(partnerPrice.totalVAT !== 0 ? -partnerPrice.totalVAT : partnerPrice.totalVAT)}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
                             <th>Ek Giderler</th>
                             {partnerPrices.map((partnerPrice) => (
                               <td
@@ -608,7 +625,6 @@ interface PriceItemDto {
   commissionAmount: number;
   shippingCost: number;
   additionalExpenses: number;
-  totalVAT: number;
   estimatedEarnings: number;
   currentDiscounts: number[];
   serviceFee: number;

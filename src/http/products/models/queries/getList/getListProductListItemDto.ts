@@ -12,7 +12,8 @@ export default interface GetListProductListItemDto {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
-  status: boolean;
+  unitsInStock: number;
   categoryCategoryPartners: GetListProductCategoryCategoryPartnerListItemDto[];
   productMaterials: GetListProductProductMaterialListItemDto[];
+  stockCode: string;
 }

@@ -132,6 +132,8 @@ export default function index({
       .required(ValidationRequired)
       .matches(/^MB-\d{5}$/, ValidationInvalid),
     purchasePrice: Yup.number().required(ValidationRequired),
+    stockCode: Yup.string().required(ValidationRequired),
+    unitsInStock: Yup.number().required(ValidationRequired),
   });
 
   return (
@@ -147,16 +149,6 @@ export default function index({
         title="Ürün Düzenle"
         buttons={modalButtons}
         size="xl"
-        footerLeft={
-          <FormCheck
-            type="switch"
-            id="updateProductModalStatusCheck"
-            label="Stokta Var"
-            name="status"
-            checked={formValues.status}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeCheck(e, setFormValues)}
-          />
-        }
       >
         <Container>
           <Formik
@@ -239,7 +231,20 @@ export default function index({
                           {errors.name && <div className="invalid-feedback">{errors.name}</div>}
                         </FormGroup>
                       </Col>
-                      <Col md={6}>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="updateProductModalStokCodeInput">
+                          <FormLabel>Stok Kodu</FormLabel>
+                          <FormControl
+                            className={errors.stockCode && "is-invalid"}
+                            placeholder="Stok Kodu"
+                            name="stockCode"
+                            value={formValues.stockCode}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                          />
+                          {errors.stockCode && <div className="invalid-feedback">{errors.stockCode}</div>}
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
                         <FormGroup className="mb-3" controlId="updateProductModalBarcodeNumberInput">
                           <FormLabel>Barkod No.</FormLabel>
                           <ReactInputMask
@@ -254,7 +259,7 @@ export default function index({
                           {errors.barcodeNumber && <div className="invalid-feedback">{errors.barcodeNumber}</div>}
                         </FormGroup>
                       </Col>
-                      <Col md={6}>
+                      <Col md={4}>
                         <FormGroup className="mb-3" controlId="updateProductModalModelNumberInput">
                           <FormLabel>Model No.</FormLabel>
                           <ReactInputMask
@@ -269,7 +274,7 @@ export default function index({
                           {errors.modelNumber && <div className="invalid-feedback">{errors.modelNumber}</div>}
                         </FormGroup>
                       </Col>
-                      <Col md={6}>
+                      <Col md={4}>
                         <FormGroup className="mb-3" controlId="UpdateProductModalCategoryIdSelect">
                           <FormLabel>Kategori</FormLabel>
                           <FormSelect
@@ -291,7 +296,7 @@ export default function index({
                           {errors.categoryId && <div className="invalid-feedback">{errors.categoryId}</div>}
                         </FormGroup>
                       </Col>
-                      <Col md={6}>
+                      <Col md={4}>
                         <FormGroup className="mb-3" controlId="updateProductModalUnitPriceInput">
                           <FormLabel>Alış Fiyatı</FormLabel>
                           <InputGroup>
@@ -307,6 +312,21 @@ export default function index({
                             <InputGroup.Text>₺</InputGroup.Text>
                             {errors.purchasePrice && <div className="invalid-feedback">{errors.purchasePrice}</div>}
                           </InputGroup>
+                        </FormGroup>
+                      </Col>
+                      <Col md={4}>
+                        <FormGroup className="mb-3" controlId="updateProductModalUnitsInStockInput">
+                          <FormLabel>Stok Miktarı</FormLabel>
+                          <FormControl
+                            type="number"
+                            step="any"
+                            className={errors.unitsInStock && "is-invalid"}
+                            placeholder="Stok Miktarı"
+                            name="unitsInStock"
+                            value={formValues.unitsInStock}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                          />
+                          {errors.unitsInStock && <div className="invalid-feedback">{errors.unitsInStock}</div>}
                         </FormGroup>
                       </Col>
                       <Col md={12} className="mb-3">

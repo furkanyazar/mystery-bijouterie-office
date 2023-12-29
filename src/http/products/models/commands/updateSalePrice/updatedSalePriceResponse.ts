@@ -12,7 +12,8 @@ export default interface UpdatedSalePriceResponse {
   modelNumber: string;
   description?: string;
   imageUrl?: string;
-  status: boolean;
+  unitsInStock: number;
   categoryCategoryPartners: UpdatedSalePriceResponseCategoryCategoryPartnerListItemDto[];
   productMaterials: UpdatedSalePriceResponseProductMaterialListItemDto[];
+  stockCode: string;
 }

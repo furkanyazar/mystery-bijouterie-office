@@ -81,14 +81,14 @@ export default function index() {
                     Kategoriler
                   </Nav.Link>
                 </Link>
-                <Link to={"/urunler"}>
-                  <Nav.Link as={"span"} active={pathName.pathname === "/urunler"}>
-                    Ürünler
-                  </Nav.Link>
-                </Link>
                 <Link to={"/materyaller"}>
                   <Nav.Link as={"span"} active={pathName.pathname === "/materyaller"}>
                     Materyaller
+                  </Nav.Link>
+                </Link>
+                <Link to={"/urunler"}>
+                  <Nav.Link as={"span"} active={pathName.pathname === "/urunler"}>
+                    Ürünler
                   </Nav.Link>
                 </Link>
               </Nav>
