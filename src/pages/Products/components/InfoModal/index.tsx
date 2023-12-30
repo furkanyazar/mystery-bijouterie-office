@@ -63,14 +63,13 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
 
           let commissionRate: number = product?.categoryCategoryPartners?.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
           let commissionAmount: number = (discountedPrice * commissionRate) / 100;
-          let shippingCost: number =
-            partner.hasShippingScale && discountedPrice >= partner.firstScaleLowerLimit && discountedPrice <= partner.firstScaleUpperLimit
+          let shippingCost: number = partner.hasShippingScale
+            ? discountedPrice >= partner.firstScaleLowerLimit && discountedPrice <= partner.firstScaleUpperLimit
               ? partner.firstScaleShippingFee
-              : partner.hasShippingScale &&
-                discountedPrice >= partner.secondScaleLowerLimit &&
-                discountedPrice <= partner.secondScaleUpperLimit
+              : discountedPrice >= partner.secondScaleLowerLimit && discountedPrice <= partner.secondScaleUpperLimit
               ? partner.secondScaleShippingFee
-              : partner.shippingCost;
+              : partner.shippingCost
+            : partner.shippingCost;
           let serviceFee: number = partner.serviceFee;
           let transactionFee: number = partner.transactionFee;
 
