@@ -1,9 +1,9 @@
 import { faCopy } from "@fortawesome/free-regular-svg-icons";
-import { faCircleCheck, faCircleNotch, faInfoCircle, faPlus, faSave, faTrash } from "@fortawesome/free-solid-svg-icons";
+import { faCircleCheck, faCircleNotch, faInfoCircle, faPlus, faSave, faSort, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import React, { useEffect, useState } from "react";
-import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row, Table } from "react-bootstrap";
+import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row, Table } from "react-bootstrap";
 import ModalImage from "react-modal-image";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -12,26 +12,32 @@ import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationRequired } from "../../../../constants/validationMessages";
 import { formatCurrency } from "../../../../functions";
-import { useAppDispatch } from "../../../../hooks/useAppDispatch";
-import { useAppSelector } from "../../../../hooks/useAppSelector";
+import GetListDiscountListItemDto from "../../../../http/discounts/models/queries/getList/getListDiscountListItemDto";
 import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
 import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import products from "../../../../http/products";
 import UpdateSalePriceCommand from "../../../../http/products/models/commands/updateSalePrice/updateSalePriceCommand";
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
+import { DiscountType } from "../../../../jsons/models/DiscountType";
 import GetListResponse from "../../../../models/getListResponse";
-import { addDiscount, removeDiscount, updateDiscount } from "../../../../store/slices/appSlice";
 
-export default function index({ product, partnersLoaded, partnersResponse, materialsLoaded, materialsResponse }: Props) {
-  const dispatch = useAppDispatch();
-
-  const { discounts } = useAppSelector((state) => state.appItems);
+export default function index({
+  product,
+  partnersLoaded,
+  partnersResponse,
+  materialsLoaded,
+  materialsResponse,
+  discountsResponse,
+  discountsLoaded,
+}: Props) {
+  const discountTypes: DiscountType[] = require("../../../../jsons/discountTypes.json");
 
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.salePrice);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
   const [productMaterials, setProductMaterials] = useState(product?.productMaterials);
   const [loading, setLoading] = useState<boolean>(false);
+  const [discounts, setDiscounts] = useState<GetListDiscountListItemDto[]>([]);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
       key: "ok",
@@ -45,21 +51,32 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
   ]);
 
   useEffect(() => {
+    if (discountsLoaded) setDiscounts((prev) => [...prev, ...discountsResponse?.items]);
+  }, [discountsLoaded, discountsResponse]);
+
+  useEffect(() => {
     if (show) {
+      let partnerDiscounts: number[] = [];
       setPartnerPrices([
-        ...partnersResponse?.items?.map((partner) => {
+        ...partnersResponse?.items?.map((partner, index) => {
+          partnerDiscounts.push(0);
+
           let partnerId: number = partner.id;
           let salePrice: number = price && !isNaN(price) ? price : 0;
           let discountedPrice: number = salePrice;
           let purchasePrice: number = product?.purchasePrice;
-          let currentDiscounts: number[] = [];
 
-          discounts.forEach((discount) => {
-            let discountAmount: number = discount && !isNaN(discount.amount) ? discount.amount : 0;
-            let discountPrice: number = discount.type === "amount" ? discountAmount : (discountedPrice * discountAmount) / 100;
-            discountedPrice -= discountPrice;
-            currentDiscounts.push(discountPrice);
-          });
+          discounts
+            .filter((c) => c.partnerId === partner.id)
+            .sort((a, b) => a.priority - b.priority)
+            .forEach((discount) => {
+              if (discountedPrice >= discount.discountLowerLimit) {
+                let discountAmount: number = discount && !isNaN(discount.discountAmount) ? discount.discountAmount : 0;
+                let discountPrice: number = discount.discountType === 1 ? (discountedPrice * discountAmount) / 100 : discountAmount;
+                discountedPrice -= discountPrice;
+                partnerDiscounts[index] -= discountPrice;
+              }
+            });
 
           let commissionRate: number = product?.categoryCategoryPartners?.find((c) => c.partnerId === partner.id)?.commissionRate ?? 0;
           let commissionAmount: number = (discountedPrice * commissionRate) / 100;
@@ -96,8 +113,8 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
             shippingCost,
             additionalExpenses,
             estimatedEarnings,
-            currentDiscounts,
             serviceFee: serviceFee + transactionFee,
+            partnerDiscounts,
           };
         }),
       ]);
@@ -324,63 +341,147 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                     <Col xs={4} lg={12} xl={4} className="mb-3">
                       <FormLabel>İndirimler</FormLabel>
                       <br />
-                      <Button variant="success" onClick={() => dispatch(addDiscount({ amount: 0, type: "amount" }))}>
+                      <Button
+                        variant="success"
+                        onClick={() =>
+                          setDiscounts((prev) => [
+                            ...prev,
+                            {
+                              id: Math.random(),
+                              discountAmount: 0,
+                              discountType: discountTypes[0]?.id ?? 0,
+                              name: "",
+                              partnerId: partnersResponse?.items[0]?.id ?? 0,
+                              partnerName: "",
+                              discountLowerLimit: 0,
+                              priority: 0,
+                            },
+                          ])
+                        }
+                      >
                         <FontAwesomeIcon icon={faPlus} className="me-1" />
                         Ekle
                       </Button>
                     </Col>
-                    {discounts.map((discount, index) => (
-                      <Row key={discount.id}>
-                        <hr />
-                        <h6>{index + 1}. İndirim</h6>
-                        <Col md={12} className="mb-2">
-                          <FormCheck
-                            type="radio"
-                            id={"infoProductModalDiscountAmountInput-" + discount.id}
-                            className="d-inline-block me-3"
-                            label="Tutar İndirimi"
-                            value="amount"
-                            checked={discount.type === "amount"}
-                            onChange={(e: any) => {
-                              if (e.target.checked)
-                                dispatch(updateDiscount({ id: discount.id, amount: discount.amount, type: e.target.value }));
-                            }}
-                          />
-                          <FormCheck
-                            type="radio"
-                            id={"infoProductModalDiscountPercentInput-" + discount.id}
-                            className="d-inline-block"
-                            label="Yüzde İndirimi"
-                            value="percent"
-                            checked={discount.type === "percent"}
-                            onChange={(e: any) => {
-                              if (e.target.checked)
-                                dispatch(updateDiscount({ id: discount.id, amount: discount.amount, type: e.target.value }));
-                            }}
-                          />
-                        </Col>
-                        <Col md={12}>
-                          <FormGroup className="mb-3" controlId="infoProductModalDiscountInput">
-                            <FormLabel>{discount.type === "amount" ? "İndirim Tutarı" : "İndirim Oranı"}</FormLabel>
-                            <InputGroup>
-                              <FormControl
-                                type="number"
-                                step="any"
-                                placeholder={discount.type === "amount" ? "İndirim Tutarı" : "İndirim Oranı"}
-                                value={!isNaN(discount.amount) ? discount.amount : ""}
-                                onChange={(e: any) =>
-                                  dispatch(updateDiscount({ id: discount.id, amount: e.target.value, type: discount.type }))
-                                }
-                              />
-                              <InputGroup.Text>{discount.type === "amount" ? "₺" : "%"}</InputGroup.Text>
-                              <Button variant="danger" onClick={() => dispatch(removeDiscount(discount.id))}>
-                                <FontAwesomeIcon icon={faTrash} />
-                              </Button>
-                            </InputGroup>
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                    ))}
+                    {partnersResponse?.items?.map((partner) =>
+                      discounts.filter((discount) => discount.partnerId === partner.id).length > 0 ? (
+                        <div key={partner.id}>
+                          <h5>{partner.name} İndirimleri</h5>
+                          {discounts
+                            .filter((discount) => discount.partnerId === partner.id)
+                            .sort((a, b) => a.priority - b.priority)
+                            .map((discount, index) => (
+                              <Row className="g-1" key={discount.id}>
+                                <hr className="mb-1" />
+                                <div className="d-flex align-items-center justify-content-between">
+                                  <b className="d-inline-block">{index + 1}. İndirim</b>
+                                  <Button
+                                    size="sm"
+                                    variant="danger"
+                                    className="mb-2"
+                                    onClick={() => setDiscounts((prev) => [...prev.filter((c) => c.id !== discount.id)])}
+                                  >
+                                    <FontAwesomeIcon icon={faTrash} />
+                                  </Button>
+                                </div>
+                                <Col xs={12} sm={6} md={6} lg={12} xl={6} xxl={6} className="mb-2">
+                                  <FormSelect
+                                    value={discount.partnerId ?? 0}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                      discount.partnerId = parseInt(e.target.value);
+                                      setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                    }}
+                                    disabled={!partnersLoaded}
+                                  >
+                                    <option value={0} disabled>
+                                      Partner
+                                    </option>
+                                    {partnersResponse?.items
+                                      ?.sort((a, b) => a.name.localeCompare(b.name))
+                                      .map((partner) => (
+                                        <option key={partner.id} value={partner.id}>
+                                          {partner.name}
+                                        </option>
+                                      ))}
+                                  </FormSelect>
+                                </Col>
+                                <Col xs={12} sm={6} md={6} lg={12} xl={6} xxl={6} className="mb-2">
+                                  <FormSelect
+                                    value={discount.discountType ?? 0}
+                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                      discount.discountType = parseInt(e.target.value);
+                                      setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                    }}
+                                    disabled={!partnersLoaded}
+                                  >
+                                    <option value={0} disabled>
+                                      İndirim Tipi
+                                    </option>
+                                    {discountTypes.map((discountType) => (
+                                      <option key={discountType.id} value={discountType.id}>
+                                        {discountType.name}
+                                      </option>
+                                    ))}
+                                  </FormSelect>
+                                </Col>
+                                <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
+                                  <FormGroup className="mb-3" controlId="infoProductModalPriorityInput">
+                                    <InputGroup>
+                                      <FormControl
+                                        type="number"
+                                        step="any"
+                                        placeholder="Öncelik"
+                                        value={!isNaN(discount.priority) ? discount.priority : ""}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                          discount.priority = parseInt(e.target.value);
+                                          setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                        }}
+                                      />
+                                      <InputGroup.Text>
+                                        <FontAwesomeIcon icon={faSort} />
+                                      </InputGroup.Text>
+                                    </InputGroup>
+                                  </FormGroup>
+                                </Col>
+                                <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
+                                  <FormGroup className="mb-3" controlId="infoProductModalDiscountLowerLimitInput">
+                                    <InputGroup>
+                                      <FormControl
+                                        type="number"
+                                        step="any"
+                                        placeholder="Alt Limiti"
+                                        value={!isNaN(discount.discountLowerLimit) ? discount.discountLowerLimit : ""}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                          discount.discountLowerLimit = parseFloat(e.target.value);
+                                          setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                        }}
+                                      />
+                                      <InputGroup.Text>₺</InputGroup.Text>
+                                    </InputGroup>
+                                  </FormGroup>
+                                </Col>
+                                <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
+                                  <FormGroup className="mb-3" controlId="infoProductModalDiscountInput">
+                                    <InputGroup>
+                                      <FormControl
+                                        type="number"
+                                        step="any"
+                                        placeholder="İndirim"
+                                        value={!isNaN(discount.discountAmount) ? discount.discountAmount : ""}
+                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                          discount.discountAmount = parseFloat(e.target.value);
+                                          setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                        }}
+                                      />
+                                      <InputGroup.Text>{discount.discountType == 1 ? "%" : "₺"}</InputGroup.Text>
+                                    </InputGroup>
+                                  </FormGroup>
+                                </Col>
+                              </Row>
+                            ))}
+                        </div>
+                      ) : null
+                    )}
                   </Row>
                 </Col>
                 <Col md={12} lg={8}>
@@ -413,40 +514,23 @@ export default function index({ product, partnersLoaded, partnersResponse, mater
                               </td>
                             ))}
                           </tr>
-                          {discounts.map((discount, index) => (
-                            <tr key={index}>
-                              <th>
-                                {index + 1}. İndirim ({discount.type === "amount" ? formatCurrency(discount.amount) : discount.amount + "%"}
-                                )
-                              </th>
-                              {partnerPrices.map((partnerPrice) => (
-                                <td
-                                  key={partnerPrice.partnerId}
-                                  className={
-                                    formatCurrency(
-                                      partnerPrice.currentDiscounts[index] !== 0
-                                        ? -partnerPrice.currentDiscounts[index]
-                                        : partnerPrice.currentDiscounts[index]
-                                    ).startsWith("-")
-                                      ? "text-danger"
-                                      : formatCurrency(
-                                          partnerPrice.currentDiscounts[index] !== 0
-                                            ? -partnerPrice.currentDiscounts[index]
-                                            : partnerPrice.currentDiscounts[index]
-                                        ) === "₺0,00"
-                                      ? ""
-                                      : "text-success"
-                                  }
-                                >
-                                  {formatCurrency(
-                                    partnerPrice.currentDiscounts[index] !== 0
-                                      ? -partnerPrice.currentDiscounts[index]
-                                      : partnerPrice.currentDiscounts[index]
-                                  )}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
+                          <tr>
+                            <th>Toplam İndirim</th>
+                            {partnerPrices.map((partnerPrice, index) => (
+                              <td
+                                key={partnerPrice.partnerId}
+                                className={
+                                  formatCurrency(partnerPrice.partnerDiscounts[index]).startsWith("-")
+                                    ? "text-danger"
+                                    : formatCurrency(partnerPrice.partnerDiscounts[index]) === "₺0,00"
+                                    ? ""
+                                    : "text-success"
+                                }
+                              >
+                                {formatCurrency(partnerPrice.partnerDiscounts[index])}
+                              </td>
+                            ))}
+                          </tr>
                           {discounts.length > 0 && (
                             <tr>
                               <th>İndirimli Satış Fiyatı</th>
@@ -619,6 +703,8 @@ interface Props {
   partnersLoaded: boolean;
   materialsResponse: GetListResponse<GetListMaterialListItemDto>;
   materialsLoaded: boolean;
+  discountsResponse: GetListResponse<GetListDiscountListItemDto>;
+  discountsLoaded: boolean;
 }
 
 interface PriceItemDto {
@@ -630,8 +716,8 @@ interface PriceItemDto {
   shippingCost: number;
   additionalExpenses: number;
   estimatedEarnings: number;
-  currentDiscounts: number[];
   serviceFee: number;
+  partnerDiscounts: number[];
 }
 
 const defaultImageUrl = process.env.DEFAULT_IMAGE_URL;

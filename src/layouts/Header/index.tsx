@@ -86,6 +86,11 @@ export default function index() {
                     Materyaller
                   </Nav.Link>
                 </Link>
+                <Link to={"/indirimler"}>
+                  <Nav.Link as={"span"} active={pathName.pathname === "/indirimler"}>
+                    İndirimler
+                  </Nav.Link>
+                </Link>
                 <Link to={"/urunler"}>
                   <Nav.Link as={"span"} active={pathName.pathname === "/urunler"}>
                     Ürünler

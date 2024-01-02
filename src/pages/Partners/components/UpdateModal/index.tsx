@@ -6,7 +6,7 @@ import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, I
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
-import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
+import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeCheck, handleChangeInput } from "../../../../functions";
 import partners from "../../../../http/partners";
 import UpdatePartnerCommand from "../../../../http/partners/models/commands/update/updatePartnerCommand";
@@ -67,9 +67,15 @@ export default function index({ fetchPartners, partner }: Props) {
 
   const validationSchema = Yup.object({
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
-    shippingCost: Yup.number().required(ValidationRequired),
-    serviceFee: Yup.number().required(ValidationRequired),
-    transactionFee: Yup.number().required(ValidationRequired),
+    shippingCost: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    serviceFee: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    transactionFee: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    firstScaleLowerLimit: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    firstScaleUpperLimit: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    firstScaleShippingFee: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    secondScaleLowerLimit: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    secondScaleUpperLimit: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
+    secondScaleShippingFee: Yup.number().required(ValidationRequired).min(0, ValidationInvalid),
   });
 
   return (
@@ -222,12 +228,14 @@ export default function index({ fetchPartners, partner }: Props) {
                             <FormControl
                               type="number"
                               step="any"
+                              className={errors.firstScaleLowerLimit && "is-invalid"}
                               placeholder="1. Barem Alt Limit"
                               name="firstScaleLowerLimit"
                               value={formValues.firstScaleLowerLimit}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                             />
                             <InputGroup.Text>₺</InputGroup.Text>
+                            {errors.firstScaleLowerLimit && <div className="invalid-feedback">{errors.firstScaleLowerLimit}</div>}
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -238,12 +246,14 @@ export default function index({ fetchPartners, partner }: Props) {
                             <FormControl
                               type="number"
                               step="any"
+                              className={errors.firstScaleUpperLimit && "is-invalid"}
                               placeholder="1. Barem Üst Limit"
                               name="firstScaleUpperLimit"
                               value={formValues.firstScaleUpperLimit}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                             />
                             <InputGroup.Text>₺</InputGroup.Text>
+                            {errors.firstScaleUpperLimit && <div className="invalid-feedback">{errors.firstScaleUpperLimit}</div>}
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -254,12 +264,14 @@ export default function index({ fetchPartners, partner }: Props) {
                             <FormControl
                               type="number"
                               step="any"
+                              className={errors.firstScaleShippingFee && "is-invalid"}
                               placeholder="1. Barem Kargo Ücreti"
                               name="firstScaleShippingFee"
                               value={formValues.firstScaleShippingFee}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                             />
                             <InputGroup.Text>₺</InputGroup.Text>
+                            {errors.firstScaleShippingFee && <div className="invalid-feedback">{errors.firstScaleShippingFee}</div>}
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -270,12 +282,14 @@ export default function index({ fetchPartners, partner }: Props) {
                             <FormControl
                               type="number"
                               step="any"
+                              className={errors.secondScaleLowerLimit && "is-invalid"}
                               placeholder="2. Barem Alt Limit"
                               name="secondScaleLowerLimit"
                               value={formValues.secondScaleLowerLimit}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                             />
                             <InputGroup.Text>₺</InputGroup.Text>
+                            {errors.secondScaleLowerLimit && <div className="invalid-feedback">{errors.secondScaleLowerLimit}</div>}
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -286,12 +300,14 @@ export default function index({ fetchPartners, partner }: Props) {
                             <FormControl
                               type="number"
                               step="any"
+                              className={errors.secondScaleUpperLimit && "is-invalid"}
                               placeholder="2. Barem Üst Limit"
                               name="secondScaleUpperLimit"
                               value={formValues.secondScaleUpperLimit}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                             />
                             <InputGroup.Text>₺</InputGroup.Text>
+                            {errors.secondScaleUpperLimit && <div className="invalid-feedback">{errors.secondScaleUpperLimit}</div>}
                           </InputGroup>
                         </FormGroup>
                       </Col>
@@ -302,12 +318,14 @@ export default function index({ fetchPartners, partner }: Props) {
                             <FormControl
                               type="number"
                               step="any"
+                              className={errors.secondScaleShippingFee && "is-invalid"}
                               placeholder="2. Barem Kargo Ücreti"
                               name="secondScaleShippingFee"
                               value={formValues.secondScaleShippingFee}
                               onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
                             />
                             <InputGroup.Text>₺</InputGroup.Text>
+                            {errors.secondScaleShippingFee && <div className="invalid-feedback">{errors.secondScaleShippingFee}</div>}
                           </InputGroup>
                         </FormGroup>
                       </Col>

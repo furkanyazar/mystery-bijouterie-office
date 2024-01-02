@@ -35,6 +35,8 @@ import {
 import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
+import GetListDiscountListItemDto from "../../http/discounts/models/queries/getList/getListDiscountListItemDto";
+import discounts from "../../http/discounts";
 
 export default function index() {
   const dispatch = useAppDispatch();
@@ -50,11 +52,13 @@ export default function index() {
   const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
   const [materialsResponse, setMaterialsResponse] = useState<GetListResponse<GetListMaterialListItemDto>>(null);
   const [materialsLoaded, setMaterialsLoaded] = useState<boolean>(false);
+  const [discountsResponse, setDiscountsResponse] = useState<GetListResponse<GetListDiscountListItemDto>>(null);
+  const [discountsLoaded, setDiscountsLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    if (productsLoaded && !categoriesLoaded && !partnersLoaded && !materialsLoaded)
-      fetchCategories().finally(fetchPartners).finally(fetchMaterials);
-  }, [productsLoaded, categoriesLoaded, partnersLoaded, materialsLoaded]);
+    if (productsLoaded && !categoriesLoaded && !partnersLoaded && !materialsLoaded && !discountsLoaded)
+      fetchCategories().finally(fetchPartners).finally(fetchMaterials).finally(fetchDiscounts);
+  }, [productsLoaded, categoriesLoaded, partnersLoaded, materialsLoaded, discountsLoaded]);
 
   useEffect(() => {
     setProductsLoaded(false);
@@ -179,6 +183,13 @@ export default function index() {
       .then((response) => setMaterialsResponse(response.data))
       .catch((errorResponse) => {})
       .finally(() => setMaterialsLoaded(true));
+
+  const fetchDiscounts = async () =>
+    await discounts
+      .getListDiscount()
+      .then((response) => setDiscountsResponse(response.data))
+      .catch((errorResponse) => {})
+      .finally(() => setDiscountsLoaded(true));
 
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
@@ -442,6 +453,8 @@ export default function index() {
                         partnersResponse={partnersResponse}
                         materialsLoaded={materialsLoaded}
                         materialsResponse={materialsResponse}
+                        discountsResponse={discountsResponse}
+                        discountsLoaded={discountsLoaded}
                       />
                       <UpdateModal
                         fetchProducts={handleSubmit}

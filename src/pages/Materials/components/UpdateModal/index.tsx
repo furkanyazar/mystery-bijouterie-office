@@ -2,12 +2,12 @@ import { faPen, faSave, faXmark } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
-import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
+import { Button, Col, Container, FormControl, FormGroup, FormLabel, InputGroup, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
-import { handleChangeCheck, handleChangeInput } from "../../../../functions";
+import { handleChangeInput } from "../../../../functions";
 import materials from "../../../../http/materials";
 import UpdateMaterialCommand from "../../../../http/materials/models/commands/update/updateMaterialCommand";
 

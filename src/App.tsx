@@ -8,6 +8,7 @@ import { useAppSelector } from "./hooks/useAppSelector";
 import Footer from "./layouts/Footer";
 import Header from "./layouts/Header";
 import Categories from "./pages/Categories";
+import Discounts from "./pages/Discounts";
 import Error from "./pages/Error";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/kategoriler" element={user ? <Categories /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/partnerler" element={user ? <Partners /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/materyaller" element={user ? <Materials /> : <Navigate to={"/giris-yap"} />} />
+        <Route path="/indirimler" element={user ? <Discounts /> : <Navigate to={"/giris-yap"} />} />
         <Route path="/hata/:code" element={<Error />} />
         <Route path="*" element={<Navigate to={"/hata/404"} />} />
       </Routes>
