@@ -514,23 +514,25 @@ export default function index({
                               </td>
                             ))}
                           </tr>
-                          <tr>
-                            <th>Toplam İndirim</th>
-                            {partnerPrices.map((partnerPrice, index) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(partnerPrice.partnerDiscounts[index]).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(partnerPrice.partnerDiscounts[index]) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(partnerPrice.partnerDiscounts[index])}
-                              </td>
-                            ))}
-                          </tr>
+                          {discounts.length > 0 && (
+                            <tr>
+                              <th>Toplam İndirim</th>
+                              {partnerPrices.map((partnerPrice, index) => (
+                                <td
+                                  key={partnerPrice.partnerId}
+                                  className={
+                                    formatCurrency(partnerPrice.partnerDiscounts[index]).startsWith("-")
+                                      ? "text-danger"
+                                      : formatCurrency(partnerPrice.partnerDiscounts[index]) === "₺0,00"
+                                      ? ""
+                                      : "text-success"
+                                  }
+                                >
+                                  {formatCurrency(partnerPrice.partnerDiscounts[index])}
+                                </td>
+                              ))}
+                            </tr>
+                          )}
                           {discounts.length > 0 && (
                             <tr>
                               <th>İndirimli Satış Fiyatı</th>
