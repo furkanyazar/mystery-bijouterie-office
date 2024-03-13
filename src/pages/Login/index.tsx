@@ -113,4 +113,4 @@ export default function index() {
   );
 }
 
-const defaultLoginModel: LoginCommand = { email: "", password: "" };
+const defaultLoginModel: LoginCommand = { email: "test@mail.com", password: "1234" };
