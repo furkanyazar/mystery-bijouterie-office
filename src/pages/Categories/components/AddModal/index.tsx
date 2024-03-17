@@ -41,8 +41,8 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
   ]);
 
   useEffect(() => {
-    if (partnersLoaded) {
-      const categoryPartners = [...partnersResponse?.items?.map((partner) => ({ partnerId: partner.id, commissionRate: 0 }))];
+    if (partnersLoaded && partnersResponse) {
+      const categoryPartners = [...partnersResponse.items.map((partner) => ({ partnerId: partner.id, commissionRate: 0 }))];
       defaultFormValues.categoryPartners = [...categoryPartners];
       setFormValues((prev) => ({ ...prev, categoryPartners: [...categoryPartners] }));
     }
