@@ -7,27 +7,19 @@ import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, F
 import ReactInputMask from "react-input-mask";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import MBSpinner from "../../../../components/MBSpinner";
 import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeEditor, handleChangeInput, handleChangeSelect } from "../../../../functions";
-import GetListCategoryListItemDto from "../../../../http/categories/models/queries/getList/getListCategoryListItemDto";
-import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import products from "../../../../http/products";
 import CreateProductCommand from "../../../../http/products/models/commands/create/createProductCommand";
 import { DefaultProductDescription } from "../../../../jsons/models/DefaultProductDescription";
-import GetListResponse from "../../../../models/getListResponse";
 
-export default function index({
-  fetchProducts,
-  categoriesLoaded,
-  categoriesResponse,
-  disabled,
-  materialsResponse,
-  materialsLoaded,
-}: Props) {
+export default function index({ fetchProducts, disabled }: Props) {
   const defaultProductDescriptions: DefaultProductDescription[] = require("../../../../jsons/defaultProductDescriptions.json");
+
+  const { categories, materials } = useAppSelector((state) => state.appItems);
 
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreateProductCommand>({ ...defaultFormValues });
@@ -222,11 +214,10 @@ export default function index({
                         name="categoryId"
                         value={formValues.categoryId ?? 0}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
-                        disabled={!categoriesLoaded}
                       >
                         <option value={0}>Seçiniz</option>
-                        {categoriesResponse?.items
-                          ?.sort((a, b) => a.name.localeCompare(b.name))
+                        {categories
+                          .sort((a, b) => a.name.localeCompare(b.name))
                           .map((category) => (
                             <option key={category.id} value={category.id}>
                               {category.name}
@@ -307,39 +298,33 @@ export default function index({
                       </InputGroup>
                     </FormGroup>
                   </Col>
-                  {materialsLoaded ? (
-                    <>
-                      <hr />
-                      <h6 className="mb-3">Materyaller</h6>
-                      {materialsResponse?.items
-                        ?.sort((a, b) => a.name.localeCompare(b.name))
-                        .map((material) => (
-                          <Col className="col-auto mb-1" key={material.id}>
-                            <FormGroup controlId={`addProductModalMaterialInput-${material.id}`}>
-                              <FormCheck
-                                label={material.name}
-                                checked={formValues.productMaterials.map((c) => c.materialId).includes(material.id)}
-                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                  if (e.target.checked) {
-                                    setFormValues((prev) => ({
-                                      ...prev,
-                                      productMaterials: [...prev.productMaterials, { materialId: material.id }],
-                                    }));
-                                  } else {
-                                    setFormValues((prev) => ({
-                                      ...prev,
-                                      productMaterials: [...prev.productMaterials.filter((c) => c.materialId !== material.id)],
-                                    }));
-                                  }
-                                }}
-                              />
-                            </FormGroup>
-                          </Col>
-                        ))}
-                    </>
-                  ) : (
-                    <MBSpinner />
-                  )}
+                  <hr />
+                  <h6 className="mb-3">Materyaller</h6>
+                  {materials
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((material) => (
+                      <Col className="col-auto mb-1" key={material.id}>
+                        <FormGroup controlId={`addProductModalMaterialInput-${material.id}`}>
+                          <FormCheck
+                            label={material.name}
+                            checked={formValues.productMaterials.map((c) => c.materialId).includes(material.id)}
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              if (e.target.checked) {
+                                setFormValues((prev) => ({
+                                  ...prev,
+                                  productMaterials: [...prev.productMaterials, { materialId: material.id }],
+                                }));
+                              } else {
+                                setFormValues((prev) => ({
+                                  ...prev,
+                                  productMaterials: [...prev.productMaterials.filter((c) => c.materialId !== material.id)],
+                                }));
+                              }
+                            }}
+                          />
+                        </FormGroup>
+                      </Col>
+                    ))}
                 </Row>
               </Form>
             )}
@@ -367,11 +352,7 @@ const formId = "addProductForm";
 
 interface Props {
   fetchProducts: () => void;
-  categoriesResponse: GetListResponse<GetListCategoryListItemDto>;
-  categoriesLoaded: boolean;
   disabled: boolean;
-  materialsResponse: GetListResponse<GetListMaterialListItemDto>;
-  materialsLoaded: boolean;
 }
 
 let tempDescription = "";

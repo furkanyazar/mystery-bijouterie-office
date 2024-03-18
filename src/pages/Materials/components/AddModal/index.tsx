@@ -11,7 +11,7 @@ import { handleChangeInput } from "../../../../functions";
 import materials from "../../../../http/materials";
 import CreateMaterialCommand from "../../../../http/materials/models/commands/create/createMaterialCommand";
 
-export default function index({ fetchMaterials, disabled }: Props) {
+export default function index({ fetchMaterials, disabled, fetchAllMaterials }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreateMaterialCommand>({ ...defaultFormValues });
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,6 +54,7 @@ export default function index({ fetchMaterials, disabled }: Props) {
         fetchMaterials();
       })
       .catch((errorResponse) => {})
+      .then(fetchAllMaterials)
       .finally(() => setLoading(false));
   };
 
@@ -156,4 +157,5 @@ const formId = "addMaterialForm";
 interface Props {
   fetchMaterials: () => void;
   disabled: boolean;
+  fetchAllMaterials: () => void;
 }

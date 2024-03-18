@@ -5,16 +5,16 @@ import React, { useEffect, useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import MBSpinner from "../../../../components/MBSpinner";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeInput } from "../../../../functions";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import categories from "../../../../http/categories";
 import CreateCategoryCommand from "../../../../http/categories/models/commands/create/createCategoryCommand";
-import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
-import GetListResponse from "../../../../models/getListResponse";
 
-export default function index({ fetchCategories, disabled, partnersLoaded, partnersResponse }: Props) {
+export default function index({ fetchCategories, disabled, fetchAllCategories }: Props) {
+  const { partners } = useAppSelector((state) => state.appItems);
+
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreateCategoryCommand>({ ...defaultFormValues });
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,12 +41,12 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
   ]);
 
   useEffect(() => {
-    if (partnersLoaded && partnersResponse) {
-      const categoryPartners = [...partnersResponse.items.map((partner) => ({ partnerId: partner.id, commissionRate: 0 }))];
+    if (partners) {
+      const categoryPartners = [...partners.map((partner) => ({ partnerId: partner.id, commissionRate: 0 }))];
       defaultFormValues.categoryPartners = [...categoryPartners];
       setFormValues((prev) => ({ ...prev, categoryPartners: [...categoryPartners] }));
     }
-  }, [partnersResponse, partnersLoaded]);
+  }, [partners]);
 
   useEffect(() => {
     setModalButtons((prev) => [
@@ -65,6 +65,7 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
         fetchCategories();
       })
       .catch((errorResponse) => {})
+      .then(fetchAllCategories)
       .finally(() => setLoading(false));
   };
 
@@ -87,78 +88,70 @@ export default function index({ fetchCategories, disabled, partnersLoaded, partn
       </Button>
       <MBModal id="addCategoryModal" closable={false} handleClose={handleClose} show={show} title="Kategori Ekle" buttons={modalButtons}>
         <Container>
-          {partnersLoaded ? (
-            <Formik
-              initialValues={formValues}
-              onSubmit={handleSubmit}
-              enableReinitialize
-              validationSchema={validationSchema}
-              validateOnChange={false}
-              validateOnBlur={false}
-            >
-              {({ errors }: any) => (
-                <Form id={formId}>
-                  <Row>
-                    <Col md={12}>
-                      <FormGroup className="mb-3" controlId="addCategoryModalNameInput">
-                        <FormLabel>Ad</FormLabel>
-                        <FormControl
-                          className={errors.name && "is-invalid"}
-                          placeholder="Ad"
-                          name="name"
-                          value={formValues.name}
-                          onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
-                        />
-                        {errors.name && <div className="invalid-feedback">{errors.name}</div>}
-                      </FormGroup>
-                    </Col>
-                    {formValues.categoryPartners
-                      .sort((a, b) => a.partnerId - b.partnerId)
-                      .map((categoryPartner, index) => (
-                        <Col key={categoryPartner.partnerId} md={6}>
-                          <FormGroup className="mb-3" controlId={"addCategoryModalPartnerInput-" + categoryPartner.partnerId}>
-                            <FormLabel>
-                              {partnersResponse?.items.find((partner) => partner.id === categoryPartner.partnerId)?.name} Komisyon O.
-                            </FormLabel>
-                            <FormControl
-                              className={errors.categoryPartners && errors.categoryPartners[index] && "is-invalid"}
-                              type="number"
-                              step="any"
-                              placeholder={
-                                partnersResponse?.items.find((partner) => partner.id === categoryPartner.partnerId)?.name + " Komisyon O."
-                              }
-                              value={
-                                (categoryPartner.commissionRate && !isNaN(categoryPartner.commissionRate)) ||
-                                categoryPartner.commissionRate === 0
-                                  ? categoryPartner.commissionRate
-                                  : ""
-                              }
-                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                setFormValues((prev) => ({
-                                  ...prev,
-                                  categoryPartners: [
-                                    ...prev.categoryPartners.filter((c) => c.partnerId !== categoryPartner.partnerId),
-                                    {
-                                      ...categoryPartner,
-                                      commissionRate: e.target.value ? Number.parseFloat(e.currentTarget.value) : null,
-                                    },
-                                  ],
-                                }));
-                              }}
-                            />
-                            {errors.categoryPartners && errors.categoryPartners[index] && (
-                              <div className="invalid-feedback">{errors.categoryPartners[index].commissionRate}</div>
-                            )}
-                          </FormGroup>
-                        </Col>
-                      ))}
-                  </Row>
-                </Form>
-              )}
-            </Formik>
-          ) : (
-            <MBSpinner />
-          )}
+          <Formik
+            initialValues={formValues}
+            onSubmit={handleSubmit}
+            enableReinitialize
+            validationSchema={validationSchema}
+            validateOnChange={false}
+            validateOnBlur={false}
+          >
+            {({ errors }: any) => (
+              <Form id={formId}>
+                <Row>
+                  <Col md={12}>
+                    <FormGroup className="mb-3" controlId="addCategoryModalNameInput">
+                      <FormLabel>Ad</FormLabel>
+                      <FormControl
+                        className={errors.name && "is-invalid"}
+                        placeholder="Ad"
+                        name="name"
+                        value={formValues.name}
+                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
+                      />
+                      {errors.name && <div className="invalid-feedback">{errors.name}</div>}
+                    </FormGroup>
+                  </Col>
+                  {formValues.categoryPartners
+                    .sort((a, b) => a.partnerId - b.partnerId)
+                    .map((categoryPartner, index) => (
+                      <Col key={categoryPartner.partnerId} md={6}>
+                        <FormGroup className="mb-3" controlId={"addCategoryModalPartnerInput-" + categoryPartner.partnerId}>
+                          <FormLabel>{partners.find((partner) => partner.id === categoryPartner.partnerId)?.name} Komisyon O.</FormLabel>
+                          <FormControl
+                            className={errors.categoryPartners && errors.categoryPartners[index] && "is-invalid"}
+                            type="number"
+                            step="any"
+                            placeholder={partners.find((partner) => partner.id === categoryPartner.partnerId)?.name + " Komisyon O."}
+                            value={
+                              (categoryPartner.commissionRate && !isNaN(categoryPartner.commissionRate)) ||
+                              categoryPartner.commissionRate === 0
+                                ? categoryPartner.commissionRate
+                                : ""
+                            }
+                            onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                              setFormValues((prev) => ({
+                                ...prev,
+                                categoryPartners: [
+                                  ...prev.categoryPartners.filter((c) => c.partnerId !== categoryPartner.partnerId),
+                                  {
+                                    ...categoryPartner,
+                                    commissionRate: e.target.value ? Number.parseFloat(e.currentTarget.value) : null,
+                                  },
+                                ],
+                              }));
+                            }}
+                          />
+                          {errors.categoryPartners && errors.categoryPartners[index] && (
+                            <div className="invalid-feedback">{errors.categoryPartners[index].commissionRate}</div>
+                          )}
+                        </FormGroup>
+                      </Col>
+                    ))}
+                </Row>
+              </Form>
+            )}
+          </Formik>
         </Container>
       </MBModal>
     </>
@@ -172,7 +165,6 @@ const formId = "addCategoryForm";
 
 interface Props {
   fetchCategories: () => void;
+  fetchAllCategories: () => void;
   disabled: boolean;
-  partnersResponse: GetListResponse<GetListPartnerListItemDto>;
-  partnersLoaded: boolean;
 }

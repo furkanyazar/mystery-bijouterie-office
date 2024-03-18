@@ -10,6 +10,7 @@ import MBTHeadItem from "../../components/MBTHeadItem";
 import MBTableFooter from "../../components/MBTableFooter";
 import { handleChangeInput, handleChangeSelect } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
+import { useAppSelector } from "../../hooks/useAppSelector";
 import discounts from "../../http/discounts";
 import GetListDiscountListItemDto from "../../http/discounts/models/queries/getList/getListDiscountListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
@@ -26,22 +27,16 @@ import {
 import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
-import GetListPartnerListItemDto from "../../http/partners/models/queries/getList/getListPartnerListItemDto";
-import partners from "../../http/partners";
 
-export default function index() {
+export default function index({ fetchAllDiscounts }: Props) {
   const dispatch = useAppDispatch();
+
+  const { partners } = useAppSelector((state) => state.appItems);
 
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
   const [pageRequest, setPageRequest] = useState<PageRequest>({ ...defaultPageRequest });
   const [discountsResponse, setDiscountsResponse] = useState<GetListResponse<GetListDiscountListItemDto>>(null);
   const [discountsLoaded, setDiscountsLoaded] = useState<boolean>(false);
-  const [partnersResponse, setPartnersResponse] = useState<GetListResponse<GetListPartnerListItemDto>>(null);
-  const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (discountsLoaded && !partnersLoaded) fetchPartners();
-  }, [discountsLoaded, partnersLoaded]);
 
   useEffect(() => {
     setDiscountsLoaded(false);
@@ -78,23 +73,13 @@ export default function index() {
       .catch((errorResponse) => {})
       .finally(() => setDiscountsLoaded(true));
 
-  const fetchPartners = async () =>
-    await partners
-      .getListPartner()
-      .then((response) => setPartnersResponse(response.data))
-      .catch((errorResponse) => {})
-      .finally(() => setPartnersLoaded(true));
-
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
   const setPageSize = (pageSize: number) => setPageRequest({ pageIndex: 0, pageSize });
 
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
 
-  const handleClear = () => {
-    setSearchValues({ ...defaultSearchValues });
-    handleSubmit();
-  };
+  const handleClear = () => setSearchValues({ ...defaultSearchValues });
 
   const handleClickRemove = (id: number, name: string) => {
     const cancelButtonKey = "cancel";
@@ -136,7 +121,7 @@ export default function index() {
                   dispatch(setButtonNotDisabled(cancelButtonKey));
                   dispatch(setButtonNotLoading(okButtonKey));
                 })
-                .finally(() => {});
+                .then(fetchAllDiscounts);
             },
             variant: "danger",
             disabled: false,
@@ -161,12 +146,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddModal
-              disabled={!discountsLoaded}
-              fetchDiscounts={handleSubmit}
-              partnersLoaded={partnersLoaded}
-              partnersResponse={partnersResponse}
-            />
+            <AddModal disabled={!discountsLoaded} fetchDiscounts={handleSubmit} fetchAllDiscounts={fetchAllDiscounts} />
           </Col>
         </Row>
         <hr />
@@ -186,17 +166,15 @@ export default function index() {
                   name="partnerId"
                   value={searchValues.partnerId}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
-                  disabled={!partnersLoaded}
                 >
                   <option value={0}>Partner</option>
-                  {partnersLoaded &&
-                    partnersResponse?.items
-                      ?.sort((a, b) => a.name.localeCompare(b.name))
-                      .map((partner) => (
-                        <option key={partner.id} value={partner.id}>
-                          {partner.name}
-                        </option>
-                      ))}
+                  {partners
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((partner) => (
+                      <option key={partner.id} value={partner.id}>
+                        {partner.name}
+                      </option>
+                    ))}
                 </FormSelect>
               </div>
               <div className="col-auto ms-auto">
@@ -236,12 +214,7 @@ export default function index() {
                     <td>{discount.name}</td>
                     <td className="text-end">
                       <InfoModal discount={discount} />
-                      <UpdateModal
-                        discount={discount}
-                        fetchDiscounts={handleSubmit}
-                        partnersLoaded={partnersLoaded}
-                        partnersResponse={partnersResponse}
-                      />
+                      <UpdateModal discount={discount} fetchDiscounts={handleSubmit} fetchAllDiscounts={fetchAllDiscounts} />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(discount.id, discount.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
@@ -265,3 +238,7 @@ export default function index() {
 const defaultSearchValues = { name: "", partnerId: 0, orderBy: "id", descending: false };
 
 const defaultPageRequest = { pageIndex: 0, pageSize: 50 };
+
+interface Props {
+  fetchAllDiscounts: () => void;
+}

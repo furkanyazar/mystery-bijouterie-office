@@ -5,31 +5,22 @@ import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row } from "react-bootstrap";
 import ReactInputMask from "react-input-mask";
+import ModalImage from "react-modal-image";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import MBSpinner from "../../../../components/MBSpinner";
 import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
-import { handleChangeCheck, handleChangeEditor, handleChangeInput, handleChangeSelect } from "../../../../functions";
-import GetListCategoryListItemDto from "../../../../http/categories/models/queries/getList/getListCategoryListItemDto";
+import { handleChangeEditor, handleChangeInput, handleChangeSelect } from "../../../../functions";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import products from "../../../../http/products";
 import UpdateProductCommand from "../../../../http/products/models/commands/update/updateProductCommand";
 import { DefaultProductDescription } from "../../../../jsons/models/DefaultProductDescription";
-import GetListResponse from "../../../../models/getListResponse";
-import ModalImage from "react-modal-image";
-import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
 
-export default function index({
-  fetchProducts,
-  product,
-  categoriesLoaded,
-  categoriesResponse,
-  imageUrl,
-  materialsResponse,
-  materialsLoaded,
-}: Props) {
+export default function index({ fetchProducts, product, imageUrl }: Props) {
   const defaultProductDescriptions: DefaultProductDescription[] = require("../../../../jsons/defaultProductDescriptions.json");
+
+  const { categories, materials } = useAppSelector((state) => state.appItems);
 
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<UpdateProductCommand>({ ...product });
@@ -178,41 +169,35 @@ export default function index({
                           </InputGroup>
                         </FormGroup>
                       </Col>
-                      {materialsLoaded ? (
-                        <>
-                          <hr />
-                          <Col md={12} className="text-center mb-3">
-                            <h6>Materyaller</h6>
+                      <hr />
+                      <Col md={12} className="text-center mb-3">
+                        <h6>Materyaller</h6>
+                      </Col>
+                      {materials
+                        .sort((a, b) => a.name.localeCompare(b.name))
+                        .map((material) => (
+                          <Col className="col-auto mb-1" key={material.id}>
+                            <FormGroup controlId={`updateProductModalMaterialInput-${material.id}`}>
+                              <FormCheck
+                                label={material.name}
+                                checked={formValues.productMaterials.map((c) => c.materialId).includes(material.id)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                  if (e.target.checked) {
+                                    setFormValues((prev) => ({
+                                      ...prev,
+                                      productMaterials: [...prev.productMaterials, { materialId: material.id }],
+                                    }));
+                                  } else {
+                                    setFormValues((prev) => ({
+                                      ...prev,
+                                      productMaterials: [...prev.productMaterials.filter((c) => c.materialId !== material.id)],
+                                    }));
+                                  }
+                                }}
+                              />
+                            </FormGroup>
                           </Col>
-                          {materialsResponse?.items
-                            ?.sort((a, b) => a.name.localeCompare(b.name))
-                            .map((material) => (
-                              <Col className="col-auto mb-1" key={material.id}>
-                                <FormGroup controlId={`updateProductModalMaterialInput-${material.id}`}>
-                                  <FormCheck
-                                    label={material.name}
-                                    checked={formValues.productMaterials.map((c) => c.materialId).includes(material.id)}
-                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                      if (e.target.checked) {
-                                        setFormValues((prev) => ({
-                                          ...prev,
-                                          productMaterials: [...prev.productMaterials, { materialId: material.id }],
-                                        }));
-                                      } else {
-                                        setFormValues((prev) => ({
-                                          ...prev,
-                                          productMaterials: [...prev.productMaterials.filter((c) => c.materialId !== material.id)],
-                                        }));
-                                      }
-                                    }}
-                                  />
-                                </FormGroup>
-                              </Col>
-                            ))}
-                        </>
-                      ) : (
-                        <MBSpinner />
-                      )}
+                        ))}
                     </Row>
                   </Col>
                   <Col md={12} lg={8}>
@@ -281,11 +266,10 @@ export default function index({
                             name="categoryId"
                             value={formValues.categoryId ?? 0}
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
-                            disabled={!categoriesLoaded}
                           >
                             <option value={0}>Seçiniz</option>
-                            {categoriesResponse?.items
-                              ?.sort((a, b) => a.name.localeCompare(b.name))
+                            {categories
+                              .sort((a, b) => a.name.localeCompare(b.name))
                               .map((category) => (
                                 <option key={category.id} value={category.id}>
                                   {category.name}
@@ -374,11 +358,7 @@ const formId = "updateProductForm";
 interface Props {
   product: UpdateProductCommand;
   fetchProducts: () => void;
-  categoriesResponse: GetListResponse<GetListCategoryListItemDto>;
-  categoriesLoaded: boolean;
   imageUrl?: string;
-  materialsResponse: GetListResponse<GetListMaterialListItemDto>;
-  materialsLoaded: boolean;
 }
 
 let tempDescription = "";

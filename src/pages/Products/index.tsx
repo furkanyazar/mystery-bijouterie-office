@@ -13,12 +13,7 @@ import MBTHeadItem from "../../components/MBTHeadItem";
 import MBTableFooter from "../../components/MBTableFooter";
 import { formatCurrency, handleChangeCheck, handleChangeInput, handleChangeSelect } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
-import categories from "../../http/categories";
-import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
-import materials from "../../http/materials";
-import GetListMaterialListItemDto from "../../http/materials/models/queries/getList/getListMaterialListItemDto";
-import partners from "../../http/partners";
-import GetListPartnerListItemDto from "../../http/partners/models/queries/getList/getListPartnerListItemDto";
+import { useAppSelector } from "../../hooks/useAppSelector";
 import products from "../../http/products";
 import GetListByDynamicProductListItemDto from "../../http/products/models/queries/getListByDynamic/getListByDynamicProductListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
@@ -35,30 +30,17 @@ import {
 import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
-import GetListDiscountListItemDto from "../../http/discounts/models/queries/getList/getListDiscountListItemDto";
-import discounts from "../../http/discounts";
 
 export default function index() {
   const dispatch = useAppDispatch();
+
+  const { categories } = useAppSelector((state) => state.appItems);
 
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
   const [pageRequest, setPageRequest] = useState<PageRequest>({ ...defaultPageRequest });
   const [productsResponse, setProductsResponse] = useState<GetListResponse<GetListByDynamicProductListItemDto>>(null);
   const [productsLoaded, setProductsLoaded] = useState<boolean>(false);
   const [clipboard, setClipboard] = useState<ClipboardJS>(null);
-  const [categoriesResponse, setCategoriesResponse] = useState<GetListResponse<GetListCategoryListItemDto>>(null);
-  const [categoriesLoaded, setCategoriesLoaded] = useState<boolean>(false);
-  const [partnersResponse, setPartnersResponse] = useState<GetListResponse<GetListPartnerListItemDto>>(null);
-  const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
-  const [materialsResponse, setMaterialsResponse] = useState<GetListResponse<GetListMaterialListItemDto>>(null);
-  const [materialsLoaded, setMaterialsLoaded] = useState<boolean>(false);
-  const [discountsResponse, setDiscountsResponse] = useState<GetListResponse<GetListDiscountListItemDto>>(null);
-  const [discountsLoaded, setDiscountsLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (productsLoaded && !categoriesLoaded && !partnersLoaded && !materialsLoaded && !discountsLoaded)
-      fetchCategories().finally(fetchPartners).finally(fetchMaterials).finally(fetchDiscounts);
-  }, [productsLoaded, categoriesLoaded, partnersLoaded, materialsLoaded, discountsLoaded]);
 
   useEffect(() => {
     setProductsLoaded(false);
@@ -163,44 +145,13 @@ export default function index() {
       .catch((errorResponse) => {})
       .finally(() => setProductsLoaded(true));
 
-  const fetchCategories = async () =>
-    await categories
-      .getListCategory()
-      .then((response) => setCategoriesResponse(response.data))
-      .catch((errorResponse) => {})
-      .finally(() => setCategoriesLoaded(true));
-
-  const fetchPartners = async () =>
-    await partners
-      .getListPartner()
-      .then((response) => setPartnersResponse(response.data))
-      .catch((errorResponse) => {})
-      .finally(() => setPartnersLoaded(true));
-
-  const fetchMaterials = async () =>
-    await materials
-      .getListMaterial()
-      .then((response) => setMaterialsResponse(response.data))
-      .catch((errorResponse) => {})
-      .finally(() => setMaterialsLoaded(true));
-
-  const fetchDiscounts = async () =>
-    await discounts
-      .getListDiscount()
-      .then((response) => setDiscountsResponse(response.data))
-      .catch((errorResponse) => {})
-      .finally(() => setDiscountsLoaded(true));
-
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
   const setPageSize = (pageSize: number) => setPageRequest({ pageIndex: 0, pageSize });
 
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
 
-  const handleClear = () => {
-    setSearchValues({ ...defaultSearchValues });
-    handleSubmit();
-  };
+  const handleClear = () => setSearchValues({ ...defaultSearchValues });
 
   const handleClickRemove = (id: number, name: string) => {
     const cancelButtonKey = "cancel";
@@ -241,8 +192,7 @@ export default function index() {
                 .catch((errorResponse) => {
                   dispatch(setButtonNotDisabled(cancelButtonKey));
                   dispatch(setButtonNotLoading(okButtonKey));
-                })
-                .finally(() => {});
+                });
             },
             variant: "danger",
             disabled: false,
@@ -267,14 +217,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddModal
-              fetchProducts={handleSubmit}
-              categoriesResponse={categoriesResponse}
-              categoriesLoaded={categoriesLoaded}
-              disabled={!productsLoaded}
-              materialsResponse={materialsResponse}
-              materialsLoaded={materialsLoaded}
-            />
+            <AddModal fetchProducts={handleSubmit} disabled={!productsLoaded} />
           </Col>
         </Row>
         <hr />
@@ -294,17 +237,15 @@ export default function index() {
                   name="categoryId"
                   value={searchValues.categoryId}
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
-                  disabled={!categoriesLoaded}
                 >
                   <option value={0}>Kategori</option>
-                  {categoriesLoaded &&
-                    categoriesResponse?.items
-                      ?.sort((a, b) => a.name.localeCompare(b.name))
-                      .map((category) => (
-                        <option key={category.id} value={category.id}>
-                          {category.name}
-                        </option>
-                      ))}
+                  {categories
+                    .sort((a, b) => a.name.localeCompare(b.name))
+                    .map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
                 </FormSelect>
               </div>
               <div className="col-6 col-sm-4 col-md-3">
@@ -447,24 +388,8 @@ export default function index() {
                     <td>{formatCurrency(product.purchasePrice)}</td>
                     <td>{product.unitsInStock}</td>
                     <td className="text-end">
-                      <InfoModal
-                        product={product}
-                        partnersLoaded={partnersLoaded}
-                        partnersResponse={partnersResponse}
-                        materialsLoaded={materialsLoaded}
-                        materialsResponse={materialsResponse}
-                        discountsResponse={discountsResponse}
-                        discountsLoaded={discountsLoaded}
-                      />
-                      <UpdateModal
-                        fetchProducts={handleSubmit}
-                        product={product}
-                        categoriesResponse={categoriesResponse}
-                        categoriesLoaded={categoriesLoaded}
-                        imageUrl={product.imageUrl}
-                        materialsResponse={materialsResponse}
-                        materialsLoaded={materialsLoaded}
-                      />
+                      <InfoModal product={product} />
+                      <UpdateModal fetchProducts={handleSubmit} product={product} imageUrl={product.imageUrl} />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(product.id, product.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>

@@ -12,8 +12,6 @@ import { handleChangeInput } from "../../functions";
 import { useAppDispatch } from "../../hooks/useAppDispatch";
 import categories from "../../http/categories";
 import GetListCategoryListItemDto from "../../http/categories/models/queries/getList/getListCategoryListItemDto";
-import partners from "../../http/partners";
-import GetListPartnerListItemDto from "../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import DynamicQuery, { Filter } from "../../models/dynamicQuery";
 import GetListResponse from "../../models/getListResponse";
 import PageRequest from "../../models/pageRequest";
@@ -29,19 +27,13 @@ import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
 
-export default function index() {
+export default function index({ fetchAllCategories }: Props) {
   const dispatch = useAppDispatch();
 
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
   const [pageRequest, setPageRequest] = useState<PageRequest>({ ...defaultPageRequest });
   const [categoriesResponse, setCategoriesResponse] = useState<GetListResponse<GetListCategoryListItemDto>>(null);
   const [categoriesLoaded, setCategoriesLoaded] = useState<boolean>(false);
-  const [partnersResponse, setPartnersResponse] = useState<GetListResponse<GetListPartnerListItemDto>>(null);
-  const [partnersLoaded, setPartnersLoaded] = useState<boolean>(false);
-
-  useEffect(() => {
-    if (categoriesLoaded && !partnersLoaded) fetchPartners();
-  }, [categoriesLoaded, partnersLoaded]);
 
   useEffect(() => {
     setCategoriesLoaded(false);
@@ -69,23 +61,13 @@ export default function index() {
       .catch((errorResponse) => {})
       .finally(() => setCategoriesLoaded(true));
 
-  const fetchPartners = async () =>
-    await partners
-      .getListPartner()
-      .then((response) => setPartnersResponse(response.data))
-      .catch((errorResponse) => {})
-      .finally(() => setPartnersLoaded(true));
-
   const setPageIndex = (pageIndex: number) => setPageRequest({ ...pageRequest, pageIndex });
 
   const setPageSize = (pageSize: number) => setPageRequest({ pageIndex: 0, pageSize });
 
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
 
-  const handleClear = () => {
-    setSearchValues({ ...defaultSearchValues });
-    handleSubmit();
-  };
+  const handleClear = () => setSearchValues({ ...defaultSearchValues });
 
   const handleClickRemove = (id: number, name: string) => {
     const cancelButtonKey = "cancel";
@@ -127,7 +109,7 @@ export default function index() {
                   dispatch(setButtonNotDisabled(cancelButtonKey));
                   dispatch(setButtonNotLoading(okButtonKey));
                 })
-                .finally(() => {});
+                .then(fetchAllCategories);
             },
             variant: "danger",
             disabled: false,
@@ -152,12 +134,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddModal
-              fetchCategories={handleSubmit}
-              disabled={!categoriesLoaded}
-              partnersLoaded={partnersLoaded}
-              partnersResponse={partnersResponse}
-            />
+            <AddModal fetchCategories={handleSubmit} disabled={!categoriesLoaded} fetchAllCategories={fetchAllCategories} />
           </Col>
         </Row>
         <hr />
@@ -200,13 +177,8 @@ export default function index() {
                     <td>{category.id}</td>
                     <td>{category.name}</td>
                     <td className="text-end">
-                      <InfoModal category={category} partners={partnersResponse} partnersLoaded={partnersLoaded} />
-                      <UpdateModal
-                        fetchCategories={handleSubmit}
-                        category={category}
-                        partnersLoaded={partnersLoaded}
-                        partnersResponse={partnersResponse}
-                      />
+                      <InfoModal category={category} />
+                      <UpdateModal fetchCategories={handleSubmit} category={category} fetchAllCategories={fetchAllCategories} />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(category.id, category.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
@@ -230,3 +202,7 @@ export default function index() {
 const defaultSearchValues = { name: "", orderBy: "id", descending: false };
 
 const defaultPageRequest = { pageIndex: 0, pageSize: 50 };
+
+interface Props {
+  fetchAllCategories: () => void;
+}

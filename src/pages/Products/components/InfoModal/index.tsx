@@ -7,37 +7,28 @@ import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, F
 import ModalImage from "react-modal-image";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
-import MBSpinner from "../../../../components/MBSpinner";
 import MBTextEditor from "../../../../components/MBTextEditor";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationRequired } from "../../../../constants/validationMessages";
 import { formatCurrency } from "../../../../functions";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import GetListDiscountListItemDto from "../../../../http/discounts/models/queries/getList/getListDiscountListItemDto";
-import GetListMaterialListItemDto from "../../../../http/materials/models/queries/getList/getListMaterialListItemDto";
-import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import products from "../../../../http/products";
 import UpdateSalePriceCommand from "../../../../http/products/models/commands/updateSalePrice/updateSalePriceCommand";
 import GetByIdProductResponse from "../../../../http/products/models/queries/getById/getByIdProductResponse";
 import { DiscountType } from "../../../../jsons/models/DiscountType";
-import GetListResponse from "../../../../models/getListResponse";
 
-export default function index({
-  product,
-  partnersLoaded,
-  partnersResponse,
-  materialsLoaded,
-  materialsResponse,
-  discountsResponse,
-  discountsLoaded,
-}: Props) {
+export default function index({ product }: Props) {
   const discountTypes: DiscountType[] = require("../../../../jsons/discountTypes.json");
+
+  const { categories, discounts, materials, partners } = useAppSelector((state) => state.appItems);
 
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.salePrice);
   const [partnerPrices, setPartnerPrices] = useState<PriceItemDto[]>([]);
   const [productMaterials, setProductMaterials] = useState(product?.productMaterials);
   const [loading, setLoading] = useState<boolean>(false);
-  const [discounts, setDiscounts] = useState<GetListDiscountListItemDto[]>([]);
+  const [currentDiscounts, setCurrentDiscounts] = useState<GetListDiscountListItemDto[]>([...discounts]);
   const [modalButtons, setModalButtons] = useState<ButtonProps[]>([
     {
       key: "ok",
@@ -51,14 +42,10 @@ export default function index({
   ]);
 
   useEffect(() => {
-    if (discountsLoaded) setDiscounts((prev) => [...prev, ...discountsResponse?.items]);
-  }, [discountsLoaded, discountsResponse]);
-
-  useEffect(() => {
     if (show) {
       let partnerDiscounts: number[] = [];
       setPartnerPrices([
-        ...partnersResponse?.items?.map((partner, index) => {
+        ...partners.map((partner, index) => {
           partnerDiscounts.push(0);
 
           let partnerId: number = partner.id;
@@ -66,7 +53,7 @@ export default function index({
           let discountedPrice: number = salePrice;
           let purchasePrice: number = product?.purchasePrice;
 
-          discounts
+          currentDiscounts
             .filter((c) => c.partnerId === partner.id)
             .sort((a, b) => a.priority - b.priority)
             .forEach((discount) => {
@@ -119,7 +106,7 @@ export default function index({
         }),
       ]);
     }
-  }, [show, price, discounts, partnersResponse, product, productMaterials]);
+  }, [show, price, currentDiscounts, product, productMaterials]);
 
   useEffect(() => {
     setModalButtons((prev) => [...prev.map((c) => ({ ...c, disabled: loading }))]);
@@ -172,42 +159,36 @@ export default function index({
                     className="img-thumbnail"
                   />
                 </Col>
-                {materialsLoaded ? (
-                  <>
-                    <hr />
-                    <Col md={12} className="text-center mb-3">
-                      <h6>Materyaller</h6>
+                <hr />
+                <Col md={12} className="text-center mb-3">
+                  <h6>Materyaller</h6>
+                </Col>
+                {materials
+                  .sort((a, b) => a.name.localeCompare(b.name))
+                  .map((material) => (
+                    <Col className="col-auto mb-1" key={material.id}>
+                      <FormGroup controlId={`infoProductModalMaterialInput-${material.id}`}>
+                        <FormCheck
+                          label={material.name}
+                          checked={productMaterials?.map((c) => c.materialId).includes(material.id)}
+                          onChange={(e) => {
+                            if (e.target.checked)
+                              setProductMaterials((prev) => [
+                                ...prev,
+                                {
+                                  id: Math.random(),
+                                  materialId: material.id,
+                                  materialName: material.name,
+                                  materialPurchasePrice: material.purchasePrice,
+                                  materialUnitsInStock: material.unitsInStock,
+                                },
+                              ]);
+                            else setProductMaterials((prev) => [...prev.filter((c) => c.materialId !== material.id)]);
+                          }}
+                        />
+                      </FormGroup>
                     </Col>
-                    {materialsResponse?.items
-                      ?.sort((a, b) => a.name.localeCompare(b.name))
-                      .map((material) => (
-                        <Col className="col-auto mb-1" key={material.id}>
-                          <FormGroup controlId={`infoProductModalMaterialInput-${material.id}`}>
-                            <FormCheck
-                              label={material.name}
-                              checked={productMaterials?.map((c) => c.materialId).includes(material.id)}
-                              onChange={(e) => {
-                                if (e.target.checked)
-                                  setProductMaterials((prev) => [
-                                    ...prev,
-                                    {
-                                      id: Math.random(),
-                                      materialId: material.id,
-                                      materialName: material.name,
-                                      materialPurchasePrice: material.purchasePrice,
-                                      materialUnitsInStock: material.unitsInStock,
-                                    },
-                                  ]);
-                                else setProductMaterials((prev) => [...prev.filter((c) => c.materialId !== material.id)]);
-                              }}
-                            />
-                          </FormGroup>
-                        </Col>
-                      ))}
-                  </>
-                ) : (
-                  <MBSpinner />
-                )}
+                  ))}
               </Row>
             </Col>
             <Col md={12} lg={8}>
@@ -289,410 +270,392 @@ export default function index({
               </Row>
             </Col>
           </Row>
-          {partnersLoaded ? (
-            <>
-              <hr />
+          <hr />
+          <Row>
+            <Col md={12} className="text-center mb-2">
+              <h5>Fiyat Hesapla</h5>
+            </Col>
+            <Col md={12} lg={4}>
               <Row>
-                <Col md={12} className="text-center mb-2">
-                  <h5>Fiyat Hesapla</h5>
-                </Col>
-                <Col md={12} lg={4}>
-                  <Row>
-                    <Col xs={8} lg={12} xl={8}>
-                      <Formik
-                        initialValues={{ salePrice: price }}
-                        onSubmit={handleSubmitSalePrice}
-                        enableReinitialize
-                        validationSchema={validationSchema}
-                        validateOnChange={false}
-                        validateOnBlur={false}
-                      >
-                        {({ errors }) => (
-                          <Form id="updateSalePriceForm">
-                            <FormGroup className="mb-3" controlId="infoProductModalPriceInput">
-                              <FormLabel>Satış Fiyatı</FormLabel>
-                              <InputGroup>
-                                <FormControl
-                                  type="number"
-                                  step="any"
-                                  className={errors.salePrice && "is-invalid"}
-                                  placeholder="Fiyat Hesapla"
-                                  name="salePrice"
-                                  value={!isNaN(price) ? price : ""}
-                                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrice(Number.parseFloat(e.target.value))}
-                                />
-                                <InputGroup.Text>₺</InputGroup.Text>
-                                <Button
-                                  type="submit"
-                                  form="updateSalePriceForm"
-                                  variant="warning"
-                                  className="text-white"
-                                  disabled={loading}
-                                >
-                                  <FontAwesomeIcon icon={loading ? faCircleNotch : faSave} className={loading ? "fa-spin" : undefined} />
-                                </Button>
-                                {errors.salePrice && <div className="invalid-feedback">{errors.salePrice}</div>}
-                              </InputGroup>
-                            </FormGroup>
-                          </Form>
-                        )}
-                      </Formik>
-                    </Col>
-                    <Col xs={4} lg={12} xl={4} className="mb-3">
-                      <FormLabel>İndirimler</FormLabel>
-                      <br />
-                      <Button
-                        variant="success"
-                        onClick={() =>
-                          setDiscounts((prev) => [
-                            ...prev,
-                            {
-                              id: Math.random(),
-                              discountAmount: 0,
-                              discountType: discountTypes[0]?.id ?? 0,
-                              name: "",
-                              partnerId: partnersResponse?.items[0]?.id ?? 0,
-                              partnerName: "",
-                              discountLowerLimit: 0,
-                              priority: 0,
-                            },
-                          ])
-                        }
-                      >
-                        <FontAwesomeIcon icon={faPlus} className="me-1" />
-                        Ekle
-                      </Button>
-                    </Col>
-                    {partnersResponse?.items?.map((partner) =>
-                      discounts.filter((discount) => discount.partnerId === partner.id).length > 0 ? (
-                        <div key={partner.id}>
-                          <h5>{partner.name} İndirimleri</h5>
-                          {discounts
-                            .filter((discount) => discount.partnerId === partner.id)
-                            .sort((a, b) => a.priority - b.priority)
-                            .map((discount, index) => (
-                              <Row className="g-1" key={discount.id}>
-                                <hr className="mb-1" />
-                                <div className="d-flex align-items-center justify-content-between">
-                                  <b className="d-inline-block">{index + 1}. İndirim</b>
-                                  <Button
-                                    size="sm"
-                                    variant="danger"
-                                    className="mb-2"
-                                    onClick={() => setDiscounts((prev) => [...prev.filter((c) => c.id !== discount.id)])}
-                                  >
-                                    <FontAwesomeIcon icon={faTrash} />
-                                  </Button>
-                                </div>
-                                <Col xs={12} sm={6} md={6} lg={12} xl={6} xxl={6} className="mb-2">
-                                  <FormSelect
-                                    value={discount.partnerId ?? 0}
-                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                      discount.partnerId = parseInt(e.target.value);
-                                      setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
-                                    }}
-                                    disabled={!partnersLoaded}
-                                  >
-                                    <option value={0} disabled>
-                                      Partner
-                                    </option>
-                                    {partnersResponse?.items
-                                      ?.sort((a, b) => a.name.localeCompare(b.name))
-                                      .map((partner) => (
-                                        <option key={partner.id} value={partner.id}>
-                                          {partner.name}
-                                        </option>
-                                      ))}
-                                  </FormSelect>
-                                </Col>
-                                <Col xs={12} sm={6} md={6} lg={12} xl={6} xxl={6} className="mb-2">
-                                  <FormSelect
-                                    value={discount.discountType ?? 0}
-                                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
-                                      discount.discountType = parseInt(e.target.value);
-                                      setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
-                                    }}
-                                    disabled={!partnersLoaded}
-                                  >
-                                    <option value={0} disabled>
-                                      İndirim Tipi
-                                    </option>
-                                    {discountTypes.map((discountType) => (
-                                      <option key={discountType.id} value={discountType.id}>
-                                        {discountType.name}
-                                      </option>
-                                    ))}
-                                  </FormSelect>
-                                </Col>
-                                <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
-                                  <FormGroup className="mb-3" controlId="infoProductModalPriorityInput">
-                                    <InputGroup>
-                                      <FormControl
-                                        type="number"
-                                        step="any"
-                                        placeholder="Öncelik"
-                                        value={!isNaN(discount.priority) ? discount.priority : ""}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                          discount.priority = parseInt(e.target.value);
-                                          setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
-                                        }}
-                                      />
-                                      <InputGroup.Text>
-                                        <FontAwesomeIcon icon={faSort} />
-                                      </InputGroup.Text>
-                                    </InputGroup>
-                                  </FormGroup>
-                                </Col>
-                                <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
-                                  <FormGroup className="mb-3" controlId="infoProductModalDiscountLowerLimitInput">
-                                    <InputGroup>
-                                      <FormControl
-                                        type="number"
-                                        step="any"
-                                        placeholder="Alt Limiti"
-                                        value={!isNaN(discount.discountLowerLimit) ? discount.discountLowerLimit : ""}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                          discount.discountLowerLimit = parseFloat(e.target.value);
-                                          setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
-                                        }}
-                                      />
-                                      <InputGroup.Text>₺</InputGroup.Text>
-                                    </InputGroup>
-                                  </FormGroup>
-                                </Col>
-                                <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
-                                  <FormGroup className="mb-3" controlId="infoProductModalDiscountInput">
-                                    <InputGroup>
-                                      <FormControl
-                                        type="number"
-                                        step="any"
-                                        placeholder="İndirim"
-                                        value={!isNaN(discount.discountAmount) ? discount.discountAmount : ""}
-                                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                                          discount.discountAmount = parseFloat(e.target.value);
-                                          setDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
-                                        }}
-                                      />
-                                      <InputGroup.Text>{discount.discountType == 1 ? "%" : "₺"}</InputGroup.Text>
-                                    </InputGroup>
-                                  </FormGroup>
-                                </Col>
-                              </Row>
-                            ))}
-                        </div>
-                      ) : null
+                <Col xs={8} lg={12} xl={8}>
+                  <Formik
+                    initialValues={{ salePrice: price }}
+                    onSubmit={handleSubmitSalePrice}
+                    enableReinitialize
+                    validationSchema={validationSchema}
+                    validateOnChange={false}
+                    validateOnBlur={false}
+                  >
+                    {({ errors }) => (
+                      <Form id="updateSalePriceForm">
+                        <FormGroup className="mb-3" controlId="infoProductModalPriceInput">
+                          <FormLabel>Satış Fiyatı</FormLabel>
+                          <InputGroup>
+                            <FormControl
+                              type="number"
+                              step="any"
+                              className={errors.salePrice && "is-invalid"}
+                              placeholder="Fiyat Hesapla"
+                              name="salePrice"
+                              value={!isNaN(price) ? price : ""}
+                              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setPrice(Number.parseFloat(e.target.value))}
+                            />
+                            <InputGroup.Text>₺</InputGroup.Text>
+                            <Button type="submit" form="updateSalePriceForm" variant="warning" className="text-white" disabled={loading}>
+                              <FontAwesomeIcon icon={loading ? faCircleNotch : faSave} className={loading ? "fa-spin" : undefined} />
+                            </Button>
+                            {errors.salePrice && <div className="invalid-feedback">{errors.salePrice}</div>}
+                          </InputGroup>
+                        </FormGroup>
+                      </Form>
                     )}
-                  </Row>
+                  </Formik>
                 </Col>
-                <Col md={12} lg={8}>
-                  <Row>
-                    <Col md={12}>
-                      <Table striped hover responsive border={1}>
-                        <thead>
-                          <tr>
-                            <th></th>
-                            {partnersResponse?.items?.map((partner) => (
-                              <th key={partner.id}>{partner.name}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <th>Satış Fiyatı</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(partnerPrice.salePrice).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(partnerPrice.salePrice) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
+                <Col xs={4} lg={12} xl={4} className="mb-3">
+                  <FormLabel>İndirimler</FormLabel>
+                  <br />
+                  <Button
+                    variant="success"
+                    onClick={() =>
+                      setCurrentDiscounts((prev) => [
+                        ...prev,
+                        {
+                          id: Math.random(),
+                          discountAmount: 0,
+                          discountType: discountTypes[0]?.id ?? 0,
+                          name: "",
+                          partnerId: partners[0]?.id ?? 0,
+                          partnerName: "",
+                          discountLowerLimit: 0,
+                          priority: 0,
+                        },
+                      ])
+                    }
+                  >
+                    <FontAwesomeIcon icon={faPlus} className="me-1" />
+                    Ekle
+                  </Button>
+                </Col>
+                {partners.map((partner) =>
+                  currentDiscounts.filter((discount) => discount.partnerId === partner.id).length > 0 ? (
+                    <div key={partner.id}>
+                      <h5>{partner.name} İndirimleri</h5>
+                      {currentDiscounts
+                        .filter((discount) => discount.partnerId === partner.id)
+                        .sort((a, b) => a.priority - b.priority)
+                        .map((discount, index) => (
+                          <Row className="g-1" key={discount.id}>
+                            <hr className="mb-1" />
+                            <div className="d-flex align-items-center justify-content-between">
+                              <b className="d-inline-block">{index + 1}. İndirim</b>
+                              <Button
+                                size="sm"
+                                variant="danger"
+                                className="mb-2"
+                                onClick={() => setCurrentDiscounts((prev) => [...prev.filter((c) => c.id !== discount.id)])}
                               >
-                                {formatCurrency(partnerPrice.salePrice)}
-                              </td>
-                            ))}
-                          </tr>
-                          {discounts.length > 0 && (
-                            <tr>
-                              <th>Toplam İndirim</th>
-                              {partnerPrices.map((partnerPrice, index) => (
-                                <td
-                                  key={partnerPrice.partnerId}
-                                  className={
-                                    formatCurrency(partnerPrice.partnerDiscounts[index]).startsWith("-")
-                                      ? "text-danger"
-                                      : formatCurrency(partnerPrice.partnerDiscounts[index]) === "₺0,00"
-                                      ? ""
-                                      : "text-success"
-                                  }
-                                >
-                                  {formatCurrency(partnerPrice.partnerDiscounts[index])}
-                                </td>
-                              ))}
-                            </tr>
-                          )}
-                          {discounts.length > 0 && (
-                            <tr>
-                              <th>İndirimli Satış Fiyatı</th>
-                              {partnerPrices.map((partnerPrice) => (
-                                <td
-                                  key={partnerPrice.partnerId}
-                                  className={
-                                    formatCurrency(partnerPrice.discountedPrice).startsWith("-")
-                                      ? "text-danger"
-                                      : formatCurrency(partnerPrice.discountedPrice) === "₺0,00"
-                                      ? ""
-                                      : "text-success"
-                                  }
-                                >
-                                  {formatCurrency(partnerPrice.discountedPrice)}
-                                </td>
-                              ))}
-                            </tr>
-                          )}
-                          <tr>
-                            <th>Alış Fiyatı</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(
+                                <FontAwesomeIcon icon={faTrash} />
+                              </Button>
+                            </div>
+                            <Col xs={12} sm={6} md={6} lg={12} xl={6} xxl={6} className="mb-2">
+                              <FormSelect
+                                value={discount.partnerId ?? 0}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                  discount.partnerId = parseInt(e.target.value);
+                                  setCurrentDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                }}
+                              >
+                                <option value={0} disabled>
+                                  Partner
+                                </option>
+                                {partners
+                                  .sort((a, b) => a.name.localeCompare(b.name))
+                                  .map((partner) => (
+                                    <option key={partner.id} value={partner.id}>
+                                      {partner.name}
+                                    </option>
+                                  ))}
+                              </FormSelect>
+                            </Col>
+                            <Col xs={12} sm={6} md={6} lg={12} xl={6} xxl={6} className="mb-2">
+                              <FormSelect
+                                value={discount.discountType ?? 0}
+                                onChange={(e: React.ChangeEvent<HTMLSelectElement>) => {
+                                  discount.discountType = parseInt(e.target.value);
+                                  setCurrentDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                }}
+                              >
+                                <option value={0} disabled>
+                                  İndirim Tipi
+                                </option>
+                                {discountTypes.map((discountType) => (
+                                  <option key={discountType.id} value={discountType.id}>
+                                    {discountType.name}
+                                  </option>
+                                ))}
+                              </FormSelect>
+                            </Col>
+                            <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
+                              <FormGroup className="mb-3" controlId="infoProductModalPriorityInput">
+                                <InputGroup>
+                                  <FormControl
+                                    type="number"
+                                    step="any"
+                                    placeholder="Öncelik"
+                                    value={!isNaN(discount.priority) ? discount.priority : ""}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                      discount.priority = parseInt(e.target.value);
+                                      setCurrentDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                    }}
+                                  />
+                                  <InputGroup.Text>
+                                    <FontAwesomeIcon icon={faSort} />
+                                  </InputGroup.Text>
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                            <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
+                              <FormGroup className="mb-3" controlId="infoProductModalDiscountLowerLimitInput">
+                                <InputGroup>
+                                  <FormControl
+                                    type="number"
+                                    step="any"
+                                    placeholder="Alt Limiti"
+                                    value={!isNaN(discount.discountLowerLimit) ? discount.discountLowerLimit : ""}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                      discount.discountLowerLimit = parseFloat(e.target.value);
+                                      setCurrentDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                    }}
+                                  />
+                                  <InputGroup.Text>₺</InputGroup.Text>
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                            <Col xs={12} sm={4} md={4} lg={12} xl={4} xxl={4}>
+                              <FormGroup className="mb-3" controlId="infoProductModalDiscountInput">
+                                <InputGroup>
+                                  <FormControl
+                                    type="number"
+                                    step="any"
+                                    placeholder="İndirim"
+                                    value={!isNaN(discount.discountAmount) ? discount.discountAmount : ""}
+                                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                                      discount.discountAmount = parseFloat(e.target.value);
+                                      setCurrentDiscounts((prev) => [...prev.map((c) => ({ ...c }))]);
+                                    }}
+                                  />
+                                  <InputGroup.Text>{discount.discountType == 1 ? "%" : "₺"}</InputGroup.Text>
+                                </InputGroup>
+                              </FormGroup>
+                            </Col>
+                          </Row>
+                        ))}
+                    </div>
+                  ) : null
+                )}
+              </Row>
+            </Col>
+            <Col md={12} lg={8}>
+              <Row>
+                <Col md={12}>
+                  <Table striped hover responsive border={1}>
+                    <thead>
+                      <tr>
+                        <th></th>
+                        {partners.map((partner) => (
+                          <th key={partner.id}>{partner.name}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <th>Satış Fiyatı</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(partnerPrice.salePrice).startsWith("-")
+                                ? "text-danger"
+                                : formatCurrency(partnerPrice.salePrice) === "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(partnerPrice.salePrice)}
+                          </td>
+                        ))}
+                      </tr>
+                      {currentDiscounts.length > 0 && (
+                        <tr>
+                          <th>Toplam İndirim</th>
+                          {partnerPrices.map((partnerPrice, index) => (
+                            <td
+                              key={partnerPrice.partnerId}
+                              className={
+                                formatCurrency(partnerPrice.partnerDiscounts[index]).startsWith("-")
+                                  ? "text-danger"
+                                  : formatCurrency(partnerPrice.partnerDiscounts[index]) === "₺0,00"
+                                  ? ""
+                                  : "text-success"
+                              }
+                            >
+                              {formatCurrency(partnerPrice.partnerDiscounts[index])}
+                            </td>
+                          ))}
+                        </tr>
+                      )}
+                      {currentDiscounts.length > 0 && (
+                        <tr>
+                          <th>İndirimli Satış Fiyatı</th>
+                          {partnerPrices.map((partnerPrice) => (
+                            <td
+                              key={partnerPrice.partnerId}
+                              className={
+                                formatCurrency(partnerPrice.discountedPrice).startsWith("-")
+                                  ? "text-danger"
+                                  : formatCurrency(partnerPrice.discountedPrice) === "₺0,00"
+                                  ? ""
+                                  : "text-success"
+                              }
+                            >
+                              {formatCurrency(partnerPrice.discountedPrice)}
+                            </td>
+                          ))}
+                        </tr>
+                      )}
+                      <tr>
+                        <th>Alış Fiyatı</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(
+                                partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
+                              ).startsWith("-")
+                                ? "text-danger"
+                                : formatCurrency(
                                     partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
-                                  ).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(
-                                        partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
-                                      ) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(
-                                  partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice
-                                )}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <th>Komisyon Tutarı</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(
+                                  ) === "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(partnerPrice.purchasePrice !== 0 ? -partnerPrice.purchasePrice : partnerPrice.purchasePrice)}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th>Komisyon Tutarı</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(
+                                partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
+                              ).startsWith("-")
+                                ? "text-danger"
+                                : formatCurrency(
                                     partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
-                                  ).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(
-                                        partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
-                                      ) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(
-                                  partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
-                                )}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <th>Hizmet Bedeli</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(
-                                    partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee
-                                  ).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee) ===
-                                      "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee)}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <th>Kargo Ücreti</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(
+                                  ) === "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(
+                              partnerPrice.commissionAmount !== 0 ? -partnerPrice.commissionAmount : partnerPrice.commissionAmount
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th>Hizmet Bedeli</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee).startsWith(
+                                "-"
+                              )
+                                ? "text-danger"
+                                : formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee) ===
+                                  "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(partnerPrice.serviceFee !== 0 ? -partnerPrice.serviceFee : partnerPrice.serviceFee)}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th>Kargo Ücreti</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(
+                                partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost
+                              ).startsWith("-")
+                                ? "text-danger"
+                                : formatCurrency(
                                     partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost
-                                  ).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(
-                                        partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost
-                                      ) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost)}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <th>Ek Giderler</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(
+                                  ) === "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(partnerPrice.shippingCost !== 0 ? -partnerPrice.shippingCost : partnerPrice.shippingCost)}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th>Ek Giderler</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(
+                                partnerPrice.additionalExpenses !== 0 ? -partnerPrice.additionalExpenses : partnerPrice.additionalExpenses
+                              ).startsWith("-")
+                                ? "text-danger"
+                                : formatCurrency(
                                     partnerPrice.additionalExpenses !== 0
                                       ? -partnerPrice.additionalExpenses
                                       : partnerPrice.additionalExpenses
-                                  ).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(
-                                        partnerPrice.additionalExpenses !== 0
-                                          ? -partnerPrice.additionalExpenses
-                                          : partnerPrice.additionalExpenses
-                                      ) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(
-                                  partnerPrice.additionalExpenses !== 0 ? -partnerPrice.additionalExpenses : partnerPrice.additionalExpenses
-                                )}
-                              </td>
-                            ))}
-                          </tr>
-                          <tr>
-                            <th>Tahminî Kâr</th>
-                            {partnerPrices.map((partnerPrice) => (
-                              <td
-                                key={partnerPrice.partnerId}
-                                className={
-                                  formatCurrency(partnerPrice.estimatedEarnings).startsWith("-")
-                                    ? "text-danger"
-                                    : formatCurrency(partnerPrice.estimatedEarnings) === "₺0,00"
-                                    ? ""
-                                    : "text-success"
-                                }
-                              >
-                                {formatCurrency(partnerPrice.estimatedEarnings)}
-                              </td>
-                            ))}
-                          </tr>
-                        </tbody>
-                      </Table>
-                    </Col>
-                  </Row>
+                                  ) === "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(
+                              partnerPrice.additionalExpenses !== 0 ? -partnerPrice.additionalExpenses : partnerPrice.additionalExpenses
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                      <tr>
+                        <th>Tahminî Kâr</th>
+                        {partnerPrices.map((partnerPrice) => (
+                          <td
+                            key={partnerPrice.partnerId}
+                            className={
+                              formatCurrency(partnerPrice.estimatedEarnings).startsWith("-")
+                                ? "text-danger"
+                                : formatCurrency(partnerPrice.estimatedEarnings) === "₺0,00"
+                                ? ""
+                                : "text-success"
+                            }
+                          >
+                            {formatCurrency(partnerPrice.estimatedEarnings)}
+                          </td>
+                        ))}
+                      </tr>
+                    </tbody>
+                  </Table>
                 </Col>
               </Row>
-            </>
-          ) : (
-            <MBSpinner />
-          )}
+            </Col>
+          </Row>
         </Container>
       </MBModal>
     </>
@@ -701,12 +664,6 @@ export default function index({
 
 interface Props {
   product: GetByIdProductResponse;
-  partnersResponse: GetListResponse<GetListPartnerListItemDto>;
-  partnersLoaded: boolean;
-  materialsResponse: GetListResponse<GetListMaterialListItemDto>;
-  materialsLoaded: boolean;
-  discountsResponse: GetListResponse<GetListDiscountListItemDto>;
-  discountsLoaded: boolean;
 }
 
 interface PriceItemDto {

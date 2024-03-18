@@ -8,14 +8,15 @@ import * as Yup from "yup";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
 import { ValidationInvalid, ValidationMinLength, ValidationRequired } from "../../../../constants/validationMessages";
 import { handleChangeInput, handleChangeSelect } from "../../../../functions";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import discounts from "../../../../http/discounts";
 import UpdateDiscountCommand from "../../../../http/discounts/models/commands/update/updateDiscountCommand";
-import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
 import { DiscountType } from "../../../../jsons/models/DiscountType";
-import GetListResponse from "../../../../models/getListResponse";
 
-export default function index({ discount, fetchDiscounts, partnersLoaded, partnersResponse }: Props) {
+export default function index({ discount, fetchDiscounts, fetchAllDiscounts }: Props) {
   const discountTypes: DiscountType[] = require("../../../../jsons/discountTypes.json");
+
+  const { partners } = useAppSelector((state) => state.appItems);
 
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<UpdateDiscountCommand>({ ...discount });
@@ -59,6 +60,7 @@ export default function index({ discount, fetchDiscounts, partnersLoaded, partne
         fetchDiscounts();
       })
       .catch((errorResponse) => {})
+      .then(fetchAllDiscounts)
       .finally(() => setLoading(false));
   };
 
@@ -124,13 +126,12 @@ export default function index({ discount, fetchDiscounts, partnersLoaded, partne
                         name="partnerId"
                         value={formValues.partnerId ?? 0}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
-                        disabled={!partnersLoaded}
                       >
                         <option value={0} disabled>
                           Seçiniz
                         </option>
-                        {partnersResponse?.items
-                          ?.sort((a, b) => a.name.localeCompare(b.name))
+                        {partners
+                          .sort((a, b) => a.name.localeCompare(b.name))
                           .map((partner) => (
                             <option key={partner.id} value={partner.id}>
                               {partner.name}
@@ -163,7 +164,6 @@ export default function index({ discount, fetchDiscounts, partnersLoaded, partne
                         name="discountType"
                         value={formValues.discountType ?? 0}
                         onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
-                        disabled={!partnersLoaded}
                       >
                         <option value={0} disabled>
                           Seçiniz
@@ -229,7 +229,6 @@ const formId = "updateDiscountForm";
 
 interface Props {
   fetchDiscounts: () => void;
-  partnersResponse: GetListResponse<GetListPartnerListItemDto>;
-  partnersLoaded: boolean;
   discount: UpdateDiscountCommand;
+  fetchAllDiscounts: () => void;
 }

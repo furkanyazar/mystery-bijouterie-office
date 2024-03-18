@@ -2,14 +2,14 @@ import { faCircleCheck, faInfoCircle } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import { Button, Col, Container, FormControl, FormGroup, FormLabel, Row } from "react-bootstrap";
-import MBSpinner from "../../../../components/MBSpinner";
 import MBModal, { ButtonProps } from "../../../../components/Modals/MBModal";
+import { useAppSelector } from "../../../../hooks/useAppSelector";
 import GetByIdCategoryResponse from "../../../../http/categories/models/queries/getById/getByIdCategoryResponse";
-import GetListPartnerListItemDto from "../../../../http/partners/models/queries/getList/getListPartnerListItemDto";
-import GetListResponse from "../../../../models/getListResponse";
 
-export default function index({ category, partners, partnersLoaded }: Props) {
+export default function index({ category }: Props) {
   const [show, setShow] = useState<boolean>(false);
+
+  const { partners } = useAppSelector((state) => state.appItems);
 
   const handleShow = () => setShow(true);
 
@@ -48,22 +48,18 @@ export default function index({ category, partners, partnersLoaded }: Props) {
                 <FormControl placeholder="Ad" value={category.name} readOnly />
               </FormGroup>
             </Col>
-            {partnersLoaded ? (
-              partners?.items?.map((partner) => (
-                <Col key={partner.id} md={6}>
-                  <FormGroup className="mb-3" controlId={"infoCategoryModalPartnerInput-" + partner.id}>
-                    <FormLabel>{partner.name} Komisyon O.</FormLabel>
-                    <FormControl
-                      placeholder={partner.name + " Komisyon O."}
-                      value={category.categoryPartners?.find((cp) => cp.partnerId === partner.id)?.commissionRate ?? ""}
-                      readOnly
-                    />
-                  </FormGroup>
-                </Col>
-              ))
-            ) : (
-              <MBSpinner />
-            )}
+            {partners.map((partner) => (
+              <Col key={partner.id} md={6}>
+                <FormGroup className="mb-3" controlId={"infoCategoryModalPartnerInput-" + partner.id}>
+                  <FormLabel>{partner.name} Komisyon O.</FormLabel>
+                  <FormControl
+                    placeholder={partner.name + " Komisyon O."}
+                    value={category.categoryPartners?.find((cp) => cp.partnerId === partner.id)?.commissionRate ?? ""}
+                    readOnly
+                  />
+                </FormGroup>
+              </Col>
+            ))}
           </Row>
         </Container>
       </MBModal>
@@ -73,6 +69,4 @@ export default function index({ category, partners, partnersLoaded }: Props) {
 
 interface Props {
   category: GetByIdCategoryResponse;
-  partners: GetListResponse<GetListPartnerListItemDto>;
-  partnersLoaded: boolean;
 }

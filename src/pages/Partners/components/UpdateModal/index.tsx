@@ -11,7 +11,7 @@ import { handleChangeCheck, handleChangeInput } from "../../../../functions";
 import partners from "../../../../http/partners";
 import UpdatePartnerCommand from "../../../../http/partners/models/commands/update/updatePartnerCommand";
 
-export default function index({ fetchPartners, partner }: Props) {
+export default function index({ fetchPartners, partner, fetchAllPartners }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<UpdatePartnerCommand>({ ...partner });
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,6 +55,7 @@ export default function index({ fetchPartners, partner }: Props) {
         fetchPartners();
       })
       .catch((errorResponse) => {})
+      .then(fetchAllPartners)
       .finally(() => setLoading(false));
   };
 
@@ -348,4 +349,5 @@ const formId = "updatePartnerForm";
 interface Props {
   partner: UpdatePartnerCommand;
   fetchPartners: () => void;
+  fetchAllPartners: () => void;
 }

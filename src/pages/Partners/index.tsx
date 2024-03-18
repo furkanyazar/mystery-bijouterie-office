@@ -27,7 +27,7 @@ import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
 
-export default function index() {
+export default function index({ fetchAllPartners }: Props) {
   const dispatch = useAppDispatch();
 
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
@@ -67,10 +67,7 @@ export default function index() {
 
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
 
-  const handleClear = () => {
-    setSearchValues({ ...defaultSearchValues });
-    handleSubmit();
-  };
+  const handleClear = () => setSearchValues({ ...defaultSearchValues });
 
   const handleClickRemove = (id: number, name: string) => {
     const cancelButtonKey = "cancel";
@@ -112,7 +109,7 @@ export default function index() {
                   dispatch(setButtonNotDisabled(cancelButtonKey));
                   dispatch(setButtonNotLoading(okButtonKey));
                 })
-                .finally(() => {});
+                .then(fetchAllPartners);
             },
             variant: "danger",
             disabled: false,
@@ -137,7 +134,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddModal fetchPartners={handleSubmit} disabled={!partnersLoaded} />
+            <AddModal fetchPartners={handleSubmit} disabled={!partnersLoaded} fetchAllPartners={fetchAllPartners} />
           </Col>
         </Row>
         <hr />
@@ -170,13 +167,7 @@ export default function index() {
               <thead>
                 <tr>
                   <MBTHeadItem responsive searchValues={searchValues} setSearchValues={setSearchValues} title="#" value="id" />
-                  <MBTHeadItem
-                    responsive
-                    searchValues={searchValues}
-                    setSearchValues={setSearchValues}
-                    title="Ad"
-                    value="name"
-                  />
+                  <MBTHeadItem responsive searchValues={searchValues} setSearchValues={setSearchValues} title="Ad" value="name" />
                   <th className="responsive-thead-item"></th>
                 </tr>
               </thead>
@@ -187,7 +178,7 @@ export default function index() {
                     <td>{partner.name}</td>
                     <td className="text-end">
                       <InfoModal partner={partner} />
-                      <UpdateModal fetchPartners={handleSubmit} partner={partner} />
+                      <UpdateModal fetchPartners={handleSubmit} partner={partner} fetchAllPartners={fetchAllPartners} />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(partner.id, partner.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
@@ -211,3 +202,7 @@ export default function index() {
 const defaultSearchValues = { name: "", orderBy: "id", descending: false };
 
 const defaultPageRequest = { pageIndex: 0, pageSize: 50 };
+
+interface Props {
+  fetchAllPartners: () => void;
+}

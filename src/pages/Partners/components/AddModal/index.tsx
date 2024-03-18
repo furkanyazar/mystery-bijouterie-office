@@ -11,7 +11,7 @@ import { handleChangeCheck, handleChangeInput } from "../../../../functions";
 import partners from "../../../../http/partners";
 import CreatePartnerCommand from "../../../../http/partners/models/commands/create/createPartnerCommand";
 
-export default function index({ fetchPartners, disabled }: Props) {
+export default function index({ fetchPartners, disabled, fetchAllPartners }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<CreatePartnerCommand>({ ...defaultFormValues });
   const [loading, setLoading] = useState<boolean>(false);
@@ -54,6 +54,7 @@ export default function index({ fetchPartners, disabled }: Props) {
         fetchPartners();
       })
       .catch((errorResponse) => {})
+      .then(fetchAllPartners)
       .finally(() => setLoading(false));
   };
 
@@ -368,4 +369,5 @@ const formId = "addPartnerForm";
 interface Props {
   fetchPartners: () => void;
   disabled: boolean;
+  fetchAllPartners: () => void;
 }

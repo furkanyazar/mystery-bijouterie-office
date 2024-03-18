@@ -11,7 +11,7 @@ import { handleChangeInput } from "../../../../functions";
 import materials from "../../../../http/materials";
 import UpdateMaterialCommand from "../../../../http/materials/models/commands/update/updateMaterialCommand";
 
-export default function index({ fetchMaterials, material }: Props) {
+export default function index({ fetchMaterials, material, fetchAllMaterials }: Props) {
   const [show, setShow] = useState<boolean>(false);
   const [formValues, setFormValues] = useState<UpdateMaterialCommand>({ ...material });
   const [loading, setLoading] = useState<boolean>(false);
@@ -55,6 +55,7 @@ export default function index({ fetchMaterials, material }: Props) {
         fetchMaterials();
       })
       .catch((errorResponse) => {})
+      .then(fetchAllMaterials)
       .finally(() => setLoading(false));
   };
 
@@ -159,4 +160,5 @@ const formId = "updateMaterialForm";
 interface Props {
   material: UpdateMaterialCommand;
   fetchMaterials: () => void;
+  fetchAllMaterials: () => void;
 }

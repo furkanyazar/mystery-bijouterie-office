@@ -27,7 +27,7 @@ import AddModal from "./components/AddModal";
 import InfoModal from "./components/InfoModal";
 import UpdateModal from "./components/UpdateModal";
 
-export default function index() {
+export default function index({ fetchAllMaterials }: Props) {
   const dispatch = useAppDispatch();
 
   const [searchValues, setSearchValues] = useState({ ...defaultSearchValues });
@@ -67,10 +67,7 @@ export default function index() {
 
   const handleSubmit = () => setPageRequest({ ...defaultPageRequest, pageSize: pageRequest.pageSize });
 
-  const handleClear = () => {
-    setSearchValues({ ...defaultSearchValues });
-    handleSubmit();
-  };
+  const handleClear = () => setSearchValues({ ...defaultSearchValues });
 
   const handleClickRemove = (id: number, name: string) => {
     const cancelButtonKey = "cancel";
@@ -112,7 +109,7 @@ export default function index() {
                   dispatch(setButtonNotDisabled(cancelButtonKey));
                   dispatch(setButtonNotLoading(okButtonKey));
                 })
-                .finally(() => {});
+                .then(fetchAllMaterials);
             },
             variant: "danger",
             disabled: false,
@@ -137,7 +134,7 @@ export default function index() {
             <h3 className="text-inline">{pageTitle}</h3>
           </Col>
           <Col className="col-6 text-end">
-            <AddModal fetchMaterials={handleSubmit} disabled={!materialsLoaded} />
+            <AddModal fetchMaterials={handleSubmit} disabled={!materialsLoaded} fetchAllMaterials={fetchAllMaterials} />
           </Col>
         </Row>
         <hr />
@@ -197,7 +194,7 @@ export default function index() {
                     <td>{material.unitsInStock}</td>
                     <td className="text-end">
                       <InfoModal material={material} />
-                      <UpdateModal fetchMaterials={handleSubmit} material={material} />
+                      <UpdateModal fetchMaterials={handleSubmit} material={material} fetchAllMaterials={fetchAllMaterials} />
                       <Button className="btn-sm ms-1" variant="danger" onClick={() => handleClickRemove(material.id, material.name)}>
                         <FontAwesomeIcon icon={faTrash} />
                       </Button>
@@ -221,3 +218,7 @@ export default function index() {
 const defaultSearchValues = { name: "", orderBy: "id", descending: false };
 
 const defaultPageRequest = { pageIndex: 0, pageSize: 50 };
+
+interface Props {
+  fetchAllMaterials: () => void;
+}
