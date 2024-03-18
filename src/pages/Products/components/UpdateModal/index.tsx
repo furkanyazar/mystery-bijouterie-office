@@ -173,7 +173,7 @@ export default function index({ fetchProducts, product, imageUrl }: Props) {
                       <Col md={12} className="text-center mb-3">
                         <h6>Materyaller</h6>
                       </Col>
-                      {materials
+                      {[...materials]
                         .sort((a, b) => a.name.localeCompare(b.name))
                         .map((material) => (
                           <Col className="col-auto mb-1" key={material.id}>
@@ -268,7 +268,7 @@ export default function index({ fetchProducts, product, imageUrl }: Props) {
                             onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setFormValues)}
                           >
                             <option value={0}>Seçiniz</option>
-                            {categories
+                            {[...categories]
                               .sort((a, b) => a.name.localeCompare(b.name))
                               .map((category) => (
                                 <option key={category.id} value={category.id}>

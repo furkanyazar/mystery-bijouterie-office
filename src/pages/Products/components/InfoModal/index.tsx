@@ -21,7 +21,7 @@ import { DiscountType } from "../../../../jsons/models/DiscountType";
 export default function index({ product }: Props) {
   const discountTypes: DiscountType[] = require("../../../../jsons/discountTypes.json");
 
-  const { categories, discounts, materials, partners } = useAppSelector((state) => state.appItems);
+  const { discounts, materials, partners } = useAppSelector((state) => state.appItems);
 
   const [show, setShow] = useState<boolean>(false);
   const [price, setPrice] = useState<number>(product.salePrice);
@@ -163,7 +163,7 @@ export default function index({ product }: Props) {
                 <Col md={12} className="text-center mb-3">
                   <h6>Materyaller</h6>
                 </Col>
-                {materials
+                {[...materials]
                   .sort((a, b) => a.name.localeCompare(b.name))
                   .map((material) => (
                     <Col className="col-auto mb-1" key={material.id}>
@@ -336,7 +336,7 @@ export default function index({ product }: Props) {
                     Ekle
                   </Button>
                 </Col>
-                {partners.map((partner) =>
+                {[...partners].map((partner) =>
                   currentDiscounts.filter((discount) => discount.partnerId === partner.id).length > 0 ? (
                     <div key={partner.id}>
                       <h5>{partner.name} İndirimleri</h5>
@@ -368,7 +368,7 @@ export default function index({ product }: Props) {
                                 <option value={0} disabled>
                                   Partner
                                 </option>
-                                {partners
+                                {[...partners]
                                   .sort((a, b) => a.name.localeCompare(b.name))
                                   .map((partner) => (
                                     <option key={partner.id} value={partner.id}>
@@ -462,7 +462,7 @@ export default function index({ product }: Props) {
                     <thead>
                       <tr>
                         <th></th>
-                        {partners.map((partner) => (
+                        {[...partners].map((partner) => (
                           <th key={partner.id}>{partner.name}</th>
                         ))}
                       </tr>

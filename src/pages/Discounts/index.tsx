@@ -168,7 +168,7 @@ export default function index({ fetchAllDiscounts }: Props) {
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
                 >
                   <option value={0}>Partner</option>
-                  {partners
+                  {[...partners]
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .map((partner) => (
                       <option key={partner.id} value={partner.id}>

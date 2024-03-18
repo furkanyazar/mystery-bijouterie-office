@@ -48,7 +48,7 @@ export default function index({ category }: Props) {
                 <FormControl placeholder="Ad" value={category.name} readOnly />
               </FormGroup>
             </Col>
-            {partners.map((partner) => (
+            {[...partners].map((partner) => (
               <Col key={partner.id} md={6}>
                 <FormGroup className="mb-3" controlId={"infoCategoryModalPartnerInput-" + partner.id}>
                   <FormLabel>{partner.name} Komisyon O.</FormLabel>

@@ -130,7 +130,7 @@ export default function index({ discount, fetchDiscounts, fetchAllDiscounts }: P
                         <option value={0} disabled>
                           Seçiniz
                         </option>
-                        {partners
+                        {[...partners]
                           .sort((a, b) => a.name.localeCompare(b.name))
                           .map((partner) => (
                             <option key={partner.id} value={partner.id}>

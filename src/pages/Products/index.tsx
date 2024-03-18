@@ -239,7 +239,7 @@ export default function index() {
                   onChange={(e: React.ChangeEvent<HTMLSelectElement>) => handleChangeSelect(e, setSearchValues)}
                 >
                   <option value={0}>Kategori</option>
-                  {categories
+                  {[...categories]
                     .sort((a, b) => a.name.localeCompare(b.name))
                     .map((category) => (
                       <option key={category.id} value={category.id}>
