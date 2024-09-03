@@ -224,7 +224,7 @@ export default function index({ product }: Props) {
                   <FormGroup className="mb-3" controlId="infoProductModalBarcodeNumberInput">
                     <FormLabel>Barkod No.</FormLabel>
                     <InputGroup>
-                      <FormControl placeholder="MB-0000000001" value={product.barcodeNumber} readOnly />
+                      <FormControl placeholder="Barkod No." value={product.barcodeNumber} readOnly />
                       <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.barcodeNumber}>
                         <FontAwesomeIcon icon={faCopy} />
                       </Button>
@@ -235,7 +235,7 @@ export default function index({ product }: Props) {
                   <FormGroup className="mb-3" controlId="infoProductModalModelNumberInput">
                     <FormLabel>Model No.</FormLabel>
                     <InputGroup>
-                      <FormControl placeholder="MB-00001" value={product.modelNumber} readOnly />
+                      <FormControl placeholder="Model No." value={product.modelNumber} readOnly />
                       <Button variant="secondary" className="btn-clipboard" data-clipboard-text={product.modelNumber}>
                         <FontAwesomeIcon icon={faCopy} />
                       </Button>

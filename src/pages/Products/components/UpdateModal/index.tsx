@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Form, Formik } from "formik";
 import { useEffect, useState } from "react";
 import { Button, Col, Container, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, InputGroup, Row } from "react-bootstrap";
-import ReactInputMask from "react-input-mask";
 import ModalImage from "react-modal-image";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
@@ -116,12 +115,8 @@ export default function index({ fetchProducts, product, imageUrl }: Props) {
   const validationSchema = Yup.object({
     categoryId: Yup.number().notRequired().min(1, ValidationInvalid),
     name: Yup.string().required(ValidationRequired).min(2, ValidationMinLength),
-    barcodeNumber: Yup.string()
-      .required(ValidationRequired)
-      .matches(/^MB-\d{10}$/, ValidationInvalid),
-    modelNumber: Yup.string()
-      .required(ValidationRequired)
-      .matches(/^MB-\d{5}$/, ValidationInvalid),
+    barcodeNumber: Yup.string().required(ValidationRequired),
+    modelNumber: Yup.string().required(ValidationRequired),
     purchasePrice: Yup.number().required(ValidationRequired),
     unitsInStock: Yup.number().required(ValidationRequired),
   });
@@ -231,11 +226,9 @@ export default function index({ fetchProducts, product, imageUrl }: Props) {
                       <Col md={4}>
                         <FormGroup className="mb-3" controlId="updateProductModalBarcodeNumberInput">
                           <FormLabel>Barkod No.</FormLabel>
-                          <ReactInputMask
-                            id="updateProductModalBarcodeNumberInput"
+                          <FormControl
                             className={errors.barcodeNumber ? "form-control is-invalid" : "form-control"}
-                            mask={"MB-0000000999"}
-                            placeholder="MB-0000000001"
+                            placeholder="Barkod No."
                             name="barcodeNumber"
                             value={formValues.barcodeNumber}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
@@ -246,11 +239,9 @@ export default function index({ fetchProducts, product, imageUrl }: Props) {
                       <Col md={4}>
                         <FormGroup className="mb-3" controlId="updateProductModalModelNumberInput">
                           <FormLabel>Model No.</FormLabel>
-                          <ReactInputMask
-                            id="updateProductModalModelNumberInput"
+                          <FormControl
                             className={errors.modelNumber ? "form-control is-invalid" : "form-control"}
-                            mask={"MB-00999"}
-                            placeholder="MB-00001"
+                            placeholder="Model No."
                             name="modelNumber"
                             value={formValues.modelNumber}
                             onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChangeInput(e, setFormValues)}
